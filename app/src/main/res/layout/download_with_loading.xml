@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="10dp"
+    android:gravity="center">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="270dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/less_round_edge_ractengle_white"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/popup_download_animation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:lottie_rawRes="@raw/progress_bar_gradient"
+            android:layout_marginBottom="0dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/popup_download_appname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"
+                android:text="Download app name"
+                android:textColor="@color/light_black"
+                android:textSize="25dp"
+                android:layout_gravity="top"/>
+
+            <TextView
+                android:id="@+id/popup_download_appsize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"
+                android:text="App size: 0 MB"
+                android:layout_gravity="start"
+                android:textColor="@color/dark_grey"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="35dp">
+
+                <TextView
+                    android:id="@+id/popup_download_percent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="0%"
+                    android:textColor="@color/dark_grey"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginStart="30dp"/>
+
+                <TextView
+                    android:layout_marginEnd="30dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="100%"
+                    android:textColor="@color/dark_grey"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp">
+
+                <TextView
+                    android:id="@+id/popup_download_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                    android:text="Cancel"
+                    android:layout_marginStart="10dp"
+                    android:textColor="@color/dark_grey"
+                    android:layout_marginEnd="28dp"
+                    android:padding="20dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/light_black"
+                    android:text="|"
+                    android:textSize="25dp"/>
+
+                <Button
+                    android:id="@+id/popup_download_open"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="OPEN"
+                    android:layout_marginStart="25dp"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

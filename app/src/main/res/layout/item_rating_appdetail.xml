@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_marginStart="@dimen/_12sdp"
+        android:layout_marginEnd="@dimen/_12sdp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/review_user_img1"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_width="@dimen/_48sdp"
+                android:layout_height="@dimen/_48sdp"
+                android:src="@drawable/ic_user_icon"/>
+
+            <TextView
+                android:id="@+id/review_username1"
+                android:textColor="@color/dark_grey"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/_14sdp"
+                android:textStyle="bold"
+                android:text="username"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_1sdp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/review_star_fill11"
+                    android:layout_width="@dimen/_12sdp"
+                    android:layout_height="@dimen/_12sdp"
+                    android:src="@drawable/ic_baseline_star"/>
+                <ImageView
+                    android:id="@+id/review_star_fill21"
+                    android:layout_width="@dimen/_12sdp"
+                    android:layout_height="@dimen/_12sdp"
+                    android:src="@drawable/ic_baseline_star"/>
+                <ImageView
+                    android:id="@+id/review_star_fill31"
+                    android:layout_width="@dimen/_12sdp"
+                    android:layout_height="@dimen/_12sdp"
+                    android:src="@drawable/ic_baseline_star"/>
+                <ImageView
+                    android:id="@+id/review_star_fill41"
+                    android:layout_width="@dimen/_12sdp"
+                    android:layout_height="@dimen/_12sdp"
+                    android:src="@drawable/ic_baseline_star"/>
+                <ImageView
+                    android:id="@+id/review_star_fill51"
+                    android:layout_width="@dimen/_12sdp"
+                    android:layout_height="@dimen/_12sdp"
+                    android:src="@drawable/ic_baseline_star"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/review_date1"
+                android:textColor="@color/dark_grey"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="08-12-2021"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/detaild_review1"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:textColor="@color/dark_grey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="review"
+            android:textSize="@dimen/_13sdp"
+            android:layout_marginBottom="@dimen/_10sdp"/>
+
+    </LinearLayout>
+
+
+
+
+    <LinearLayout
+        android:layout_marginStart="@dimen/_12sdp"
+        android:layout_marginEnd="@dimen/_12sdp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/review_user_img2"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_width="@dimen/_48sdp"
+                android:layout_height="@dimen/_48sdp"
+                android:src="@drawable/ic_user_icon"/>
+
+            <TextView
+                android:textSize="@dimen/_14sdp"
+                android:textStyle="bold"
+                android:id="@+id/review_username2"
+                android:textColor="@color/dark_grey"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="username"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_1sdp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/review_star_fill12"
+                    android:layout_width="@dimen/_12sdp"
+                    android:layout_height="@dimen/_12sdp"
+                    android:src="@drawable/ic_baseline_star"/>
+                <ImageView
+                    android:id="@+id/review_star_fill22"
+                    android:layout_width="@dimen/_12sdp"
+                    android:layout_height="@dimen/_12sdp"
+                    android:src="@drawable/ic_baseline_star"/>
+                <ImageView
+                    android:id="@+id/review_star_fill32"
+                    android:layout_width="@dimen/_12sdp"
+                    android:layout_height="@dimen/_12sdp"
+                    android:src="@drawable/ic_baseline_star"/>
+                <ImageView
+                    android:id="@+id/review_star_fill42"
+                    android:layout_width="@dimen/_12sdp"
+                    android:layout_height="@dimen/_12sdp"
+                    android:src="@drawable/ic_baseline_star"/>
+                <ImageView
+                    android:id="@+id/review_star_fill52"
+                    android:layout_width="@dimen/_12sdp"
+                    android:layout_height="@dimen/_12sdp"
+                    android:src="@drawable/ic_baseline_star"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/review_date2"
+                android:textColor="@color/dark_grey"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="08-12-2021"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/detaild_review2"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:textColor="@color/dark_grey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="review"
+            android:textSize="@dimen/_13sdp"
+            android:layout_marginBottom="@dimen/_10sdp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginStart="@dimen/_12sdp"
+        android:layout_marginEnd="@dimen/_12sdp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/review_user_img3"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_width="@dimen/_48sdp"
+                android:layout_height="@dimen/_48sdp"
+                android:src="@drawable/ic_user_icon"/>
+
+            <TextView
+                android:textSize="@dimen/_14sdp"
+                android:textStyle="bold"
+                android:id="@+id/review_username3"
+                android:textColor="@color/dark_grey"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="username"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_1sdp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/review_star_fill13"
+                    android:layout_width="@dimen/_12sdp"
+                    android:layout_height="@dimen/_12sdp"
+                    android:src="@drawable/ic_baseline_star"/>
+                <ImageView
+                    android:id="@+id/review_star_fill23"
+                    android:layout_width="@dimen/_12sdp"
+                    android:layout_height="@dimen/_12sdp"
+                    android:src="@drawable/ic_baseline_star"/>
+                <ImageView
+                    android:id="@+id/review_star_fill33"
+                    android:layout_width="@dimen/_12sdp"
+                    android:layout_height="@dimen/_12sdp"
+                    android:src="@drawable/ic_baseline_star"/>
+                <ImageView
+                    android:id="@+id/review_star_fill43"
+                    android:layout_width="@dimen/_12sdp"
+                    android:layout_height="@dimen/_12sdp"
+                    android:src="@drawable/ic_baseline_star"/>
+                <ImageView
+                    android:id="@+id/review_star_fill53"
+                    android:layout_width="@dimen/_12sdp"
+                    android:layout_height="@dimen/_12sdp"
+                    android:src="@drawable/ic_baseline_star"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/review_date3"
+                android:textColor="@color/dark_grey"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="08-12-2021"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/detaild_review3"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:textColor="@color/dark_grey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="review"
+            android:textSize="@dimen/_13sdp"
+            android:layout_marginBottom="@dimen/_10sdp"/>
+
+    </LinearLayout>
+
+</LinearLayout>

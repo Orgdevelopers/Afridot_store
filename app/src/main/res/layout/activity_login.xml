@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:background="@drawable/bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_280sdp"
+            android:layout_gravity="center"
+            app:cardCornerRadius="@dimen/_10sdp"
+            android:elevation="@dimen/_10sdp"
+            app:cardBackgroundColor="#FFFFFF"
+            android:layout_marginStart="@dimen/_20sdp"
+            android:layout_marginEnd="@dimen/_20sdp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tabs"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_40sdp"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center"
+                    app:tabBackground="@color/white"
+                    app:tabGravity="fill"
+                    app:tabIndicatorColor="#30D5C8"
+                    app:tabMode="fixed"
+                    app:tabPaddingEnd="0dp"
+                    app:tabPaddingStart="0dp"
+                    app:tabSelectedTextColor="@color/black"
+                    app:tabTextColor="@color/dark_grey" />
+
+
+                <androidx.viewpager.widget.ViewPager
+                    android:id="@+id/login_pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tabs"
+                    android:layout_centerHorizontal="true" />
+
+
+            </RelativeLayout>
+
+
+
+
+        </androidx.cardview.widget.CardView>
+
+
+        <!--<LinearLayout
+
+                            android:id="@+id/phone_login_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:orientation="horizontal" >
+                            <com.rilixtech.widget.countrycodepicker.CountryCodePicker
+                                android:id="@+id/country_code_picker"
+                                android:layout_width="@dimen/_50sdp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/_5sdp"/>
+
+                            <EditText
+                                android:id="@+id/phone_no_box"
+                                android:layout_width="@dimen/_150sdp"
+                                android:layout_height="wrap_content"
+                                android:hint="enter mobile number"
+                                android:inputType="phone"/>
+
+                            <ImageView
+                                android:id="@+id/send_otp"
+                                android:layout_width="@dimen/_36sdp"
+                                android:layout_height="@dimen/_36sdp"
+                                android:src="@drawable/ic_send"
+                                android:padding="@dimen/_3sdp"
+                                android:layout_marginEnd="@dimen/_10sdp"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/otp_layout"
+                            android:visibility="gone"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal"
+                            android:gravity="center">
+
+                            <EditText
+                                android:id="@+id/otp_txt"
+                                android:layout_width="@dimen/_200sdp"
+                                android:layout_height="wrap_content"/>
+
+                            <ImageView
+                                android:layout_width="@dimen/_28sdp"
+                                android:layout_height="@dimen/_28sdp"
+                                android:src="@drawable/ic_send"
+                                android:id="@+id/check_otp"/>
+                        </LinearLayout>1-->
+
+    </LinearLayout>
+
+</LinearLayout>

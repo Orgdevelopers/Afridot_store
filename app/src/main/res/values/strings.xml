@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">Hamz appstore</string>
+
+    <string name="appstore_url_domain">hamz.fun</string>
+    <string name="appstore_url_domain_pathprefix">/hamzmander/web/test.php</string>
+
+    <!--to toggle the open close button
+        of the navigation drawer-->
+    <string name="nav_open">Open</string>
+    <string name="nav_close">Close</string>
+
+    <string name="ratings_and_reviews">Rating and reviews</string>
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome!"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="please_confirm_terms_and_condition">Please confirm terms and condition</string>
+    <string name="please_enter_phone_number">Please enter a phone number</string>
+
+    <string name="reviews_are_public">Reviews are public and include your account info. Privacy Policy</string>
+
+    <string name="also_check_our_web">Also check our Website</string>
+    <string name="about_us">Hamz Store an it\'s all apps are owned and managed by a Canadian Based Company Hamz Link Limited which features others platforms in areas including Entertainment, Education, Social Media, Ecommerce among others.</string>
+
+    <string name="terms_of_use">Terms of Use</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="login_privacy_part1">By signing up, you confirm that you agree \nto our Terms of Use and have read and understood \nour Privacy Policy.\nif you signup with SMS. SMS fee may apply</string>
+    <string name="title_activity_search">SearchActivity</string>
+</resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="my_custom_animation">
+        <item name="android:windowEnterAnimation">@anim/slide_up</item>
+        <item name="android:windowExitAnimation">@anim/slide_bottom</item>
+    </style>
+
+
+<style name="dialog_bounce_animation">
+    <item name="android:windowEnterAnimation">@anim/bounce_animation</item>
+    <item name="android:windowExitAnimation">@anim/slide_bottom</item>
+</style>
+
+    <style name="my_rating_bar">
+        <item name="colorControlActivated">@color/install_btn_bg</item>
+        <item name="colorControlNormal">#8B6591</item>
+    </style>
+
+</resources>

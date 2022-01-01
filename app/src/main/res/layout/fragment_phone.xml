@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:clickable="true"
+    android:focusable="true"
+    tools:context=".Profile.Fragments.Phone_F">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none">
+
+        <RelativeLayout
+            android:id="@+id/main_rlt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_12sdp"
+            android:padding="@dimen/_8sdp"
+            android:visibility="visible">
+
+            <RelativeLayout
+                android:background="@drawable/less_round_edge_ractengle_white"
+                android:id="@+id/main_div"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_15sdp">
+
+
+                <TextView
+                    android:id="@+id/country_code"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:gravity="center"
+                    android:padding="@dimen/_8sdp"
+                    android:text=""
+                    android:textColor="@color/ultra_light_grey"
+                    android:textSize="@dimen/_11sdp" />
+
+                <View
+                    android:id="@+id/line_beside_country"
+                    android:layout_width="@dimen/_1sdp"
+                    android:layout_height="@dimen/_12sdp"
+                    android:layout_centerVertical="true"
+                    android:layout_toEndOf="@+id/country_code"
+                    android:background="@color/dark_grey" />
+
+                <EditText
+                    android:id="@+id/phone_edit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/_4sdp"
+                    android:layout_toEndOf="@+id/line_beside_country"
+                    android:backgroundTint="@color/invisible"
+                    android:hint="enter phone number"
+                    android:inputType="phone"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/ultra_light_grey"
+                    android:textSize="@dimen/_11sdp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/main_div"
+                android:id="@+id/otp_div"
+                android:layout_marginTop="@dimen/_6sdp"
+                android:background="@drawable/less_round_edge_ractengle_white">
+
+
+                <EditText
+                    android:id="@+id/otp_box"
+                    android:layout_marginEnd="@dimen/_22sdp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/_22sdp"
+                    android:backgroundTint="@color/invisible"
+                    android:hint="enter OTP"
+                    android:inputType="phone"
+                    android:maxLength="6"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/ultra_light_grey"
+                    android:textSize="@dimen/_11sdp" />
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:id="@+id/tabTermsCondition"
+                android:layout_marginTop="@dimen/_6sdp"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@+id/otp_div"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <CheckBox
+                    android:id="@+id/chBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true" />
+
+                <TextView
+                    android:id="@+id/login_terms_condition_txt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/_4sdp"
+                    android:layout_toEndOf="@id/chBox"
+                    android:justificationMode="inter_word"
+                    android:text="@string/login_privacy_part1"
+                    android:textColor="@color/ultra_light_grey"
+                    android:textSize="@dimen/_10sdp"
+                    android:visibility="visible" />
+
+            </RelativeLayout>
+
+
+            <Button
+                android:id="@+id/btn_send_code"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_38sdp"
+                android:layout_below="@+id/tabTermsCondition"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="@dimen/_22sdp"
+                android:clickable="false"
+                android:enabled="false"
+                android:gravity="center"
+                android:text="Send Code"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_11sdp" />
+
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+
+</FrameLayout>
