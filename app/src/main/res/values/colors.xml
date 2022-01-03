@@ -26,7 +26,7 @@
     <color name="rating_bar_bg">#EEEEEE</color>
     <color name="rating_star_color">#01875F</color>
     <color name="rating_bar_color">#01875F</color>
-    <color name="Login_tab_txt_color">#30D5C8</color>
+    <color name="Login_tab_txt_color">#404040</color>
     <color name="green">#009137</color>
     <color name="redcolor">#ff0008</color>
 
@@ -35,5 +35,7 @@
     <color name="link_blue">#3F51B5</color>
 
     <color name="invisible">#00000000</color>
+
+    <color name="splash_background">#E1DEDE</color>
 
 </resources>

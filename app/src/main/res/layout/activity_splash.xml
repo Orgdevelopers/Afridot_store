@@ -9,20 +9,22 @@
     tools:context=".SplashActivity"
     android:background="@color/splash_bg">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+
+    <LinearLayout
+        android:gravity="center"
+         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/splash_background"
         android:orientation="vertical">
 
         <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/hamz_banner_portrait"
-            android:scaleType="centerCrop"
-            />
+            android:id="@+id/imageView"
+            android:layout_width="@dimen/_200sdp"
+            android:layout_height="@dimen/_200sdp"
+            android:src="@drawable/splashh"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
+    </LinearLayout>
 
 
 

@@ -57,7 +57,7 @@
         android:id="@+id/shimmer_layout_app_detail"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <include layout="@layout/shimmer_app_detail"/>
 
