@@ -27,10 +27,18 @@
     <string name="reviews_are_public">Reviews are public and include your account info. Privacy Policy</string>
 
     <string name="also_check_our_web">Also check our Website</string>
-    <string name="about_us">Hamz Store an it\'s all apps are owned and managed by a Canadian Based Company Hamz Link Limited which features others platforms in areas including Entertainment, Education, Social Media, Ecommerce among others.</string>
+    <string name="about_us">Afri-AppStore is managed and owned by Socialize Platforms Inc. Our AppStore features Apps developed by different developers and we are proud to present a platform that allows developers display their hardwork.
+Apps featured on our AppStore include but not limited to the following categories Entertainment, Education, Social Media, Ecomerce, Gaming, Just to mention a few among others!\nIn order to contact us for any communications, please get to us through info@afriappstore.com</string>
 
     <string name="terms_of_use">Terms of Use</string>
     <string name="privacy_policy">Privacy Policy</string>
     <string name="login_privacy_part1">By signing up, you confirm that you agree \nto our Terms of Use and have read and understood \nour Privacy Policy.\nif you signup with SMS. SMS fee may apply</string>
     <string name="title_activity_search">SearchActivity</string>
+
+    <string name="no_app_found">Sorry, we didn\'t found any app in this category \nTry with a other category</string>
+
+    <string name="email_sent_successfully">Email sent successfully please check inbox</string>
+
+    <string name="also_check_spam">sometimes email is marked as spam so please check spam also</string>
+
 </resources>

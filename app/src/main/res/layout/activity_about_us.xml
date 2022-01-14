@@ -33,7 +33,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hamz Appstore"
+                android:text="Afri Appstore"
                 android:textColor="@color/white"
                 android:textSize="@dimen/_20sdp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -101,7 +101,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/_5sdp"
-            android:text="Hamz Appstore"
+            android:text="Afri Appstore"
             android:textColor="@color/light_black"
             android:textSize="@dimen/_14sdp"
             android:textStyle="bold" />

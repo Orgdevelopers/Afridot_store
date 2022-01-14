@@ -4,8 +4,8 @@ public class ApiConfig {
 
     public static final String Base_url="http://afriappstore.com/web/";
     public static final String Api_url=Base_url+"api.php";
-    public static final String Terms_url="https://hamz.fun/hamzmander/web/";
-    public static final String Privacy_url="https://hamz.fun/hamzmander/web/";
+    public static final String Terms_url="";
+    public static final String Privacy_url="";
 
 
 
@@ -30,6 +30,10 @@ public class ApiConfig {
     public static final String createEmailUser="createEmailUser";
     public static final String check_myReview="check_myReview";
     public static final String check_review="check_review";
+    public static final String getallcategories="getallcategories";
+    public static final String getCategoryapps="getCategoryapps";
+    public static final String isverified="isverified";
+    public static final String verifyEmail="verifyEmail";
 
 
 

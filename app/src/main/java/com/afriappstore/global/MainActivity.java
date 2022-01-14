@@ -4,20 +4,34 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.util.SparseArray;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afriappstore.global.Fragments.Categories_fragment;
+import com.afriappstore.global.Fragments.Main_Fragment;
+import com.afriappstore.global.Profile.Fragments.Email_F;
+import com.afriappstore.global.Profile.Fragments.Phone_F;
 import com.google.android.material.navigation.NavigationView;
 import com.afriappstore.global.Adepters.MainAdapter;
 import com.afriappstore.global.ApiClasses.ApiConfig;
@@ -30,6 +44,7 @@ import com.afriappstore.global.Profile.ProfileA;
 import com.afriappstore.global.SimpleClasses.Functions;
 import com.afriappstore.global.SimpleClasses.ShearedPrefs;
 import com.afriappstore.global.SimpleClasses.Variables;
+import com.google.android.material.tabs.TabLayout;
 
 public class MainActivity extends AppCompatActivity {
     GridView gridView;
@@ -39,7 +54,9 @@ public class MainActivity extends AppCompatActivity {
     public int backpress=0;
     public ImageView side_menu_btn,search_btn,about_us_button;
     CountDownTimer back_timer,login_timer;
-
+    ViewPager pager;
+    ViewPagerAdapter adapter;
+    TabLayout tabs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        gridView = findViewById(R.id.grid_view);
+        /*gridView = findViewById(R.id.grid_view);
        MainAdapter adapter = new MainAdapter(MainActivity.this);
         gridView.setAdapter(adapter);
        gridView.setOnItemClickListener( new AdapterView.OnItemClickListener()  {
@@ -80,7 +97,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-       drawerLayout = findViewById(R.id.my_drawer_layout);
+         */
+
+        tabs=findViewById(R.id.tabs);
+        pager=findViewById(R.id.main_pager);
+        pager.setOffscreenPageLimit(3);
+
+        adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        pager.setAdapter(adapter);
+        tabs.setupWithViewPager(pager);
+        setupTabIcons();
+
+
+
+        drawerLayout = findViewById(R.id.my_drawer_layout);
         // pass the Open and Close toggle for the drawer layout listener
         // to toggle the button
         navigationView=findViewById(R.id.navigation_view);
@@ -328,6 +358,13 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        Functions.isVerified(this, new FragmentCallBack() {
+            @Override
+            public void onResponce(Bundle bundle) {
+
+            }
+        });
+
     }
 
     private void logOut(){
@@ -405,4 +442,122 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         setNavigation();
     }
+
+
+    private void setupTabIcons() {
+
+        View view1 = LayoutInflater.from(this).inflate(R.layout.item_tabs_signup, null);
+        TextView text_history = view1.findViewById(R.id.text_history);
+        text_history.setText("All apps");
+        tabs.getTabAt(0).setCustomView(view1);
+
+        View view2 = LayoutInflater.from(this).inflate(R.layout.item_tabs_signup, null);
+        TextView text_history1 = view2.findViewById(R.id.text_history);
+        text_history1.setText("Categories");
+        tabs.getTabAt(1).setCustomView(view2);
+
+        tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                View v = tab.getCustomView();
+                TextView text_history = v.findViewById(R.id.text_history);
+
+                switch (tab.getPosition()) {
+                    case 0:
+                        text_history.setTextColor(getResources().getColor(R.color.Login_tab_txt_color));
+                        break;
+
+                    case 1:
+                        text_history.setTextColor(getResources().getColor(R.color.Login_tab_txt_color));
+                        break;
+                }
+                tab.setCustomView(v);
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                View v = tab.getCustomView();
+                TextView text_history = v.findViewById(R.id.text_history);
+
+                switch (tab.getPosition()) {
+                    case 0:
+                        text_history.setTextColor(getResources().getColor(R.color.black));
+                        break;
+                    case 1:
+                        text_history.setTextColor(getResources().getColor(R.color.black));
+                        break;
+
+                }
+
+                tab.setCustomView(v);
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+
+        });
+
+
+    }
+
+
+
+    class ViewPagerAdapter extends FragmentPagerAdapter {
+
+        SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
+
+        public ViewPagerAdapter( FragmentManager fm) {
+            super(fm,FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            final Fragment result;
+            switch (position) {
+                case 0:
+                    result = new Main_Fragment(MainActivity.this);
+                    break;
+                case 1:
+                    result = new Categories_fragment(MainActivity.this);
+                    break;
+
+                default:
+                    result = null;
+                    break;
+            }
+
+            return result;
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
+
+
+        @Override
+        public CharSequence getPageTitle(final int position) {
+            return null;
+        }
+
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Fragment fragment = (Fragment) super.instantiateItem(container, position);
+            registeredFragments.put(position, fragment);
+            return fragment;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            registeredFragments.remove(position);
+            super.destroyItem(container, position, object);
+        }
+
+
+    }
+
 }

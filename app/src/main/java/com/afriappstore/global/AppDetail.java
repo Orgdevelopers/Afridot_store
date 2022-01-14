@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.StrictMode;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -74,9 +75,10 @@ public class AppDetail extends AppCompatActivity {
     ImageView myrevstar1,myrevstar2,myrevstar3,myrevstar4,myrevstar5;
     ImageView r_star11,r_star12,r_star13,r_star14,r_star15,r_star21,r_star22,r_star23,r_star24,r_star25,r_star31,r_star32,r_star33,r_star34,r_star35;
     CircleImageView r_profile1,r_profile2,r_profile3,my_review_profile;
-    LinearLayout rating_bar_background_layout,shimmer_layout,rating_bar_bg,my_review_layout;
+    LinearLayout rating_bar_background_layout,shimmer_layout,rating_bar_bg,my_review_layout,some_reviews,first_review_layout,second_review_layout,third_review_layout,no_review_found;
     ScrollView all_stuff;
     RatingBar ratingBar;
+    RatingReviews ratingReviews;
 
     //rating
     public Integer pos;
@@ -213,7 +215,7 @@ public class AppDetail extends AppCompatActivity {
                     public void run() {
                         shimmer_layout.setVisibility(View.GONE);
                     }
-                },100);
+                },800);
             }catch (Exception e){
                 e.printStackTrace();
 
@@ -431,12 +433,15 @@ public class AppDetail extends AppCompatActivity {
 
                         totalrates=s5+s4+s3+s2+s1;
 
+                        if (ratingReviews!=null){
+                            ratingReviews=null;
+                        }
+                        ratingReviews = (RatingReviews) findViewById(R.id.rating_reviews);
 
-                        RatingReviews ratingReviews = (RatingReviews) findViewById(R.id.rating_reviews);
 
                         int colors= getResources().getColor(R.color.rating_bar_color);
 
-                        int raters[]=new int[]{s5,s4,(s3*5), (s2*5),(s1*7)};
+                        int raters[]=new int[]{s5,s4,(s3), (s2),(s1)};
                         int total_stars=(s1)+(s2*2)+(s3*3)+(s4*4)+(s5*5);
 
 
@@ -456,10 +461,11 @@ public class AppDetail extends AppCompatActivity {
                         float avrage=(total_stars*100)/totalrates;
                         avrage=avrage/100;
 
+                        //Toast.makeText(context, ""+Functions.Convert_rating(avrage), Toast.LENGTH_SHORT).show();
                         horizontal_bar_review_count.setText(Functions.Format_numbers(totalrates)+"+");
-                        horizontal_bar_rating.setText(String.valueOf(Functions.Convert_rating(avrage))+"+");
+                        horizontal_bar_rating.setText(String.valueOf(avrage));
 
-                        rating_big_text.setText(String.valueOf(Functions.Convert_rating(avrage)));
+                        rating_big_text.setText(String.valueOf(avrage));
                     }catch (Exception e){
                         e.printStackTrace();
                     }
@@ -506,6 +512,11 @@ public class AppDetail extends AppCompatActivity {
         rating_bar_bg=findViewById(R.id.rating_bar_bgbgb);
 
         my_review_layout=findViewById(R.id.my_review_layout);
+        some_reviews=findViewById(R.id.some_reviews);
+        first_review_layout=findViewById(R.id.first_review_layout);
+        second_review_layout=findViewById(R.id.second_review_layout);
+        third_review_layout=findViewById(R.id.third_review_layout);
+
         myrevstar1=findViewById(R.id.my_review_star1);
         myrevstar2=findViewById(R.id.my_review_star2);
         myrevstar3=findViewById(R.id.my_review_star3);
@@ -517,109 +528,15 @@ public class AppDetail extends AppCompatActivity {
         my_review_profile=findViewById(R.id.my_review_img);
         edit_review_btn=findViewById(R.id.edit_review_btn);
 
+        no_review_found = findViewById(R.id.no_rev_found_layout);
+
+
         //shimmer
         shimmer_layout=findViewById(R.id.shimmer_layout_app_detail);
         all_stuff=findViewById(R.id.all_stuff);
 
-        if (Functions.is_Login(context)){
-            ApiRequests.checkReviewForThisApp(context, p_App_id, new FragmentCallBack() {
-                @Override
-                public void onResponce(Bundle bundle) {
-                    String code = bundle.getString(ApiConfig.Request_code);
-                    if (code.equals(ApiConfig.RequestSuccess)){
 
-                        try {
-                            my_review_layout.setVisibility(View.VISIBLE);
-                            ratingBar.setVisibility(View.GONE);
-                            JSONObject rev = new JSONObject(bundle.getString(ApiConfig.Request_response));
-                            String name = Functions.getSharedPreference(context).getString(ShearedPrefs.U_FNAME,"")+" "+Functions.getSharedPreference(context).getString(ShearedPrefs.U_LNAME,"");
-                            my_review_username.setText(name);
-                            Variables.my_review=rev.getString("review");
-                            my_detailed_review.setText(rev.getString("review"));
-                            my_review_date.setText(rev.getString("date"));
-                            String star = rev.getString("star");
-                            String pic = Functions.getSharedPreference(context).getString(ShearedPrefs.U_PIC,"");
-
-                            edit_review_btn.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    Intent edit_review = new Intent(AppDetail.this,ReviewActivity.class);
-                                    edit_review.putExtra("mode","edit");
-                                    edit_review.putExtra("rating",Float.valueOf(star));
-                                    edit_review.putExtra("review",my_detailed_review.getText());
-                                    edit_review.putExtra("pos",pos);
-                                    //Toast.makeText(context, "bfbdjjrhudbfiu", Toast.LENGTH_SHORT).show();
-                                    startActivity(edit_review);
-                                }
-                            });
-
-
-                            if (star.equals("5")){
-                                //
-                            }else if (star.equals("4")){
-                                myrevstar5.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                            }else if (star.equals("3")){
-                                myrevstar5.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                                myrevstar4.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-
-                            }else if (star.equals("2")){
-                                myrevstar5.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                                myrevstar4.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                                myrevstar3.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                            }else if (star.equals("1")){
-                                myrevstar5.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                                myrevstar4.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                                myrevstar3.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                                myrevstar2.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-
-                            }
-
-
-                            if (!pic.equals("default")){
-                                Picasso picasso = Picasso.get();
-                                picasso.setLoggingEnabled(false);
-                                pic=ApiConfig.Base_url+pic;
-
-                                String finalPic = pic;
-                                picasso.load(pic).fetch(new Callback() {
-                                    @Override
-                                    public void onSuccess() {
-                                        picasso.load(finalPic).into(my_review_profile);
-                                        picasso.setLoggingEnabled(true);
-                                    }
-
-                                    @Override
-                                    public void onError(Exception e) {
-                                        picasso.setLoggingEnabled(true);
-                                        my_review_profile.setImageDrawable(getResources().getDrawable(R.drawable.ic_user_icon));
-                                    }
-                                });
-                            }
-
-                            //Toast.makeText(context, ""+bundle.getString(ApiConfig.Request_response), Toast.LENGTH_SHORT).show();
-
-                        }catch (Exception e){
-                            e.printStackTrace();
-                            my_review_layout.setVisibility(View.GONE);
-                            ratingBar.setVisibility(View.VISIBLE);
-                        }
-
-
-
-                    }else{
-                        //Toast.makeText(context,bundle.getString(ApiConfig.Request_response),Toast.LENGTH_SHORT).show();
-                        my_review_layout.setVisibility(View.GONE);
-                        ratingBar.setVisibility(View.VISIBLE);
-                    }
-
-                }
-            });
-        }else{
-            my_review_layout.setVisibility(View.GONE);
-            ratingBar.setVisibility(View.VISIBLE);
-        }
-
-
+        check_myreview();
         //rating bar setup
         rating_bar_bg.setVisibility(View.GONE);
         ratingBar.setRating(0);
@@ -708,6 +625,126 @@ public class AppDetail extends AppCompatActivity {
 
     }
 
+    private void check_myreview() {
+
+
+        if (Functions.is_Login(context)){
+            ApiRequests.checkReviewForThisApp(context, p_App_id, new FragmentCallBack() {
+                @Override
+                public void onResponce(Bundle bundle) {
+                    String code = bundle.getString(ApiConfig.Request_code);
+                    if (code.equals(ApiConfig.RequestSuccess)){
+
+                        try {
+                            my_review_layout.setVisibility(View.VISIBLE);
+                            ratingBar.setVisibility(View.GONE);
+                            JSONObject rev = new JSONObject(bundle.getString(ApiConfig.Request_response));
+                            String name = Functions.getSharedPreference(context).getString(ShearedPrefs.U_FNAME,"")+" "+Functions.getSharedPreference(context).getString(ShearedPrefs.U_LNAME,"");
+                            my_review_username.setText(name);
+                            Variables.my_review=rev.getString("review");
+                            my_detailed_review.setText(rev.getString("review"));
+                            my_review_date.setText(rev.getString("date"));
+                            String star = rev.getString("star");
+                            String pic = Functions.getSharedPreference(context).getString(ShearedPrefs.U_PIC,"");
+
+                            edit_review_btn.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Intent edit_review = new Intent(AppDetail.this,ReviewActivity.class);
+                                    edit_review.putExtra("mode","edit");
+                                    edit_review.putExtra("rating",Float.valueOf(star));
+                                    edit_review.putExtra("review",my_detailed_review.getText());
+                                    edit_review.putExtra("pos",pos);
+                                    //Toast.makeText(context, "bfbdjjrhudbfiu", Toast.LENGTH_SHORT).show();
+                                    startActivity(edit_review);
+                                }
+                            });
+
+                            //Toast.makeText(context, ""+star, Toast.LENGTH_SHORT).show();
+
+                            if (star.equals("5")){
+                                //
+                                myrevstar5.setColorFilter(getResources().getColor(R.color.install_btn_bg));
+                                myrevstar4.setColorFilter(getResources().getColor(R.color.install_btn_bg));
+                                myrevstar3.setColorFilter(getResources().getColor(R.color.install_btn_bg));
+                                myrevstar2.setColorFilter(getResources().getColor(R.color.install_btn_bg));
+                            }else if (star.equals("4")){
+                                //uncheck stars
+                                myrevstar5.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                                //check stars
+                                myrevstar4.setColorFilter(getResources().getColor(R.color.install_btn_bg));
+                                myrevstar3.setColorFilter(getResources().getColor(R.color.install_btn_bg));
+                                myrevstar2.setColorFilter(getResources().getColor(R.color.install_btn_bg));
+
+                            }else if (star.equals("3")){
+                                myrevstar5.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                                myrevstar4.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                                //
+                                myrevstar3.setColorFilter(getResources().getColor(R.color.install_btn_bg));
+                                myrevstar2.setColorFilter(getResources().getColor(R.color.install_btn_bg));
+
+                            }else if (star.equals("2")){
+                                myrevstar5.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                                myrevstar4.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                                myrevstar3.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                                //
+                                myrevstar2.setColorFilter(getResources().getColor(R.color.install_btn_bg));
+
+                            }else if (star.equals("1")){
+                                myrevstar5.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                                myrevstar4.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                                myrevstar3.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                                myrevstar2.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+
+                            }
+
+
+                            if (!pic.equals("default")){
+                                Picasso picasso = Picasso.get();
+                                picasso.setLoggingEnabled(false);
+                                pic=ApiConfig.Base_url+pic;
+
+                                String finalPic = pic;
+                                picasso.load(pic).fetch(new Callback() {
+                                    @Override
+                                    public void onSuccess() {
+                                        picasso.load(finalPic).into(my_review_profile);
+                                        picasso.setLoggingEnabled(true);
+                                    }
+
+                                    @Override
+                                    public void onError(Exception e) {
+                                        picasso.setLoggingEnabled(true);
+                                        my_review_profile.setImageDrawable(getResources().getDrawable(R.drawable.ic_user_icon));
+                                    }
+                                });
+                            }
+
+                            //set_reviews(context);
+                            //Toast.makeText(context, ""+bundle.getString(ApiConfig.Request_response), Toast.LENGTH_SHORT).show();
+
+                        }catch (Exception e){
+                            e.printStackTrace();
+                            my_review_layout.setVisibility(View.GONE);
+                            ratingBar.setVisibility(View.VISIBLE);
+                        }
+
+
+
+                    }else{
+                        //Toast.makeText(context,bundle.getString(ApiConfig.Request_response),Toast.LENGTH_SHORT).show();
+                        my_review_layout.setVisibility(View.GONE);
+                        ratingBar.setVisibility(View.VISIBLE);
+                    }
+
+                }
+            });
+        }else{
+            my_review_layout.setVisibility(View.GONE);
+            ratingBar.setVisibility(View.VISIBLE);
+        }
+    }
+
     private void logIn(){
         Intent i= new Intent(this, LoginActivity.class);
         startActivity(i);
@@ -756,105 +793,55 @@ public class AppDetail extends AppCompatActivity {
             public void onResponce(Bundle bundle) {
                 if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
                     try {
-                        Picasso picasso = Picasso.get();
                         JSONArray rating3=Variables.rating3_array.getJSONArray(Integer.parseInt(p_App_id));
-                        JSONObject first=rating3.getJSONObject(0);
-                        JSONObject second=rating3.getJSONObject(1);
-                        JSONObject third=rating3.getJSONObject(2);
+                        if (rating3.length()>0){
+                            if (rating3.length()>1){
 
-                        //set first
-                        if (!first.getString("pic").equals("")){
-                            picasso.load(first.getString("pic")).into(r_profile1);
-                        }
-                        r_username1.setText(first.getString("username"));
+                                if (rating3.length()>2){
 
-                        r_date1.setText(first.getString("date"));
+                                    JSONObject first=rating3.getJSONObject(0);
+                                    JSONObject second=rating3.getJSONObject(1);
+                                    JSONObject third=rating3.getJSONObject(2);
+                                    setall(first,second,third);
 
-                        r_discription1.setText(first.getString("review"));
+                                }else{
+                                    JSONObject first=rating3.getJSONObject(0);
+                                    JSONObject second=rating3.getJSONObject(1);
+                                    settwo(first,second);
+                                    third_review_layout.setVisibility(View.GONE);
+                                    see_all_rev_txt_bottom.setVisibility(View.VISIBLE);
+                                    no_review_found.setVisibility(View.GONE);
+                                    some_reviews.setVisibility(View.VISIBLE);
+                                }
 
-                        String start1=first.getString("star");
-                        if (start1.equals("5")){
-                            //
-                        }else if (start1.equals("4")){
-                            r_star15.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                        }else if (start1.equals("3")){
-                            r_star14.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                            r_star15.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                            }else{
+                                JSONObject first=rating3.getJSONObject(0);
+                                setfirst(first);
 
-                        }else if (start1.equals("2")){
-                            r_star14.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                            r_star15.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                            r_star13.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                        }else if (start1.equals("1")){
-                            r_star14.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                            r_star15.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                            r_star13.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                            r_star12.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                        }
+                                second_review_layout.setVisibility(View.GONE);
+                                third_review_layout.setVisibility(View.GONE);
 
-                        //set second
-                        if (!second.getString("pic").equals("")){
-                            picasso.load(second.getString("pic")).into(r_profile2);
-                        }
-                        r_username2.setText(second.getString("username"));
+                            }
+                            see_all_rev_txt_bottom.setVisibility(View.VISIBLE);
+                            no_review_found.setVisibility(View.GONE);
+                            some_reviews.setVisibility(View.VISIBLE);
 
-                        r_date2.setText(second.getString("date"));
+                        }else{
 
-                        r_discription2.setText(second.getString("review"));
+                            see_all_rev_txt_bottom.setVisibility(View.GONE);
+                            some_reviews.setVisibility(View.GONE);
+                            no_review_found.setVisibility(View.VISIBLE);
 
-                        String start2=second.getString("star");
-                        if (start2.equals("5")){
-                            //
-                        }else if (start2.equals("4")){
-                            r_star25.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                        }else if (start2.equals("3")){
-                            r_star24.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                            r_star25.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-
-                        }else if (start2.equals("2")){
-                            r_star24.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                            r_star25.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                            r_star23.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                        }else if (start2.equals("1")){
-                            r_star24.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                            r_star25.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                            r_star23.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                            r_star22.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
                         }
 
-                        //set third
-                        if (!third.getString("pic").equals("")){
-                            picasso.load(third.getString("pic")).into(r_profile3);
-                        }
-                        r_username3.setText(third.getString("username"));
-
-                        r_date3.setText(third.getString("date"));
-
-                        r_discription3.setText(third.getString("review"));
-
-                        String start3=third.getString("star");
-                        if (start3.equals("5")){
-                            //
-                        }else if (start3.equals("4")){
-                            r_star35.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                        }else if (start3.equals("3")){
-                            r_star34.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                            r_star35.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-
-                        }else if (start3.equals("2")){
-                            r_star34.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                            r_star35.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                            r_star33.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                        }else if (start3.equals("1")){
-                            r_star34.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                            r_star35.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                            r_star33.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                            r_star32.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                        }
 
                     }catch (Exception e){
                         e.printStackTrace();
                     }
+                }else{
+                    some_reviews.setVisibility(View.GONE);
+                    no_review_found.setVisibility(View.VISIBLE);
+                    see_all_rev_txt_bottom.setVisibility(View.GONE);
                 }
             }
         });
@@ -1094,6 +1081,8 @@ public class AppDetail extends AppCompatActivity {
     protected void onResume() {
         try {
             my_detailed_review.setText(Variables.my_review);
+            set_reviews(context);
+            check_myreview();
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -1114,5 +1103,234 @@ public class AppDetail extends AppCompatActivity {
         overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
     }
 
+    public void setfirst(JSONObject first){
+        try {
+            //set first
+            if (!first.getString("pic").equals("")){
+                Picasso picasso = Picasso.get();
+                picasso.setLoggingEnabled(false);
+                picasso.load(first.getString("pic")).fetch(new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        try {
+                            picasso.load(first.getString("pic")).into(r_profile1);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        picasso.setLoggingEnabled(true);
+
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        r_profile1.setImageDrawable(getResources().getDrawable(R.drawable.ic_user_icon));
+                        picasso.setLoggingEnabled(true);
+
+                    }
+                });
+            }
+            r_username1.setText(first.getString("username"));
+
+            r_date1.setText(first.getString("date"));
+
+            r_discription1.setText(first.getString("review"));
+
+            String start1=first.getString("star");
+            if (start1.equals("5")){
+                //
+            }else if (start1.equals("4")){
+                r_star15.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+            }else if (start1.equals("3")){
+                r_star14.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                r_star15.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+
+            }else if (start1.equals("2")){
+                r_star14.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                r_star15.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                r_star13.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+            }else if (start1.equals("1")){
+                r_star14.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                r_star15.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                r_star13.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                r_star12.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void settwo(JSONObject first,JSONObject second){
+        Picasso picasso = Picasso.get();
+
+        try {
+
+        //set first
+        if (!first.getString("pic").equals("")){
+            picasso.setLoggingEnabled(false);
+            picasso.load(first.getString("pic")).fetch(new Callback() {
+                @Override
+                public void onSuccess() {
+                    try {
+                        picasso.load(first.getString("pic")).into(r_profile1);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    picasso.setLoggingEnabled(true);
+
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    r_profile1.setImageDrawable(getResources().getDrawable(R.drawable.ic_user_icon));
+                    picasso.setLoggingEnabled(true);
+
+                }
+            });
+        }
+        r_username1.setText(first.getString("username"));
+
+        r_date1.setText(first.getString("date"));
+
+        r_discription1.setText(first.getString("review"));
+
+        String start1=first.getString("star");
+        if (start1.equals("5")){
+            //
+        }else if (start1.equals("4")){
+            r_star15.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+        }else if (start1.equals("3")){
+            r_star14.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+            r_star15.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+
+        }else if (start1.equals("2")){
+            r_star14.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+            r_star15.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+            r_star13.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+        }else if (start1.equals("1")){
+            r_star14.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+            r_star15.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+            r_star13.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+            r_star12.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+        }
+
+
+
+            //set second
+            if (!second.getString("pic").equals("")){
+                picasso.setLoggingEnabled(false);
+                picasso.load(second.getString("pic")).fetch(new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        try {
+                            picasso.load(second.getString("pic")).into(r_profile2);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        picasso.setLoggingEnabled(true);
+
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        r_profile2.setImageDrawable(getResources().getDrawable(R.drawable.ic_user_icon));
+                        picasso.setLoggingEnabled(true);
+
+                    }
+                });
+
+            }
+            r_username2.setText(second.getString("username"));
+
+            r_date2.setText(second.getString("date"));
+
+            r_discription2.setText(second.getString("review"));
+
+            String start2=second.getString("star");
+            if (start2.equals("5")){
+                //
+            }else if (start2.equals("4")){
+                r_star25.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+            }else if (start2.equals("3")){
+                r_star24.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                r_star25.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+
+            }else if (start2.equals("2")){
+                r_star24.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                r_star25.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                r_star23.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+            }else if (start2.equals("1")){
+                r_star24.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                r_star25.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                r_star23.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                r_star22.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+            }
+
+    }catch (Exception e){
+        e.printStackTrace();
+    }
+    }
+
+    public void setall(JSONObject first,JSONObject second,JSONObject third){
+
+        try {
+
+            settwo(first,second);
+
+            Picasso picasso = Picasso.get();
+            //set third
+            if (!third.getString("pic").equals("")){
+                picasso.setLoggingEnabled(false);
+                picasso.load(third.getString("pic")).fetch(new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        try {
+                            picasso.load(third.getString("pic")).into(r_profile3);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        picasso.setLoggingEnabled(true);
+
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        r_profile3.setImageDrawable(getResources().getDrawable(R.drawable.ic_user_icon));
+                        picasso.setLoggingEnabled(true);
+
+                    }
+                });
+                picasso.load(third.getString("pic")).into(r_profile3);
+            }
+            r_username3.setText(third.getString("username"));
+
+            r_date3.setText(third.getString("date"));
+
+            r_discription3.setText(third.getString("review"));
+
+            String start3=third.getString("star");
+            if (start3.equals("5")){
+                //
+            }else if (start3.equals("4")){
+                r_star35.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+            }else if (start3.equals("3")){
+                r_star34.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                r_star35.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+
+            }else if (start3.equals("2")){
+                r_star34.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                r_star35.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                r_star33.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+            }else if (start3.equals("1")){
+                r_star34.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                r_star35.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                r_star33.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+                r_star32.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
+            }
+
+        }catch (Exception e ){
+            e.printStackTrace();
+        }
+
+    }
 
 }

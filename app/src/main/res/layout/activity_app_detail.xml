@@ -30,7 +30,7 @@
                 android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hamz Appstore"
+                android:text="Afri Appstore"
                 android:textColor="@color/white"
                 android:textSize="@dimen/_20sdp"
                 android:layout_marginStart="@dimen/_10sdp"
@@ -57,7 +57,7 @@
         android:id="@+id/shimmer_layout_app_detail"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <include layout="@layout/shimmer_app_detail"/>
 
@@ -156,9 +156,13 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:layout_marginStart="@dimen/_2sdp"
+                        android:layout_marginEnd="@dimen/_2sdp"
+                        android:paddingStart="@dimen/_2sdp"
+                        android:paddingEnd="@dimen/_2sdp"
                         android:gravity="center_horizontal">
 
                         <TextView
@@ -180,9 +184,11 @@
                     <TextView
                         android:paddingStart="@dimen/_2sdp"
                         android:paddingEnd="@dimen/_2sdp"
+                        android:layout_marginStart="@dimen/_2sdp"
+                        android:layout_marginEnd="@dimen/_2sdp"
                         android:id="@+id/horizontal_bar_review_count"
                         android:textColor="@color/light_black"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textAlignment="center"
                         android:text="10k reviews"/>
@@ -525,13 +531,14 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:padding="@dimen/_1sdp"
                             android:id="@+id/big_rating_text"
                             android:layout_marginTop="@dimen/_5sdp"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:textAlignment="center"
                             android:text="5.0"
                             android:textStyle="bold"
+                            android:maxLength="3"
                             android:textSize="@dimen/_35sdp"
                             android:textColor="@color/light_black"/>
                         <LinearLayout
@@ -573,7 +580,7 @@
                             android:layout_marginTop="@dimen/_5sdp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="10000"
+                            android:text="00"
                             android:textColor="@color/dark_grey"/>
 
                     </LinearLayout>
@@ -611,8 +618,38 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+                <LinearLayout
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/some_reviews"
+                    android:orientation="vertical">
 
-                <include layout="@layout/item_rating_appdetail"/>
+                    <include layout="@layout/item_rating_appdetail"/>
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:id="@+id/no_rev_found_layout"
+                    >
+                    <TextView
+                        android:textStyle="bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/_14sdp"
+                        android:textColor="#6A6A6A"
+                        android:text="No reviews yet"/>
+
+
+
+
+                </LinearLayout>
+
 
                 <TextView
                     android:id="@+id/see_all_rev_btn"

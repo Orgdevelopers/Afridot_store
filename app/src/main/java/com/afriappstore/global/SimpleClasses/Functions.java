@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
+import com.afriappstore.global.ApiClasses.ApiRequests;
 import com.airbnb.lottie.LottieAnimationView;
 import com.downloader.Error;
 import com.downloader.OnCancelListener;
@@ -634,4 +635,33 @@ public class Functions {
         return uid;
     }
 
+    public static void isVerified(Context context,FragmentCallBack callBack) {
+
+        Bundle bundle = new Bundle();
+        if (Functions.getSharedPreference(context).getString(ShearedPrefs.SIGN_IN_TYPE,"not").equals(ShearedPrefs.SIGN_IN_TYPE_EMAIL)){
+
+            try {
+
+                    ApiRequests.checkverificationstatus(context, Functions.getSharedPreference(context).getString(ShearedPrefs.U_ID, ""), new FragmentCallBack() {
+                        @Override
+                        public void onResponce(Bundle bundle) {
+
+                            callBack.onResponce(new Bundle());
+
+                        }
+                    });
+
+
+
+
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+        }else {
+            bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
+            callBack.onResponce(new Bundle());
+        }
+
+    }
 }

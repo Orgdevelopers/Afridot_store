@@ -9,7 +9,7 @@ import java.io.File;
 
 public class Variables {
 
-    public static final String App_path= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString()+ File.separator+"Hamz Appstore";
+    public static final String App_path= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString()+ File.separator+"Afri Appstore";
     public static final String Http="https://";
 
 
@@ -30,5 +30,6 @@ public class Variables {
     public static JSONObject AppDetails_isFirst;
 
     public static String my_review;
+    public static Boolean is_verify ;
 
 }

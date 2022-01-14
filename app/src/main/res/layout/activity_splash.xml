@@ -6,25 +6,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SplashActivity"
-    android:background="@color/splash_bg">
+    tools:context=".SplashActivity">
 
 
-    <LinearLayout
-        android:gravity="center"
-         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/splash_background"
-        android:orientation="vertical">
 
         <ImageView
+            android:scaleType="centerCrop"
             android:id="@+id/imageView"
-            android:layout_width="@dimen/_200sdp"
-            android:layout_height="@dimen/_200sdp"
-            android:src="@drawable/splashh"/>
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/afristore_splash"/>
 
 
-    </LinearLayout>
+
 
 
 

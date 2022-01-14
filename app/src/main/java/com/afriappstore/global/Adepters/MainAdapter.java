@@ -10,6 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.afriappstore.global.SimpleClasses.Functions;
 import com.airbnb.lottie.LottieAnimationView;
 import com.afriappstore.global.R;
 import com.afriappstore.global.SimpleClasses.Variables;
@@ -54,13 +55,15 @@ public class MainAdapter extends BaseAdapter {
 
         }
 
-        TextView app_name,app_size,app_free;
+        TextView app_name,app_size,app_free,main_downloads;
         LottieAnimationView loading;
         ImageView imageView = convertView.findViewById(R.id.image_view);
         app_name = convertView.findViewById(R.id.text_view);
         app_size=convertView.findViewById(R.id.app_size_text);
         app_free=convertView.findViewById(R.id.app_free_text);
         loading=convertView.findViewById(R.id.image_loading);
+        main_downloads=convertView.findViewById(R.id.main_downloads);
+
 
         try {
             //app icon
@@ -96,6 +99,13 @@ public class MainAdapter extends BaseAdapter {
             //app size
             String appsize_s=Variables.array.getJSONObject(position).getString("size");
             app_size.setText(appsize_s+" Mb");
+
+            //downloads
+            try {
+                main_downloads.setText(Functions.Format_numbers(Integer.parseInt(Variables.array.getJSONObject(position).getString("downloads"))));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             String package_name = null;
             try {

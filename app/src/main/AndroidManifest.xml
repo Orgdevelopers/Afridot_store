@@ -18,31 +18,39 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication"
-        android:usesCleartextTraffic="true"
-        >
+        android:usesCleartextTraffic="true">
         <activity
-            android:name="com.afriappstore.global.ExtraActivities.Email_signUp"
+            android:name=".ExtraActivities.PublishApps"
             android:exported="true" />
         <activity
-            android:name="com.afriappstore.global.ExtraActivities.ReviewActivity"
+            android:name=".ExtraActivities.VerifyEmail"
             android:exported="true" />
         <activity
-            android:name="com.afriappstore.global.ExtraActivities.SearchActivity"
+            android:name=".ExtraActivities.CategoryApps"
             android:exported="true" />
         <activity
-            android:name="com.afriappstore.global.ExtraActivities.AboutUs_A"
+            android:name=".ExtraActivities.Email_signUp"
             android:exported="true" />
         <activity
-            android:name="com.afriappstore.global.Profile.ProfileA"
+            android:name=".ExtraActivities.ReviewActivity"
             android:exported="true" />
         <activity
-            android:name="com.afriappstore.global.Profile.SignUp.SignupActivity"
+            android:name=".ExtraActivities.SearchActivity"
             android:exported="true" />
         <activity
-            android:name="com.afriappstore.global.Profile.LoginActivity"
+            android:name=".ExtraActivities.AboutUs_A"
             android:exported="true" />
         <activity
-            android:name="com.afriappstore.global.All_ReviewsActivity"
+            android:name=".Profile.ProfileA"
+            android:exported="true" />
+        <activity
+            android:name=".Profile.SignUp.SignupActivity"
+            android:exported="true" />
+        <activity
+            android:name=".Profile.LoginActivity"
+            android:exported="true" />
+        <activity
+            android:name=".All_ReviewsActivity"
             android:exported="true" />
 
         <provider
@@ -56,10 +64,10 @@
         </provider>
 
         <activity
-            android:name="com.afriappstore.global.AppDetail"
+            android:name=".AppDetail"
             android:exported="true" />
         <activity
-            android:name="com.afriappstore.global.SplashActivity"
+            android:name=".SplashActivity"
             android:exported="true"
             android:hardwareAccelerated="false">
             <intent-filter>
@@ -80,7 +88,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.afriappstore.global.MainActivity"
+            android:name=".MainActivity"
             android:exported="true" />
     </application>
 
