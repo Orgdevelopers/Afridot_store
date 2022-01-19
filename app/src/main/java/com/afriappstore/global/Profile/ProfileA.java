@@ -118,17 +118,22 @@ public class ProfileA extends AppCompatActivity {
 
             Log.wtf("image",img1);
 
-            String img=ApiConfig.Base_url+img1;
+            String img=img1;
+            if (!img1.contains("http")){
+                img=ApiConfig.Base_url+img1;
+            }
             if (!img1.equals("default")){
                 Picasso picasso = Picasso.get();
                 picasso.setLoggingEnabled(false);
+
+                String finalImg = img;
                 picasso.load(Uri.parse(img)).fetch(new Callback() {
                     @Override
                     public void onSuccess() {
-                        picasso.load(Uri.parse(img)).into(pfp);
+                        picasso.load(Uri.parse(finalImg)).into(pfp);
                         profile_image_loading.setVisibility(View.GONE);
                         profile_image_loading.cancelAnimation();
-                        picasso.invalidate(Uri.parse(img));
+                        picasso.invalidate(Uri.parse(finalImg));
                         Log.wtf("image",img1);
 
                         picasso.setLoggingEnabled(true);
@@ -417,6 +422,7 @@ public class ProfileA extends AppCompatActivity {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 if (item==publish){
+                    /////////////////////////////////////////////////////////////////////////////////////////////
                     if (Functions.getSharedPreference(ProfileA.this).getString(ShearedPrefs.SIGN_IN_TYPE,"not").equals(ShearedPrefs.SIGN_IN_TYPE_EMAIL)){
 
                         Functions.showLoader(ProfileA.this);

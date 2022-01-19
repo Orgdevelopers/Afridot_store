@@ -28,6 +28,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afriappstore.global.ExtraActivities.PublishApps;
+import com.afriappstore.global.ExtraActivities.VerifyEmail;
 import com.afriappstore.global.Fragments.Categories_fragment;
 import com.afriappstore.global.Fragments.Main_Fragment;
 import com.afriappstore.global.Profile.Fragments.Email_F;
@@ -62,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        Functions.make_app_dirs();
         if (Variables.array==null){
             try {
                 Handler handler=new Handler();
@@ -300,7 +302,8 @@ public class MainActivity extends AppCompatActivity {
             MenuItem prof=menu.getItem(0);
             MenuItem logout_in = menu.getItem(1);
             MenuItem settings = menu.getItem(2);
-            MenuItem exit = menu.getItem(3);
+            MenuItem publish_your_app=menu.getItem(3);
+            MenuItem exit = menu.getItem(4);
 
             MenuItem.OnMenuItemClickListener listener = new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -334,6 +337,47 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
                     });
+                }else if (menuItem==publish_your_app){
+                    if (Functions.is_Login(MainActivity.this)){
+                        if (Functions.getSharedPreference(MainActivity.this).getString(ShearedPrefs.SIGN_IN_TYPE,"not").equals(ShearedPrefs.SIGN_IN_TYPE_EMAIL)){
+                            close_drawer();
+                            Functions.showLoader(MainActivity.this);
+                            Functions.isVerified(MainActivity.this, new FragmentCallBack() {
+                                @Override
+                                public void onResponce(Bundle bundle) {
+                                    Functions.cancelLoader();
+                                    if (Variables.is_verify){
+                                        Intent intent = new Intent(MainActivity.this, PublishApps.class);
+                                        startActivity(intent);
+                                        overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
+
+                                    }else{
+                                        Functions.Showdouble_btn_alert(MainActivity.this, "It seems your email is not verified", "you need to verify your email first", "cancel", "Verify", true, new FragmentCallBack() {
+                                            @Override
+                                            public void onResponce(Bundle bundle) {
+                                                if (bundle.getString("action").equals("ok")){
+                                                    Intent intent = new Intent(MainActivity.this, VerifyEmail.class);
+                                                    startActivity(intent);
+                                                    overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
+
+                                                }
+
+                                            }
+                                        });
+
+                                    }
+
+                                }
+                            });
+
+                        }else {
+                            Toast.makeText(MainActivity.this, "you need to log in via email in order to use this feature", Toast.LENGTH_SHORT).show();
+                        }
+                    }else{
+                        close_drawer();
+                        Toast.makeText(MainActivity.this, "you need to log in via email in order to use this feature", Toast.LENGTH_SHORT).show();
+                    }
+
                 }
                 return false;
             }
@@ -350,6 +394,7 @@ public class MainActivity extends AppCompatActivity {
             }
             logout_in.setOnMenuItemClickListener(listener);
 
+            publish_your_app.setOnMenuItemClickListener(listener);
             settings.setOnMenuItemClickListener(listener);
             exit.setOnMenuItemClickListener(listener);
 
@@ -559,5 +604,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
 
 }

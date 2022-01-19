@@ -13,6 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.afriappstore.global.ApiClasses.ApiConfig;
 import com.afriappstore.global.ExtraActivities.CategoryApps;
 import com.afriappstore.global.Model.CategoriesModel;
 import com.afriappstore.global.R;
@@ -64,6 +65,9 @@ public class Categories_adapter extends RecyclerView.Adapter<Categories_adapter.
         CategoriesModel item = list.get(position);
 
         holder.cat_name.setText(item.name);
+        if (!item.pic.contains("http")){
+            item.pic= ApiConfig.Base_url+item.pic;
+        }
 
         picasso.load(item.pic).fetch(new Callback() {
             @Override

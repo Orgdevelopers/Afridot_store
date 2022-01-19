@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.afriappstore.global.ApiClasses.ApiConfig;
 import com.afriappstore.global.Model.Review_Model;
 import com.afriappstore.global.R;
 import com.squareup.picasso.Picasso;
@@ -59,6 +60,9 @@ public class All_reviews_Adapter extends RecyclerView.Adapter<All_reviews_Adapte
         try{
             if (item.image!=null && item.image!=""){
                 Picasso picasso = Picasso.get();
+                if (!item.image.contains("http")){
+                    item.image= ApiConfig.Base_url+item.image;
+                }
                 picasso.load(item.image).into(holder.pfp);
             }
         }

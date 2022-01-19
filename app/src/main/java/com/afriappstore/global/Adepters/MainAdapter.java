@@ -10,6 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.afriappstore.global.ApiClasses.ApiConfig;
 import com.afriappstore.global.SimpleClasses.Functions;
 import com.airbnb.lottie.LottieAnimationView;
 import com.afriappstore.global.R;
@@ -70,6 +71,9 @@ public class MainAdapter extends BaseAdapter {
             String image_uri=null;
             image_uri=Variables.array.getJSONObject(position).getString("icon");
             Uri uri = null;
+            if (!image_uri.contains("http")){
+                image_uri= ApiConfig.Base_url+image_uri;
+            }
             uri=Uri.parse(image_uri);
 
              Picasso picasso=Picasso.get();
@@ -83,6 +87,7 @@ public class MainAdapter extends BaseAdapter {
                     picasso.load(finalUri).into(imageView);
                     loading.cancelAnimation();
                     loading.setVisibility(View.GONE);
+
                 }
 
                 @Override

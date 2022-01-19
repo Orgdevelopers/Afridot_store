@@ -14,12 +14,18 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.afriappstore.global.Adepters.Categories_adapter;
+import com.afriappstore.global.Adepters.DialogAdapters.D_allcatAdaper;
 import com.afriappstore.global.ApiClasses.ApiRequests;
+import com.afriappstore.global.Model.CategoriesModel;
 import com.airbnb.lottie.LottieAnimationView;
 import com.downloader.Error;
 import com.downloader.OnCancelListener;
@@ -36,12 +42,18 @@ import com.afriappstore.global.Interfaces.FragmentCallBack;
 import com.afriappstore.global.R;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Random;
 
@@ -580,7 +592,7 @@ public class Functions {
         try {
             ByteArrayOutputStream baos =new ByteArrayOutputStream();
             Bitmap bitmap = BitmapFactory.decodeFile(image);
-            bitmap.compress(Bitmap.CompressFormat.JPEG,50,baos);
+            bitmap.compress(Bitmap.CompressFormat.JPEG,10,baos);
             byte[] image_bytes=baos.toByteArray();
             base64= Base64.getEncoder().encodeToString(image_bytes);
 
@@ -591,6 +603,7 @@ public class Functions {
 
         Bundle bundle = new Bundle();
         bundle.putString("img",base64);
+        //Log.wtf("img",base64);
         callBack.onResponce(bundle);
     }
 
@@ -661,6 +674,113 @@ public class Functions {
         }else {
             bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
             callBack.onResponce(new Bundle());
+        }
+
+    }
+
+    public static void show_select_categories(Context context,FragmentCallBack callBack){
+        Dialog dialog=new Dialog(context);
+        dialog.setContentView(R.layout.dialog_show_all_categories);
+        dialog.getWindow().setBackgroundDrawable(context.getResources().getDrawable(R.drawable.less_round_edge_ractengle_white));
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.getWindow().getAttributes();
+        dialog.getWindow().getAttributes().windowAnimations=R.style.dialog_bounce_animation;
+
+
+        dialog.show();
+
+        ProgressBar loading = dialog.findViewById(R.id.loading_progress_bar);
+        RecyclerView cat_list=dialog.findViewById(R.id.all_cat_list);
+
+        loading.setVisibility(View.VISIBLE);
+        cat_list.setVisibility(View.GONE);
+
+        ApiRequests.getAllCategories(context, new FragmentCallBack() {
+            @Override
+            public void onResponce(Bundle bundle) {
+                loading.setVisibility(View.GONE);
+                cat_list.setVisibility(View.VISIBLE);
+                try {
+                    if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)) {
+                        final ArrayList<CategoriesModel> datalist=new ArrayList<>();
+                        JSONArray categories = new JSONArray(bundle.getString(ApiConfig.Request_response));
+
+                        for (int i = 0; i < categories.length(); i++) {
+                            JSONObject singlecat = categories.getJSONObject(i);
+
+                            CategoriesModel model = new CategoriesModel();
+
+                            model.id = singlecat.getString("id");
+                            model.name = singlecat.getString("name");
+                            model.pic = singlecat.getString("pic");
+
+                            datalist.add(model);
+
+                        }
+                        if (datalist != null && !datalist.isEmpty()) {
+                            LinearLayoutManager manager = new LinearLayoutManager(context);
+                            D_allcatAdaper adapter = new D_allcatAdaper(context, datalist, new FragmentCallBack() {
+                                @Override
+                                public void onResponce(Bundle bundle) {
+                                    callBack.onResponce(bundle);
+                                    dialog.dismiss();
+                                }
+                            });
+
+                            cat_list.setLayoutManager(manager);
+                            cat_list.setAdapter(adapter);
+                        } else {
+                            Toast.makeText(context, "no categories on server", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
+
+    }
+
+    public static boolean CopyFile(String target,String destination){
+        boolean b = false;
+        try {
+            InputStream in = new FileInputStream(target);
+            OutputStream out = new FileOutputStream(destination);
+
+            // Copy the bits from instream to outstream
+            byte[] buf = new byte[1024];
+            int len;
+
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+
+            in.close();
+            out.close();
+            b=true;
+            //Toast.makeText(C, "file copied to " +destination_path, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(MainActivity.this, "Total files "+files.length, Toast.LENGTH_SHORT).show();
+        }catch (Exception e){
+            e.printStackTrace();
+            b=false;
+        }
+
+        return b;
+    }
+
+    public static void make_app_dirs(){
+        File file = null;
+        try {
+            file = new File(Variables.Appcopypath);
+            if (!file.exists()){
+                file.mkdirs();
+            }else{
+                file.delete();
+                file.exists();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }

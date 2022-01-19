@@ -7,13 +7,15 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
-import com.afriappstore.global.Model.CatAppModel;
-import com.afriappstore.global.Model.Search_result_AppModel;
+import com.afriappstore.global.Interfaces.FragmentCallBack;
 import com.afriappstore.global.R;
-import com.airbnb.lottie.L;
+import com.afriappstore.global.SimpleClasses.Functions;
+import com.afriappstore.global.SimpleClasses.ShearedPrefs;
+import com.afriappstore.global.SimpleClasses.Variables;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -21,16 +23,12 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.afriappstore.global.Interfaces.FragmentCallBack;
-import com.afriappstore.global.SimpleClasses.Functions;
-import com.afriappstore.global.SimpleClasses.ShearedPrefs;
-import com.afriappstore.global.SimpleClasses.Variables;
+import com.google.android.gms.common.api.Api;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -104,6 +102,7 @@ public class ApiRequests {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Functions.ShowToast(c, error.toString());
+                Log.wtf("volley erro",error);
             }
         }){
             @Nullable
@@ -460,7 +459,7 @@ public class ApiRequests {
                 Bundle bundle = new Bundle();
                 bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
                 callBack.onResponce(bundle);
-                Log.wtf("error",error.getMessage());
+                Log.wtf("error volley",error);
             }
         }){
             @Nullable
@@ -1048,6 +1047,142 @@ public class ApiRequests {
 
         RequestQueue queue = Volley.newRequestQueue(context.getApplicationContext());
         queue.add(request);
+    }
+
+    public static void getallmyapps(Context context,FragmentCallBack callBack){
+
+        StringRequest request = new StringRequest(Request.Method.POST, Api_url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.wtf("  all my apps",response);
+                Bundle bundle = new Bundle();
+                try{
+                    JSONObject resp = new JSONObject(response);
+                    if (resp.getString("code").equals("200")){
+                        bundle.putString(ApiConfig.Request_code,ApiConfig.RequestSuccess);
+                        bundle.putString(ApiConfig.Request_response,resp.getString("msg"));
+
+                    }else{
+                        bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
+                    }
+
+                    callBack.onResponce(bundle);
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.wtf(error.getMessage(),error);
+                Bundle bundle = new Bundle();
+                bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
+                callBack.onResponce(bundle);
+            }
+        }){
+            @Nullable
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params = new HashMap<String, String>();
+                params.put(ApiConfig.Request,ApiConfig.getallmyapps);
+                params.put(ApiConfig.AUTH_ID,Functions.getSharedPreference(context).getString(ShearedPrefs.U_ID,"null"));
+                return params;
+            }
+        };
+
+        RequestQueue queue = Volley.newRequestQueue(context.getApplicationContext());
+        queue.add(request);
+
+
+    }
+
+    public static void isPackageAvailable(Context context,String package_name,FragmentCallBack callBack){
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Api_url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.wtf("resp",response);
+                Bundle bundle = new Bundle();
+                try {
+                    JSONObject resp = new JSONObject(response);
+                    if (resp.getString("code").equals("200")){
+                        bundle.putString(ApiConfig.Request_code,ApiConfig.RequestSuccess);
+                    }else {
+                        bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
+                    }
+                    Toast.makeText(context, ""+resp.getString("msg"), Toast.LENGTH_SHORT).show();
+                }catch (Exception e){
+                    e.printStackTrace();
+                    bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
+                }
+
+                callBack.onResponce(bundle);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Bundle bundle = new Bundle();
+                bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
+                callBack.onResponce(bundle);
+
+            }
+        }){
+            @Nullable
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params = new HashMap<String, String>();
+                params.put(ApiConfig.Request,ApiConfig.CHECK_PACKAGE_AVAILABILITY);
+                params.put("pkg",package_name);
+                return params;
+            }
+        };
+
+        RequestQueue queue = Volley.newRequestQueue(context.getApplicationContext());
+        queue.add(stringRequest);
+
+    }
+
+    public static void Rollout_my_app(Context context,JSONObject app_details,FragmentCallBack callBack){
+        Bundle bundle = new Bundle();
+        try{
+            StringRequest request = new StringRequest(Request.Method.POST, Api_url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Log.wtf("res",response);
+                    bundle.putString(ApiConfig.Request_code,ApiConfig.RequestSuccess);
+                    bundle.putString(ApiConfig.Request_response,response);
+                    callBack.onResponce(bundle);
+
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
+                    callBack.onResponce(bundle);
+                }
+            }){
+                @Nullable
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String,String> params = new HashMap<String, String>();
+                    params.put(ApiConfig.Request,ApiConfig.Rollout_my_app);
+                    params.put(ApiConfig.AUTH_ID,Functions.getSharedPreference(context).getString(ShearedPrefs.U_ID,"not"));
+                    params.put("data",app_details.toString());
+                    return params;
+                }
+            };
+
+            RequestQueue q = Volley.newRequestQueue(context.getApplicationContext());
+            q.add(request);
+            Log.wtf("sent data",app_details.toString());
+
+        }catch (Exception e){
+            e.printStackTrace();
+            bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
+            callBack.onResponce(bundle);
+        }
+
     }
 
 }

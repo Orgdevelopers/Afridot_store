@@ -81,6 +81,10 @@ public class Search_resultAdapter extends RecyclerView.Adapter<Search_resultAdap
             holder.app_size_text.setText(item.size+" MB");
             holder.dow_count_text.setText(Functions.Format_numbers(Integer.parseInt(item.downloads)));
 
+            if (!item.app_icon.contains("http")){
+                item.app_icon=ApiConfig.Base_url+item.app_icon;
+            }
+
             picasso.load(Uri.parse(item.app_icon)).fetch(new Callback() {
                 @Override
                 public void onSuccess() {

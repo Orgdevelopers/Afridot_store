@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.afriappstore.global.ApiClasses.ApiConfig;
 import com.afriappstore.global.Model.CatAppModel;
 import com.afriappstore.global.R;
 import com.afriappstore.global.SimpleClasses.Functions;
@@ -70,6 +71,10 @@ public class CategoryApplistAdapter extends RecyclerView.Adapter<CategoryApplist
             holder.app_name.setText(item.app_name);
             holder.app_size.setText(item.size+"MB");
             holder.downloads_count.setText(Functions.Format_numbers(Integer.parseInt(item.downloads)));
+
+            if (!item.app_icon.contains("http")){
+                item.app_icon= ApiConfig.Base_url+item.app_icon;
+            }
 
             String icon=item.app_icon;
             picasso.load(item.app_icon).fetch(new Callback() {

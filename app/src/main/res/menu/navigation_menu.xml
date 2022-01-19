@@ -21,6 +21,11 @@
         android:title="Share" />
 
     <item
+        android:icon="@drawable/ic_send"
+        android:id="@+id/nav_submit_app"
+        android:title="Submit your App" />
+
+    <item
         android:id="@+id/nav_exit_to_app"
         android:icon="@drawable/ic_exit_to_app"
         android:title="Exit" />

@@ -313,13 +313,20 @@ public class AppDetail extends AppCompatActivity {
 
         try {
             app_name.setText(app.getString("name"));
-            picasso.load(Uri.parse(app.getString("icon"))).fetch(new Callback() {
+            String icon;
+            if (!app.getString("icon").contains("http")){
+                icon=ApiConfig.Base_url+app.getString("icon");
+            }else{
+                icon=app.getString("icon");
+            }
+
+            picasso.load(Uri.parse(icon)).fetch(new Callback() {
                 @Override
                 public void onSuccess() {
                     try {
-                        picasso.load(Uri.parse(app.getString("icon"))).into(app_icon);
+                        picasso.load(Uri.parse(icon)).into(app_icon);
 
-                    } catch (JSONException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }

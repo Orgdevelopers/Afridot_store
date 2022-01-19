@@ -29,6 +29,7 @@
     <color name="Login_tab_txt_color">#404040</color>
     <color name="green">#009137</color>
     <color name="redcolor">#ff0008</color>
+    <color name="warningred">#B51A1A</color>
 
     <color name="searchbar_bg">#6E6C6C</color>
 

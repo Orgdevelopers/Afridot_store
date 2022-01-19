@@ -2,11 +2,13 @@ package com.afriappstore.global.ApiClasses;
 
 public class ApiConfig {
 
-    public static final String Base_url="http://afriappstore.com/web/";
+    public static final String Base_url="https://afriappstore.com/web/";
     public static final String Api_url=Base_url+"api.php";
     public static final String Terms_url="";
     public static final String Privacy_url="";
-
+    public static final String APPUPLOADURI=Base_url+"uploads/apks/file_recive.php";
+    public static final String APPIMAGEUPLOADURI=Base_url+"uploads/file_recive.php";
+    public static final String APPICONUPLOADURI=Base_url+"uploads/logos/file_recive.php";
 
 
     //
@@ -34,6 +36,9 @@ public class ApiConfig {
     public static final String getCategoryapps="getCategoryapps";
     public static final String isverified="isverified";
     public static final String verifyEmail="verifyEmail";
+    public static final String getallmyapps="getallmyapps";
+    public static final String CHECK_PACKAGE_AVAILABILITY="checkpackageavailability";
+    public static final String Rollout_my_app="rolloutmyapp";
 
 
 
