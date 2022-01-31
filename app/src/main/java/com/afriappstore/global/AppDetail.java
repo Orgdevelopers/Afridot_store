@@ -1,5 +1,6 @@
 package com.afriappstore.global;
 
+import android.Manifest;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -22,8 +23,10 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -33,6 +36,7 @@ import com.afriappstore.global.ApiClasses.ApiConfig;
 import com.afriappstore.global.ApiClasses.ApiRequests;
 import com.afriappstore.global.ExtraActivities.ReviewActivity;
 import com.afriappstore.global.Interfaces.FragmentCallBack;
+import com.afriappstore.global.Model.Download_model;
 import com.afriappstore.global.Profile.LoginActivity;
 import com.afriappstore.global.SimpleClasses.Functions;
 import com.afriappstore.global.SimpleClasses.ShearedPrefs;
@@ -53,8 +57,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import io.paperdb.Paper;
 
 public class AppDetail extends AppCompatActivity {
 
@@ -82,6 +88,9 @@ public class AppDetail extends AppCompatActivity {
 
     //rating
     public Integer pos;
+
+    int UnknowSourcePermission=1827;
+
     JSONObject app = null;
     RecyclerView recyclerView;
     String p_App_id="";
@@ -387,30 +396,31 @@ public class AppDetail extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
 
-                        Intent it = new Intent();
-                        it.setAction(Intent.ACTION_VIEW);
-                        it.setData(Uri.parse(download_link));
-                        startActivity(it);
-
-                        /*
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             if (!getPackageManager().canRequestPackageInstalls()){
+                                //Toast.makeText(context, "request permission", Toast.LENGTH_SHORT).show();
+
                                 Functions.Showdouble_btn_alert(context, "Permission needed for auto install", "click on settings and allow permission for enabling auto install", "cancel", "settings", false, new FragmentCallBack() {
                                     @Override
                                     public void onResponce(Bundle bundle) {
                                         if (bundle.getString("action").equals("ok")){
-                                            startActivity(new Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,Uri.parse("package:com.orgdevelopers.hamzs")));
+                                            startActivityForResult(new Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,Uri.parse("package:"+BuildConfig.APPLICATION_ID)),UnknowSourcePermission);
                                         }else{
                                             Toast.makeText(context, "permission required for install", Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 });
                             }else{
-                                do_rest();
-                            }
-                        }
+                                //Toast.makeText(context, "do rest", Toast.LENGTH_SHORT).show();
+                                if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED){
+                                    do_rest();
+                                }else{
+                                    requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},9090);
 
-                        */
+                                }
+
+                            }
+
+
                     }
                 });
 
@@ -945,16 +955,29 @@ public class AppDetail extends AppCompatActivity {
         }
 
         try {
+            File folder = new File(Variables.AppDownloadpath);
+            if(!folder.exists()){
+                folder.mkdirs();
+            }
+
             Functions.showDownloadConfirmer(context, app.getString("name"), app.getString("size"), false, new FragmentCallBack() {
                 @Override
                 public void onResponce(Bundle bundle) {
                     if (bundle.getString("click").equals("download")) {
+
                         try {
-                            Functions.DownloadWithLoading(context, app.getString("download_link"), Variables.App_path, app.getString("name"), pos, new FragmentCallBack() {
+                            String download_link;
+                            if(app.getString("download_link").contains("http")){
+                                download_link=app.getString("download_link");
+                            }else {
+                                download_link=ApiConfig.Base_url+app.getString("download_link");
+                            }
+                            Functions.DownloadWithLoading(context,download_link, Variables.AppDownloadpath, app.getString("name"), pos, new FragmentCallBack() {
                                 @Override
                                 public void onResponce(Bundle bundle) {
                                     if (bundle.getString("action").equals("install")) {
                                         String path = bundle.getString("path");
+
                                         String package_name = null;
                                         String version = null;
                                         try {
@@ -1340,4 +1363,9 @@ public class AppDetail extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 }

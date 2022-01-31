@@ -5,18 +5,33 @@
       <map>
         <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/drawable/bg_outline.xml" value="0.2265625" />
         <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/drawable/outilne_less_round_rect.xml" value="0.2265625" />
-        <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/activity_app_detail.xml" value="0.14764492753623187" />
+        <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/activity_about_us.xml" value="0.1890625" />
+        <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/activity_all_reviews.xml" value="0.12228260869565218" />
+        <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/activity_app_detail.xml" value="0.176" />
+        <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/activity_edit_my_app.xml" value="0.264" />
         <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/activity_file_upload.xml" value="0.264" />
         <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/activity_main.xml" value="0.20625" />
+        <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/activity_profile.xml" value="0.20625" />
         <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/activity_publish_apps.xml" value="0.264" />
         <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/activity_publish_apps_second.xml" value="0.25" />
+        <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/activity_search.xml" value="0.20625" />
         <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/dialog_show_all_categories.xml" value="0.20625" />
+        <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/fragment_buisness.xml" value="0.20625" />
+        <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/fragment_categories_fragment.xml" value="0.20625" />
+        <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/fragment_email.xml" value="0.264" />
+        <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/fragment_main_.xml" value="0.20625" />
+        <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/fragment_phone.xml" value="0.20625" />
         <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/item_app_image.xml" value="0.20625" />
+        <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/item_big_slider.xml" value="0.20625" />
         <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/item_category_apps.xml" value="0.20625" />
-        <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/item_myapps_layout.xml" value="0.264" />
-        <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/item_search_result.xml" value="0.20625" />
+        <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/item_main_slider.xml" value="0.20625" />
+        <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/item_myapps_layout.xml" value="0.25" />
+        <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/item_search_result.xml" value="0.264" />
         <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/item_select_publishappimg.xml" value="0.20625" />
+        <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/item_tabs_signup.xml" value="0.20625" />
         <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/row_item.xml" value="0.1" />
+        <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/shimmer_app_detail.xml" value="0.20625" />
+        <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/layout/shimmer_layout.xml" value="0.20625" />
         <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/menu/navigation_menu.xml" value="0.20625" />
         <entry key="..\:/Users/hp/AndroidStudioProjects/Afridot_store/app/src/main/res/menu/profile_menu.xml" value="0.20625" />
         <entry key="..\:/Users/hp/AndroidStudioProjects/Appstore/app/src/main/res/drawable-v24/ic_user_icon.xml" value="0.21296296296296297" />

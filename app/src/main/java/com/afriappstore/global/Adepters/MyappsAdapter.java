@@ -1,16 +1,20 @@
 package com.afriappstore.global.Adepters;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.afriappstore.global.ApiClasses.ApiConfig;
+import com.afriappstore.global.ExtraActivities.EditMyApp;
 import com.afriappstore.global.Model.MyappModel;
 import com.afriappstore.global.R;
 import com.afriappstore.global.SimpleClasses.Functions;
@@ -18,6 +22,7 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import java.io.Serializable;
 import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 
@@ -26,10 +31,12 @@ public class MyappsAdapter extends RecyclerView.Adapter<MyappsAdapter.MyHolder> 
     Context context;
     ArrayList<MyappModel> list;
     Picasso picasso;
+    Activity activity;
 
-    public MyappsAdapter(Context context, ArrayList<MyappModel> datalist){
+    public MyappsAdapter(Activity activity, ArrayList<MyappModel> datalist){
 
-        this.context =context;
+        this.activity=activity;
+        this.context =activity.getBaseContext();
         this.list=null ;
         this.list = datalist;
     }
@@ -106,6 +113,17 @@ public class MyappsAdapter extends RecyclerView.Adapter<MyappsAdapter.MyHolder> 
 
             holder.download_count.setText(Functions.Format_numbers(Integer.parseInt(item.downloads)));
 
+            holder.my_app.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent =new Intent(context, EditMyApp.class);
+                    intent.putExtra("app", list.get(holder.getAdapterPosition()));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(intent);
+                    activity.overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
+                }
+            });
+
 
         }catch (Exception e){
             e.printStackTrace();
@@ -123,9 +141,11 @@ public class MyappsAdapter extends RecyclerView.Adapter<MyappsAdapter.MyHolder> 
         ImageView app_icon;
         TextView app_name,download_count,app_status;
         LottieAnimationView image_loading;
+        LinearLayout my_app;
 
         public MyHolder(@NonNull View itemView) {
             super(itemView);
+            my_app=itemView.findViewById(R.id.my_app);
             app_icon=itemView.findViewById(R.id.app_icon_myapps);
             app_name=itemView.findViewById(R.id.app_name_myapps);
             download_count=itemView.findViewById(R.id.downloads_count_txt);
@@ -134,4 +154,5 @@ public class MyappsAdapter extends RecyclerView.Adapter<MyappsAdapter.MyHolder> 
 
         }
     }
+
 }

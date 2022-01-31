@@ -108,6 +108,15 @@
                             app:lottie_loop="true"
                             app:lottie_rawRes="@raw/loading_ajax" />
 
+                        <ImageView
+                            android:id="@+id/verified_tic"
+                            android:layout_width="@dimen/_24sdp"
+                            android:layout_height="@dimen/_24sdp"
+                            android:src="@drawable/ic_verified"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            android:visibility="gone"/>
+
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -120,6 +129,15 @@
                         android:textColor="@color/gainsbro"
                         app:layout_constraintTop_toBottomOf="@+id/prof_pic" />
 
+                    <TextView
+                        android:layout_marginTop="@dimen/_5sdp"
+                        android:visibility="visible"
+                        android:id="@+id/email_phone_txt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="email"
+                        android:textColor="@color/gainsbro"
+                        app:layout_constraintTop_toBottomOf="@+id/prof_pic" />
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -155,7 +173,7 @@
                         android:layout_below="@+id/main_div"
                         android:layout_marginStart="@dimen/_25sdp"
                         android:layout_marginEnd="@dimen/_25sdp"
-                        android:layout_marginTop="@dimen/_20sdp"
+                        android:layout_marginTop="@dimen/_10sdp"
                         android:layout_marginBottom="@dimen/_26sdp"
                         android:background="@drawable/less_round_edge_ractengle_white">
 

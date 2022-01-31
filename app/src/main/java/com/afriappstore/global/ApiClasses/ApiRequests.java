@@ -1,6 +1,7 @@
 package com.afriappstore.global.ApiClasses;
 
 import static com.afriappstore.global.ApiClasses.ApiConfig.Api_url;
+import static com.afriappstore.global.ApiClasses.ApiConfig.GETALLBUISNESSAPPS;
 import static com.afriappstore.global.ApiClasses.ApiConfig.Request_UpdateProfile;
 
 import android.content.Context;
@@ -16,6 +17,7 @@ import com.afriappstore.global.R;
 import com.afriappstore.global.SimpleClasses.Functions;
 import com.afriappstore.global.SimpleClasses.ShearedPrefs;
 import com.afriappstore.global.SimpleClasses.Variables;
+import com.airbnb.lottie.L;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -29,6 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -798,7 +801,6 @@ public class ApiRequests {
             public void onResponse(String response) {
 
                 Bundle bundle = new Bundle();
-
                 try{
 
                     JSONObject object = new JSONObject(response);
@@ -962,6 +964,12 @@ public class ApiRequests {
                         String verified=resp.getString("msg");
                         if (verified.equals("1")){
                             Variables.is_verify=true;
+                            bundle.putString(ApiConfig.Request_code,ApiConfig.RequestSuccess);
+                        }else if (verified.equals("404")){
+                            //user is set to logout
+                            Toast.makeText(context, "your account is suspended", Toast.LENGTH_SHORT).show();
+                            Functions.Log_Out(context);
+
                         }else {
                             Variables.is_verify=false;
                         }
@@ -1182,6 +1190,250 @@ public class ApiRequests {
             bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
             callBack.onResponce(bundle);
         }
+
+    }
+
+    public static void sendemailotp(Context context,String email,FragmentCallBack callBack){
+        StringRequest request = new StringRequest(Request.Method.POST, Api_url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.wtf("send rmail otp",response);
+                Bundle bundle = new Bundle();
+                try {
+                    JSONObject resp = new JSONObject(response);
+                    if (resp.getString("code").equals("200")){
+                        bundle.putString(ApiConfig.Request_code,ApiConfig.RequestSuccess);
+                        bundle.putString(ApiConfig.Request_response,resp.getString("msg"));
+
+                    }else {
+                        bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
+                    }
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                    bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
+                }
+
+                callBack.onResponce(bundle);
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Bundle bundle = new Bundle();
+                bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
+                callBack.onResponce(bundle);
+
+            }
+        }){
+            @Nullable
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params = new HashMap<String, String>();
+                params.put(ApiConfig.Request,ApiConfig.sendemailotp);
+                params.put(ApiConfig.POST_Email,email);
+                return params;
+            }
+        };
+
+        RequestQueue queue = Volley.newRequestQueue(context.getApplicationContext());
+        queue.add(request);
+
+    }
+
+
+    public static void updatePassword(Context context,String email,String password,FragmentCallBack callBack){
+
+        StringRequest request = new StringRequest(Request.Method.POST, Api_url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.wtf("update password",response);
+                Bundle bundle = new Bundle();
+                try {
+                    JSONObject resp = new JSONObject(response);
+                    if (resp.getString("code").equals("200")){
+                        bundle.putString(ApiConfig.Request_code,ApiConfig.RequestSuccess);
+
+                    }else{
+                        Toast.makeText(context, ""+resp.getString("msg"), Toast.LENGTH_SHORT).show();
+                        bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
+                    }
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                    bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
+                }
+                callBack.onResponce(bundle);
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Bundle bundle = new Bundle();
+                bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
+                callBack.onResponce(bundle);
+            }
+        }){
+            @Nullable
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params = new HashMap<String, String>();
+                params.put(ApiConfig.Request,ApiConfig.UPDATEPASSWORD);
+                params.put(ApiConfig.POST_Email,email);
+                params.put("pass",password);
+                return params;
+            }
+        };
+
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(request);
+
+    }
+
+    public static void getSlider(Context context,FragmentCallBack callBack){
+
+        StringRequest request = new StringRequest(Request.Method.POST, Api_url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Functions.log(response);
+                Bundle bundle = new Bundle();
+                try{
+                    JSONObject resp = new JSONObject(response);
+                    if (resp.getString("code").equals("200")){
+                        bundle.putString(ApiConfig.Request_code,ApiConfig.RequestSuccess);
+                        bundle.putString(ApiConfig.Request_response,resp.getString("msg"));
+
+                    }else{
+                        bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
+                    }
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                    bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
+
+                }
+                callBack.onResponce(bundle);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Bundle bundle = new Bundle();
+                bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
+                callBack.onResponce(bundle);
+
+            }
+        }){
+            @Nullable
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params= new HashMap<>();
+                params.put(ApiConfig.Request,ApiConfig.GETALLSLIDERS);
+                return params;
+            }
+        };
+        RequestQueue queue= Volley.newRequestQueue(context.getApplicationContext());
+        queue.add(request);
+
+    }
+
+    public static void getallbuisnessapps(Context context,int starting_point,FragmentCallBack callBack){
+
+        StringRequest request = new StringRequest(Request.Method.POST, Api_url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.wtf("resp: 1344",response);
+                Bundle bundle = new Bundle();
+                try {
+                    JSONObject resp = new JSONObject(response);
+                    if (resp.getString("code").equals("200")){
+                        bundle.putString(ApiConfig.Request_code,ApiConfig.RequestSuccess);
+                        bundle.putString(ApiConfig.Request_response,resp.getString("msg"));
+
+                    }else{
+                        bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
+                    }
+
+                } catch (Exception e){
+                    e.printStackTrace();
+                    bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
+                }
+
+                callBack.onResponce(bundle);
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.wtf("error",error);
+                Bundle bundle = new Bundle();
+                bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
+                callBack.onResponce(bundle);
+
+            }
+        }){
+            @Nullable
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params = new HashMap<String, String>();
+                params.put(ApiConfig.Request,GETALLBUISNESSAPPS);
+                params.put("startinpoint",String.valueOf(starting_point));
+                return params;
+
+
+             }
+        };
+
+        RequestQueue queue = Volley.newRequestQueue(context.getApplicationContext());
+        queue.add(request);
+
+    }
+
+    public static void getAllbigslider(Context context,FragmentCallBack callBack){
+
+        StringRequest request = new StringRequest(Request.Method.POST, Api_url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Bundle bundle = new Bundle();
+
+                try {
+                    JSONObject resp = new JSONObject(response);
+                    if(resp.getString("code").equals("200")){
+                        bundle.putString(ApiConfig.Request_code,ApiConfig.RequestSuccess);
+                        bundle.putString(ApiConfig.Request_response,resp.getString("msg"));
+
+                    }else{
+                        bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
+
+                }
+
+                callBack.onResponce(bundle);
+
+            }
+        }, new Response.ErrorListener(){
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Bundle bundle = new Bundle();
+                bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
+                callBack.onResponce(bundle);
+
+            }
+        }){
+            @Nullable
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params = new HashMap<String, String>();
+                params.put(ApiConfig.Request,ApiConfig.GETALLBIGSLIDERS);
+                return params;
+            }
+        };
+
+        RequestQueue queue = Volley.newRequestQueue(context.getApplicationContext());
+        queue.add(request);
 
     }
 

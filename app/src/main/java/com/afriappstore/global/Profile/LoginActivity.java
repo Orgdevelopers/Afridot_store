@@ -40,13 +40,16 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         /*
-        otp_layout=findViewById(R.id.otp_layout);
-        phone_box=findViewById(R.id.phone_no_box);
-        countryCodePicker=findViewById(R.id.country_code_picker);
-        send_phone_otp_btn=findViewById(R.id.send_otp);
-        phone_sign_in_layout=findViewById(R.id.phone_login_layout);
-        otp_box=findViewById(R.id.otp_txt);
-        check_otp=findViewById(R.id.check_otp);*/
+
+            otp_layout=findViewById(R.id.otp_layout);
+            phone_box=findViewById(R.id.phone_no_box);
+            countryCodePicker=findViewById(R.id.country_code_picker);
+            send_phone_otp_btn=findViewById(R.id.send_otp);
+            phone_sign_in_layout=findViewById(R.id.phone_login_layout);
+            otp_box=findViewById(R.id.otp_txt);
+            check_otp=findViewById(R.id.check_otp);
+
+        */
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         pager = findViewById(R.id.login_pager);

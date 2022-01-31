@@ -1,6 +1,7 @@
 package com.afriappstore.global.Adepters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,9 +9,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.afriappstore.global.ApiClasses.ApiConfig;
+import com.afriappstore.global.AppDetail;
 import com.afriappstore.global.Model.CatAppModel;
 import com.afriappstore.global.R;
 import com.afriappstore.global.SimpleClasses.Functions;
@@ -36,9 +39,11 @@ public class CategoryApplistAdapter extends RecyclerView.Adapter<CategoryApplist
 
         ImageView app_image;
         TextView app_name,app_size,downloads_count;
+        CardView category_app;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            category_app=itemView.findViewById(R.id.category_app);
             app_image=itemView.findViewById(R.id.app_image);
             app_name=itemView.findViewById(R.id.app_name_txt);
             app_size=itemView.findViewById(R.id.app_size);
@@ -64,7 +69,6 @@ public class CategoryApplistAdapter extends RecyclerView.Adapter<CategoryApplist
             if (picasso==null){
                 picasso=Picasso.get();
             }
-
             CatAppModel item = new CatAppModel();
             item=list.get(position);
 
@@ -85,6 +89,18 @@ public class CategoryApplistAdapter extends RecyclerView.Adapter<CategoryApplist
 
                 @Override
                 public void onError(Exception e) {
+
+                }
+            });
+
+            holder.category_app.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    Intent intent = new Intent(context, AppDetail.class);
+                    intent.putExtra(ApiConfig.Request_code,"pos");
+                    intent.putExtra("pos",Functions.convert_appid_to_pos(Integer.parseInt(list.get(holder.getAdapterPosition()).app_id)));
+                    context.startActivity(intent);
 
                 }
             });

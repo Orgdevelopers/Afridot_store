@@ -14,6 +14,7 @@
         android:scrollbars="none">
 
         <RelativeLayout
+            android:visibility="visible"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="@dimen/_8sdp"
@@ -21,6 +22,13 @@
             android:layout_marginStart="@dimen/_12sdp"
             android:layout_marginEnd="@dimen/_12sdp"
             android:layout_marginBottom="@dimen/_5sdp">
+
+            <RelativeLayout
+                android:id="@+id/login_layout"
+                android:visibility="visible"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
 
 
             <LinearLayout
@@ -145,28 +153,93 @@
                         android:visibility="visible" />
 
 
-
                 </RelativeLayout>
+            </RelativeLayout>
+
+                <Button
+                    android:id="@+id/btn_next"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_38sdp"
+                    android:layout_below="@+id/text_div"
+                    android:layout_centerInParent="true"
+                    android:layout_marginTop="@dimen/_22sdp"
+                    android:clickable="false"
+                    android:enabled="false"
+                    android:gravity="center"
+                    android:text="Next"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/_11sdp" />
+
 
             </RelativeLayout>
 
 
-            <Button
-                android:id="@+id/btn_next"
+            <LinearLayout
+                android:id="@+id/verify_otp_layout"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_38sdp"
-                android:layout_below="@+id/text_div"
-                android:layout_centerInParent="true"
-                android:layout_marginTop="@dimen/_22sdp"
-                android:clickable="false"
-                android:enabled="false"
-                android:gravity="center"
-                android:text="Next"
-                android:textColor="@color/white"
-                android:textSize="@dimen/_11sdp" />
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/enter_otp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_15sdp"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:text="Enter Otp"
+                    android:textColor="@color/light_black"
+                    android:textSize="@dimen/_14sdp" />
+
+                <TextView
+                    android:id="@+id/create_password"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_15sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:text="you will receive email soon, please also check spam folder"
+                    android:textColor="@color/ultra_light_grey"
+                    android:textSize="@dimen/_12sdp" />
+
+                <EditText
+                    android:id="@+id/otp_edit"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_38sdp"
+                    android:layout_margin="@dimen/_10sdp"
+                    android:background="@drawable/less_round_edge_ractengle_white"
+                    android:hint="enter otp here"
+                    android:inputType="phone"
+                    android:maxLength="6"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/light_white"
+                    android:textSize="@dimen/_11sdp" />
+
+                <TextView
+                    android:id="@+id/resend_otp_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_15sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:text="resend otp"
+                    android:textColor="@color/ultra_light_grey"
+                    android:textSize="@dimen/_12sdp" />
+
+                <Button
+                    android:id="@+id/verify_otp_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_38sdp"
+                    android:layout_margin="@dimen/_15sdp"
+                    android:clickable="false"
+                    android:enabled="false"
+                    android:gravity="center"
+                    android:text="Verify"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/_11sdp" />
+
+            </LinearLayout>
+
 
         </RelativeLayout>
-
 
     </ScrollView>
 

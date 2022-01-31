@@ -61,10 +61,10 @@ public class ProfileA extends AppCompatActivity {
     LottieAnimationView profile_image_loading;
     Button update_prof_btn;
     FloatingActionButton edit_prof;
-    TextView click_to_change;
+    TextView click_to_change,email_phone_txt;
     String f_nam,l_nam;
     String pic_path="";
-    ImageView back_button,profile_sidebar_toggle;
+    ImageView back_button,profile_sidebar_toggle,verified_tic;
 
     public DrawerLayout drawerLayout;
     NavigationView navigationView;
@@ -82,6 +82,8 @@ public class ProfileA extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         getSupportActionBar().hide();
 
+        email_phone_txt = findViewById(R.id.email_phone_txt);
+        verified_tic=findViewById(R.id.verified_tic);
         back_button=findViewById(R.id.profile_back_button);
         firstname=findViewById(R.id.firstname_txt);
         lastname=findViewById(R.id.lastname_txt);
@@ -100,6 +102,7 @@ public class ProfileA extends AppCompatActivity {
 
         //
         setnavigation();
+        set_verification();
 
         back_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,6 +114,14 @@ public class ProfileA extends AppCompatActivity {
         try {
             f_nam=Functions.getSharedPreference(this).getString(ShearedPrefs.U_FNAME,"");
             l_nam=Functions.getSharedPreference(this).getString(ShearedPrefs.U_LNAME,"");
+
+            if (Functions.getSharedPreference(this).getString(ShearedPrefs.SIGN_IN_TYPE,"not").equals(ShearedPrefs.SIGN_IN_TYPE_EMAIL)){
+                email_phone_txt.setText(Functions.getSharedPreference(this).getString(ShearedPrefs.U_EMAIL,"not"));
+
+            }else if (Functions.getSharedPreference(this).getString(ShearedPrefs.SIGN_IN_TYPE,"not").equals(ShearedPrefs.SIGN_IN_TYPE_PHONE)){
+                email_phone_txt.setText(Functions.getSharedPreference(this).getString(ShearedPrefs.U_PHONE,"not"));
+
+            }
 
             firstname.setText(f_nam);
             lastname.setText(l_nam);
@@ -285,6 +296,19 @@ public class ProfileA extends AppCompatActivity {
             e.printStackTrace();
         }
 
+    }
+
+    private void set_verification() {
+        verified_tic.setVisibility(View.GONE);
+        ApiRequests.checkverificationstatus(this, Functions.getSharedPreference(this).getString(ShearedPrefs.U_ID, "not"), new FragmentCallBack() {
+            @Override
+            public void onResponce(Bundle bundle) {
+                if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
+                    verified_tic.setVisibility(View.VISIBLE);
+                }
+
+            }
+        });
     }
 
     private void change_text() {

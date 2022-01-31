@@ -263,6 +263,13 @@ public class FileUploadA extends AppCompatActivity {
             }
         };
         timer.start();
+
+        //delete temp copy directory
+        File directory = new File(Variables.Appcopypath);
+        if (directory.exists()){
+            directory.delete();
+        }
+
     }
 
     private void makearrays() {

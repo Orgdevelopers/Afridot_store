@@ -295,12 +295,12 @@ public class PublishAppsSecond extends AppCompatActivity {
         }else if (requestCode==PICK_APK){
             if (resultCode== Activity.RESULT_OK){
                String real_path=getPath(PublishAppsSecond.this,data.getData());
-               if(!real_path.isEmpty()){
+               if(real_path!=null){
                    app_path=real_path;
                    check_apk_file();
 
                }else {
-                   Toast.makeText(this, "please select try selecting apk again", Toast.LENGTH_SHORT).show();
+                   Toast.makeText(this, "please try selecting apk again", Toast.LENGTH_SHORT).show();
                }
 
             }else{

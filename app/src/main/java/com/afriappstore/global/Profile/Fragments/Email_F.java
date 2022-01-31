@@ -6,8 +6,10 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -16,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,14 +40,18 @@ public class Email_F extends Fragment {
     Context context;
     View view;
     TextView loginTermsConditionTxt;
-    EditText email_edit,password_edit;
-    Button next_button;
+    EditText email_edit,password_edit,otp_edit;
+    Button next_button,verify_otp_button;
     CheckBox privacy_check_box;
-    TextView forgot_pass_btn;
+    TextView forgot_pass_btn,resend_button,enter_otp,create_password;
+    int sec=60;
+    CountDownTimer timer;
 
-    RelativeLayout tabPassword;
+    RelativeLayout tabPassword,login_layout;
+    LinearLayout verify_otp_layout;
 
     int email_checked_switch=0;
+    String email_otp;
 
 
     public Email_F(Context context) {
@@ -225,6 +232,210 @@ public class Email_F extends Fragment {
             }
         });
 
+        forgot_pass_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //loop
+                setupotplayout();
+                /*
+                forgot_pass_btn.setClickable(false);
+                forgot_pass_btn.setTextColor(context.getResources().getColor(R.color.light_white));
+                timer = new CountDownTimer(60000,1000) {
+                    @Override
+                    public void onTick(long l) {
+                        forgot_pass_btn.setText("resend in: "+sec);
+                        sec=sec-1;
+
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        timer.cancel();
+                        forgot_pass_btn.setText("resend otp");
+                        forgot_pass_btn.setTextColor(context.getResources().getColor(R.color.light_black));
+                        forgot_pass_btn.setClickable(true);
+
+                    }
+                };
+                timer.start();
+                */
+            }
+        });
+
+    }
+
+    private void setupotplayout() {
+        verify_otp_layout.setVisibility(View.VISIBLE);
+        login_layout.setVisibility(View.GONE);
+        resend_button.setVisibility(View.GONE);
+        Functions.showLoader(context);
+
+        ApiRequests.sendemailotp(context, email_edit.getText().toString(), new FragmentCallBack() {
+            @Override
+            public void onResponce(Bundle bundle) {
+                Functions.cancelLoader();
+                if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
+
+                    email_otp=bundle.getString(ApiConfig.Request_response);
+                    setup_resend_view();
+
+                }else{
+                    Toast.makeText(context, "failed to send otp", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (view==resend_button){
+                    //clicked resend button
+                    Functions.showLoader(context);
+                    ApiRequests.sendemailotp(context, email_edit.getText().toString(), new FragmentCallBack() {
+                    @Override
+                    public void onResponce(Bundle bundle) {
+                        Functions.cancelLoader();
+                        if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
+                            setup_resend_view();
+                        }else{
+                            Toast.makeText(context, "failed to send otp", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+                }else if (view==verify_otp_button){
+                    //clicked verify button
+                    if (verify_otp_button.getText().equals("create password")){
+
+                        if ((!otp_edit.getText().toString().isEmpty()) && otp_edit.getText().length()>5){
+                            Functions.showLoader(context);
+                            ApiRequests.updatePassword(context, email_edit.getText().toString(), otp_edit.getText().toString(), new FragmentCallBack() {
+                                @Override
+                                public void onResponce(Bundle bundle) {
+                                    Functions.cancelLoader();
+                                    if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
+                                        Toast.makeText(context, "password updated successfully", Toast.LENGTH_SHORT).show();
+                                        Functions.showLoader(context);
+                                        verify_otp_layout.setVisibility(View.GONE);
+                                        login_layout.setVisibility(View.VISIBLE);
+                                        forgot_pass_btn.setVisibility(View.INVISIBLE);
+                                        Handler handler = new Handler();
+                                        handler.postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Functions.cancelLoader();
+                                            }
+                                        },500);
+
+
+                                    }else {
+                                        Toast.makeText(context, "failed to update password please try again later", Toast.LENGTH_SHORT).show();
+                                    }
+
+                                }
+                            });
+
+                        }else{
+
+                            otp_edit.setError("password length should be more than 6");
+                        }
+
+                    }else{
+
+                        Functions.showLoader(context);
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                Functions.cancelLoader();
+                                if (otp_edit.getText().toString().trim().equals(email_otp.trim())) {
+                                    Toast.makeText(context, "otp verified", Toast.LENGTH_SHORT).show();
+                                    setupcreatepassview();
+
+                                } else {
+                                    Toast.makeText(context, "wrong otp", Toast.LENGTH_SHORT).show();
+                                }
+
+                            }
+                        }, 500);
+
+                    }
+
+
+
+                }
+
+            }
+        };
+
+        resend_button.setOnClickListener(listener);
+        verify_otp_button.setOnClickListener(listener);
+
+
+        otp_edit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence text, int i, int i1, int i2) {
+                if (text.length()==6){
+                    verify_otp_button.setEnabled(true);
+                    verify_otp_button.setClickable(true);
+                }else {
+                    verify_otp_button.setEnabled(false);
+                    verify_otp_button.setClickable(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+
+
+    }
+
+    private void setupcreatepassview() {
+
+        enter_otp.setText("Enter new password");
+        create_password.setText("create password minimum length (6)");
+        otp_edit.setHint("enter new password");
+        verify_otp_button.setText("create password");
+        otp_edit.setMaxEms(18);
+        otp_edit.setInputType(InputType.TYPE_CLASS_TEXT);
+        otp_edit.setText("");
+
+    }
+
+    private void setup_resend_view() {
+
+
+        resend_button.setVisibility(View.VISIBLE);
+        resend_button.setClickable(false);
+        resend_button.setTextColor(context.getResources().getColor(R.color.ultra_light_grey));
+        sec=60;
+        timer=new CountDownTimer(60000,1000) {
+            @Override
+            public void onTick(long l) {
+                resend_button.setText("resend otp in: "+sec);
+                sec=sec-1;
+
+            }
+
+            @Override
+            public void onFinish() {
+                timer.cancel();
+                resend_button.setClickable(true);
+                resend_button.setTextColor(context.getResources().getColor(R.color.light_black));
+                resend_button.setText("resend otp");
+            }
+        };
+
+        timer.start();
     }
 
     private void update_password_view() {
@@ -266,6 +477,13 @@ public class Email_F extends Fragment {
         privacy_check_box=view.findViewById(R.id.privacy_check_box);
         forgot_pass_btn=view.findViewById(R.id.forgot_pass_btn);
         tabPassword=view.findViewById(R.id.tabPassword);
+        verify_otp_layout=view.findViewById(R.id.verify_otp_layout);
+        login_layout=view.findViewById(R.id.login_layout);
+        resend_button=view.findViewById(R.id.resend_otp_txt);
+        otp_edit=view.findViewById(R.id.otp_edit);
+        verify_otp_button=view.findViewById(R.id.verify_otp_button);
+        enter_otp=view.findViewById(R.id.enter_otp);
+        create_password=view.findViewById(R.id.create_password);
 
     }
 

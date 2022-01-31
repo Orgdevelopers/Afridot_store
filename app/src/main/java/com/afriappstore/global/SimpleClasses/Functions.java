@@ -26,6 +26,7 @@ import com.afriappstore.global.Adepters.Categories_adapter;
 import com.afriappstore.global.Adepters.DialogAdapters.D_allcatAdaper;
 import com.afriappstore.global.ApiClasses.ApiRequests;
 import com.afriappstore.global.Model.CategoriesModel;
+import com.afriappstore.global.Model.SliderModel;
 import com.airbnb.lottie.LottieAnimationView;
 import com.downloader.Error;
 import com.downloader.OnCancelListener;
@@ -56,6 +57,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Random;
+
+import io.paperdb.Paper;
 
 public class Functions {
 
@@ -784,4 +787,33 @@ public class Functions {
         }
 
     }
+
+    public static String convertStatus(String status_type){
+
+        String ret="";
+        if (status_type.equals("0")){
+            ret="In Review...";
+
+        }else if (status_type.equals("1")){
+            ret="Live";
+
+        }else if (status_type.equals("2")){
+            ret="Unpublished";
+
+        }else if (status_type.equals("3")){
+            ret="Suspended";
+
+        }else{
+            ret="Unspecified";
+        }
+
+        return ret;
+
+    }
+
+    public static void log(String response) {
+        Log.wtf("log",response);
+    }
+
+
 }

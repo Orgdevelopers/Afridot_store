@@ -1,5 +1,9 @@
 package com.afriappstore.global.ExtraActivities;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static android.os.Build.VERSION.SDK_INT;
+
 import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -11,9 +15,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -26,17 +33,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.afriappstore.global.Adepters.MyappsAdapter;
 import com.afriappstore.global.ApiClasses.ApiConfig;
 import com.afriappstore.global.ApiClasses.ApiRequests;
+import com.afriappstore.global.BuildConfig;
 import com.afriappstore.global.FileUploadServices.UploadFileAsync;
 import com.afriappstore.global.Interfaces.FragmentCallBack;
+import com.afriappstore.global.MainActivity;
 import com.afriappstore.global.Model.CategoriesModel;
 import com.afriappstore.global.Model.MyappModel;
 import com.afriappstore.global.Model.PublishAppModel;
@@ -49,6 +60,7 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.security.Permission;
 import java.util.ArrayList;
 
 public class PublishApps extends AppCompatActivity {
@@ -63,12 +75,12 @@ public class PublishApps extends AppCompatActivity {
     ArrayList<MyappModel> datalist;
     
     int PICK_PROFILE_PIC=101;
-    int ASK_PERMISSION=9909;
+    int ASK_PERMISSION=9909,ASK_MANAGE_STORAGE_PERMISSION=6463;
     
     //second layout components
     TextView app_name_wordcounter,app_description_wordcounter,select_category_button,selected_cat_name_txt,next_btn;
     EditText app_name_txt,app_description_txt;
-    ImageView app_icon_img;
+    ImageView app_icon_img,publish_apps_back;
     String app_icon_path;
 
     CategoriesModel categoriesModel;
@@ -88,17 +100,65 @@ public class PublishApps extends AppCompatActivity {
         setuppublishappform();
 
         create_app_btn.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View view) {
-                showCreateapplayout();
+                if (!checkPermission()){
+                    Functions.Showdouble_btn_alert(PublishApps.this, "Permission alert",
+                            "these permissions required for App's functionality",
+                            "Cancel", "Continue", true, new FragmentCallBack() {
+                                @Override
+                                public void onResponce(Bundle bundle) {
+                                    if (bundle.getString("action").equals("ok")){
+                                        //startActivity(new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION,Uri.parse("package:"+ BuildConfig.APPLICATION_ID)));
+                                        try {
+                                            Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                                            intent.addCategory("android.intent.category.DEFAULT");
+                                            intent.setData(Uri.parse(String.format("package:%s",getApplicationContext().getPackageName())));
+                                            startActivityForResult(intent, 2296);
+                                        } catch (Exception e) {
+                                            Intent intent = new Intent();
+                                            intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                                            startActivityForResult(intent, 2296);
+                                        }
+
+
+                                    }else{
+                                        Toast.makeText(PublishApps.this, "Permission required for publishing apps", Toast.LENGTH_SHORT).show();
+                                    }
+
+                                }
+                            });
+
+                }else{
+                    showCreateapplayout();
+                }
+
+
 
             }
         });
 
 
+        publish_apps_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+
+            }
+        });
+
     }
 
-    
+    private boolean checkPermission(){
+        if (SDK_INT >= Build.VERSION_CODES.R) {
+            return Environment.isExternalStorageManager();
+        } else {
+            int result = ContextCompat.checkSelfPermission(PublishApps.this, READ_EXTERNAL_STORAGE);
+            int result1 = ContextCompat.checkSelfPermission(PublishApps.this, WRITE_EXTERNAL_STORAGE);
+            return result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED;
+        }
+    }
 
     private void showCreateapplayout() {
         my_all_apps_layout.setVisibility(View.GONE);
@@ -208,6 +268,7 @@ public class PublishApps extends AppCompatActivity {
         selected_cat_name_txt=findViewById(R.id.selected_category_name_txt);
         next_btn=findViewById(R.id.next_btn);
         app_icon_img=findViewById(R.id.app_icon_img);
+        publish_apps_back=findViewById(R.id.publish_apps_back);
         
     }
 
@@ -289,12 +350,12 @@ public class PublishApps extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (view==app_icon_img){
-                    if (ActivityCompat.checkSelfPermission(PublishApps.this, Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED){
+                    if (ActivityCompat.checkSelfPermission(PublishApps.this, READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED){
                         Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
                         i.setType("image/*");
                         startActivityForResult(i,PICK_PROFILE_PIC);
                     }else{
-                        ActivityCompat.requestPermissions(PublishApps.this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},ASK_PERMISSION);
+                        ActivityCompat.requestPermissions(PublishApps.this,new String[]{READ_EXTERNAL_STORAGE},ASK_PERMISSION);
                     }
                     
                 }else if(view==select_category_button){

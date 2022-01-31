@@ -61,6 +61,13 @@ public class Search_resultAdapter extends RecyclerView.Adapter<Search_resultAdap
         notifyDataSetChanged();
     }
 
+    public void Add_more(ArrayList<Search_result_AppModel> more_items){
+
+        main_list.addAll(more_items);
+        notifyDataSetChanged();
+
+    }
+
 
     @NonNull
     @Override

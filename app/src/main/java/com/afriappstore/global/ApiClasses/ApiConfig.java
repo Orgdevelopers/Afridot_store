@@ -1,5 +1,7 @@
 package com.afriappstore.global.ApiClasses;
 
+import android.os.health.PackageHealthStats;
+
 public class ApiConfig {
 
     public static final String Base_url="https://afriappstore.com/web/";
@@ -39,7 +41,11 @@ public class ApiConfig {
     public static final String getallmyapps="getallmyapps";
     public static final String CHECK_PACKAGE_AVAILABILITY="checkpackageavailability";
     public static final String Rollout_my_app="rolloutmyapp";
-
+    public static final String sendemailotp="sendemailotp";
+    public static final String UPDATEPASSWORD="updatepassword";
+    public static final String GETALLSLIDERS="getallsliders";
+    public static final String GETALLBUISNESSAPPS="getallbuisnessapps";
+    public  static  final String GETALLBIGSLIDERS="getallbigsliderssss";
 
 
     public static final String AUTH_ID="auth_id";

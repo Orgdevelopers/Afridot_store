@@ -18,7 +18,7 @@ public class Variables {
     public static final String App_path= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString()+ File.separator+"Afri Appstore";
     public static final String Http="https://";
     public static final String Appcopypath=App_path+File.separator+"operations/";
-
+    public static final String AppDownloadpath=App_path+File.separator+"downloads/";
 
     //App settings//
 

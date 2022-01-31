@@ -1,19 +1,28 @@
 package com.afriappstore.global;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -23,6 +32,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,8 +40,10 @@ import android.widget.Toast;
 
 import com.afriappstore.global.ExtraActivities.PublishApps;
 import com.afriappstore.global.ExtraActivities.VerifyEmail;
+import com.afriappstore.global.Fragments.BuisnessFragment;
 import com.afriappstore.global.Fragments.Categories_fragment;
 import com.afriappstore.global.Fragments.Main_Fragment;
+import com.afriappstore.global.Model.SliderModel;
 import com.afriappstore.global.Profile.Fragments.Email_F;
 import com.afriappstore.global.Profile.Fragments.Phone_F;
 import com.google.android.material.navigation.NavigationView;
@@ -47,24 +59,36 @@ import com.afriappstore.global.SimpleClasses.Functions;
 import com.afriappstore.global.SimpleClasses.ShearedPrefs;
 import com.afriappstore.global.SimpleClasses.Variables;
 import com.google.android.material.tabs.TabLayout;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
+import io.paperdb.Paper;
 
 public class MainActivity extends AppCompatActivity {
-    GridView gridView;
     public DrawerLayout drawerLayout;
     NavigationView navigationView;
     public ActionBarDrawerToggle actionBarDrawerToggle;
-    public int backpress=0;
+    public int backpress=0,banner_count=0;
     public ImageView side_menu_btn,search_btn,about_us_button;
-    CountDownTimer back_timer,login_timer;
-    ViewPager pager;
+    CountDownTimer back_timer,main_pager_timer;
+    ViewPager pager,slider_pager;
     ViewPagerAdapter adapter;
     TabLayout tabs;
 
+    Picasso picasso;
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Functions.make_app_dirs();
+        picasso = Picasso.get();
         if (Variables.array==null){
             try {
                 Handler handler=new Handler();
@@ -100,6 +124,16 @@ public class MainActivity extends AppCompatActivity {
         });
 
          */
+
+        //init the paper db
+        Paper.init(this);
+
+        //check permission
+        //check_permission();
+
+        //slider pager
+        slider_pager=findViewById(R.id.main_slider_pager);
+        getAllbigsliders();
 
         tabs=findViewById(R.id.tabs);
         pager=findViewById(R.id.main_pager);
@@ -164,6 +198,7 @@ public class MainActivity extends AppCompatActivity {
                     public void run(){
                         open_appDetails_byApp_id(Integer.parseInt(data));
                     }
+
                 },200);
             }
 
@@ -174,6 +209,88 @@ public class MainActivity extends AppCompatActivity {
 
         check_update();
 
+    }
+
+    private void getAllbigsliders() {
+        ApiRequests.getAllbigslider(MainActivity.this, new FragmentCallBack() {
+            @Override
+            public void onResponce(Bundle bundle) {
+                if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
+
+                    try {
+                    JSONArray array = new JSONArray(bundle.getString(ApiConfig.Request_response));
+                    ArrayList<SliderModel> dataList = new ArrayList<>();
+                    for (int i=0;i<array.length();i++){
+                        JSONObject single = array.getJSONObject(i);
+                        SliderModel item = new SliderModel();
+                        item.img=single.getString("img");
+                        item.url=single.getString("url");
+
+                        dataList.add(item);
+
+                    }
+
+                    SliderPagerAdapter adapter = new SliderPagerAdapter(MainActivity.this,dataList);
+                    slider_pager.setAdapter(adapter);
+
+                    main_pager_timer=new CountDownTimer(3000,1000) {
+                        @Override
+                        public void onTick(long l) {
+
+
+                        }
+
+                        @Override
+                        public void onFinish() {
+                            main_pager_timer.cancel();
+                            main_pager_timer.start();
+                            if (banner_count<adapter.getCount()-1){
+                                banner_count++;
+                                slider_pager.setCurrentItem(banner_count,true);
+                            }else{
+                                banner_count=0;
+                                slider_pager.setCurrentItem(banner_count,true);
+
+                            }
+
+                        }
+                    };
+
+                    main_pager_timer.start();
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+                }
+
+            }
+        });
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void check_permission() {
+        if (this.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
+            Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Functions.Showdouble_btn_alert(MainActivity.this, "Permission alert",
+                        "these permissions required for App's functionality",
+                        "Cancel", "Continue", true, new FragmentCallBack() {
+                    @Override
+                    public void onResponce(Bundle bundle) {
+                        if (bundle.getString("action").equals("ok")){
+                            ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},1001);
+
+                        }
+
+                    }
+                });
+
+            }
+        },1000);
+        }
     }
 
     private void check_update() {
@@ -475,10 +592,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void close_drawer(){
-        drawerLayout.closeDrawer(Gravity.START,true);
+        drawerLayout.closeDrawer(GravityCompat.START,true);
     }
     private void Open_drawer(){
-        drawerLayout.openDrawer(Gravity.START,true);
+        drawerLayout.openDrawer(GravityCompat.START,true);
     }
 
 
@@ -498,8 +615,13 @@ public class MainActivity extends AppCompatActivity {
 
         View view2 = LayoutInflater.from(this).inflate(R.layout.item_tabs_signup, null);
         TextView text_history1 = view2.findViewById(R.id.text_history);
-        text_history1.setText("Categories");
+        text_history1.setText("Business Reach");
         tabs.getTabAt(1).setCustomView(view2);
+
+        View view3 = LayoutInflater.from(this).inflate(R.layout.item_tabs_signup, null);
+        TextView text_history2 = view3.findViewById(R.id.text_history);
+        text_history2.setText("Categories");
+        tabs.getTabAt(2).setCustomView(view3);
 
         tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
 
@@ -516,6 +638,10 @@ public class MainActivity extends AppCompatActivity {
                     case 1:
                         text_history.setTextColor(getResources().getColor(R.color.Login_tab_txt_color));
                         break;
+
+                    case 2:
+                        text_history.setTextColor(getResources().getColor(R.color.Login_tab_txt_color));
+                        break;
                 }
                 tab.setCustomView(v);
             }
@@ -530,6 +656,10 @@ public class MainActivity extends AppCompatActivity {
                         text_history.setTextColor(getResources().getColor(R.color.black));
                         break;
                     case 1:
+                        text_history.setTextColor(getResources().getColor(R.color.black));
+                        break;
+
+                    case 2:
                         text_history.setTextColor(getResources().getColor(R.color.black));
                         break;
 
@@ -566,6 +696,10 @@ public class MainActivity extends AppCompatActivity {
                     result = new Main_Fragment(MainActivity.this);
                     break;
                 case 1:
+                    result = new BuisnessFragment(MainActivity.this);
+                    break;
+
+                case 2:
                     result = new Categories_fragment(MainActivity.this);
                     break;
 
@@ -579,7 +713,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
 
 
@@ -605,5 +739,68 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+
+
+
+
+
+    class SliderPagerAdapter extends PagerAdapter {
+
+        Context context;
+        ArrayList<SliderModel> main_list;
+
+        public SliderPagerAdapter(Context context, ArrayList<SliderModel> dataList){
+            this.context=context;
+            this.main_list=dataList;
+
+        }
+
+
+        @Override
+        public int getCount() {
+            return main_list.size();
+        }
+
+        @Override
+        public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
+            container.removeView((View) object);
+        }
+
+        @NonNull
+        @Override
+        public Object instantiateItem(@NonNull ViewGroup container, int position) {
+            LayoutInflater inflater = (LayoutInflater) MainActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View view = inflater.inflate(R.layout.item_big_slider,container,false);
+            ImageView img = view.findViewById(R.id.big_slider_img);
+
+            if(picasso==null){
+                picasso=Picasso.get();
+            }
+
+            picasso.load(main_list.get(position).img).fetch(new Callback() {
+                @Override
+                public void onSuccess() {
+                    picasso.load(main_list.get(position).img).into(img);
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.wtf("picasso error: ",e);
+                    img.setImageDrawable(getResources().getDrawable(R.drawable.ic_banner));
+                }
+            });
+
+            container.addView(view);
+
+            return view;
+
+        }
+
+        @Override
+        public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
+            return view.equals(object);
+        }
+    }
 
 }

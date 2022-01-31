@@ -19,21 +19,49 @@
                 android:layout_height="wrap_content"
                 android:background="#1C6AA5">
 
-                <ImageView
-
-                    android:id="@+id/imageView2"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_155sdp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_banner"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:orientation="vertical"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:id="@+id/top_slider_layout">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <androidx.viewpager.widget.ViewPager
+                            android:visibility="visible"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:id="@+id/main_slider_pager"
+
+                            />
+
+                        <com.rd.PageIndicatorView
+                            android:id="@+id/main_slider_pager_indicator"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentBottom="true"
+                            android:layout_centerHorizontal="true"
+                            android:layout_marginBottom="@dimen/_5sdp"
+                            app:piv_animationType="worm"
+                            app:piv_dynamicCount="true"
+                            app:piv_interactiveAnimation="true"
+                            app:piv_radius="@dimen/_2sdp"
+                            app:piv_selectedColor="@color/teal_200"
+                            app:piv_unselectedColor="@color/ultra_light_grey"
+                            app:piv_viewPager="@id/main_slider_pager"/>
+
+                    </RelativeLayout>
+
+                </LinearLayout>
+
 
                 <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/constraintLayout2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:layout_constraintTop_toTopOf="@+id/imageView2">
+                    app:layout_constraintTop_toTopOf="parent">
 
                     <ImageView
                         android:id="@+id/side_menu_button"
