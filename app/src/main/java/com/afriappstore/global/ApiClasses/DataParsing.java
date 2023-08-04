@@ -3,7 +3,6 @@ package com.afriappstore.global.ApiClasses;
 import com.afriappstore.global.Model.AppModel;
 import com.afriappstore.global.Model.UserModel;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class DataParsing {
@@ -28,7 +27,7 @@ public class DataParsing {
             item.created_at = object.getString("created_at");
             item.category = object.getString("category");
             item.long_description = object.optString("long_description");
-            item.app_images = object.optString("app_images");
+            item.App_Images = object.optString("app_images");
             item.Reviews = object.optString("Reviews");
 
         } catch (Exception e) {
