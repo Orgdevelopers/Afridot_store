@@ -14,7 +14,6 @@ import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -24,30 +23,30 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afriappstore.global.ApiClasses.DataParsing;
 import com.afriappstore.global.ExtraActivities.PublishApps;
 import com.afriappstore.global.ExtraActivities.VerifyEmail;
-import com.afriappstore.global.Fragments.BuisnessFragment;
+import com.afriappstore.global.Fragments.BusinessFragment;
 import com.afriappstore.global.Fragments.Categories_fragment;
 import com.afriappstore.global.Fragments.Main_Fragment;
+import com.afriappstore.global.Model.AppModel;
 import com.afriappstore.global.Model.SliderModel;
-import com.afriappstore.global.Profile.Fragments.Email_F;
-import com.afriappstore.global.Profile.Fragments.Phone_F;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.navigation.NavigationView;
-import com.afriappstore.global.Adepters.MainAdapter;
 import com.afriappstore.global.ApiClasses.ApiConfig;
 import com.afriappstore.global.ApiClasses.ApiRequests;
 import com.afriappstore.global.ExtraActivities.AboutUs_A;
@@ -80,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
     ViewPagerAdapter adapter;
     TabLayout tabs;
 
+
     Picasso picasso;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -89,29 +89,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Functions.make_app_dirs();
         picasso = Picasso.get();
-        if (Variables.array==null){
-            try {
-                Handler handler=new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        startActivity(new Intent(MainActivity.this,SplashActivity.class));
-                        overridePendingTransition(R.anim.in_from_left,R.anim.out_to_right);
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                finish();
-                            }
-                        },11);
-                    }
-                },100);
-            }catch (Exception e){
-                e.printStackTrace();
 
 
-            }
-            return;
-        }
+
 
         /*gridView = findViewById(R.id.grid_view);
        MainAdapter adapter = new MainAdapter(MainActivity.this);
@@ -223,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
                     for (int i=0;i<array.length();i++){
                         JSONObject single = array.getJSONObject(i);
                         SliderModel item = new SliderModel();
-                        item.img=single.getString("img");
+                        item.img=single.getString("image");
                         item.url=single.getString("url");
 
                         dataList.add(item);
@@ -267,6 +247,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void check_permission() {
@@ -610,18 +592,18 @@ public class MainActivity extends AppCompatActivity {
 
         View view1 = LayoutInflater.from(this).inflate(R.layout.item_tabs_signup, null);
         TextView text_history = view1.findViewById(R.id.text_history);
-        text_history.setText("All apps");
-        tabs.getTabAt(0).setCustomView(view1);
+        text_history.setText("Categories");
+        tabs.getTabAt(2).setCustomView(view1);
 
         View view2 = LayoutInflater.from(this).inflate(R.layout.item_tabs_signup, null);
         TextView text_history1 = view2.findViewById(R.id.text_history);
-        text_history1.setText("Business Reach");
+        text_history1.setText("Afri Apps");
         tabs.getTabAt(1).setCustomView(view2);
 
         View view3 = LayoutInflater.from(this).inflate(R.layout.item_tabs_signup, null);
         TextView text_history2 = view3.findViewById(R.id.text_history);
-        text_history2.setText("Categories");
-        tabs.getTabAt(2).setCustomView(view3);
+        text_history2.setText("Business Reach");
+        tabs.getTabAt(0).setCustomView(view3);
 
         tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
 
@@ -631,7 +613,7 @@ public class MainActivity extends AppCompatActivity {
                 TextView text_history = v.findViewById(R.id.text_history);
 
                 switch (tab.getPosition()) {
-                    case 0:
+                    case 2:
                         text_history.setTextColor(getResources().getColor(R.color.Login_tab_txt_color));
                         break;
 
@@ -639,7 +621,7 @@ public class MainActivity extends AppCompatActivity {
                         text_history.setTextColor(getResources().getColor(R.color.Login_tab_txt_color));
                         break;
 
-                    case 2:
+                    case 0:
                         text_history.setTextColor(getResources().getColor(R.color.Login_tab_txt_color));
                         break;
                 }
@@ -652,14 +634,14 @@ public class MainActivity extends AppCompatActivity {
                 TextView text_history = v.findViewById(R.id.text_history);
 
                 switch (tab.getPosition()) {
-                    case 0:
+                    case 2:
                         text_history.setTextColor(getResources().getColor(R.color.black));
                         break;
                     case 1:
                         text_history.setTextColor(getResources().getColor(R.color.black));
                         break;
 
-                    case 2:
+                    case 0:
                         text_history.setTextColor(getResources().getColor(R.color.black));
                         break;
 
@@ -692,15 +674,15 @@ public class MainActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             final Fragment result;
             switch (position) {
-                case 0:
-                    result = new Main_Fragment(MainActivity.this);
-                    break;
-                case 1:
-                    result = new BuisnessFragment(MainActivity.this);
-                    break;
-
                 case 2:
                     result = new Categories_fragment(MainActivity.this);
+                    break;
+                case 1:
+                    result = new Main_Fragment(MainActivity.this);
+                    break;
+
+                case 0:
+                    result = new BusinessFragment(MainActivity.this);
                     break;
 
                 default:

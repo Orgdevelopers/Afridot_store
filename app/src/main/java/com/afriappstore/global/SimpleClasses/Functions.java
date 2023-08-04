@@ -104,7 +104,7 @@ public class Functions {
     }
 
     public static void ShowToast(Context context, String text) {
-        if (context != null && Variables.Toast_enabled == true) {
+        if (context != null && Variables.Toast_enabled) {
             Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
         }
     }
@@ -658,14 +658,6 @@ public class Functions {
 
             try {
 
-                    ApiRequests.checkverificationstatus(context, Functions.getSharedPreference(context).getString(ShearedPrefs.U_ID, ""), new FragmentCallBack() {
-                        @Override
-                        public void onResponce(Bundle bundle) {
-
-                            callBack.onResponce(new Bundle());
-
-                        }
-                    });
 
 
 

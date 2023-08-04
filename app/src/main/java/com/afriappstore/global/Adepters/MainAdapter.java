@@ -3,37 +3,53 @@ package com.afriappstore.global.Adepters;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afriappstore.global.ApiClasses.ApiConfig;
+import com.afriappstore.global.ApiClasses.DataParsing;
+import com.afriappstore.global.Model.AppModel;
 import com.afriappstore.global.SimpleClasses.Functions;
 import com.airbnb.lottie.LottieAnimationView;
 import com.afriappstore.global.R;
 import com.afriappstore.global.SimpleClasses.Variables;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class MainAdapter extends BaseAdapter {
 
     private  Context context;
     private LayoutInflater inflater;
     private PackageManager pm;
+    ArrayList<AppModel> datalist = new ArrayList<>();
 
-    public MainAdapter(Context c){
+    public MainAdapter(Context c, ArrayList<AppModel> datalist ){
         context = c;
+        this.datalist = datalist;
     }
 
 
     @Override
     public int getCount() {
-        return Variables.array.length();
+        return datalist.size();
     }
 
     @Override
@@ -66,76 +82,71 @@ public class MainAdapter extends BaseAdapter {
         main_downloads=convertView.findViewById(R.id.main_downloads);
 
 
+        AppModel item = datalist.get(position);
+        //app icon
+        String image_uri=null;
+        image_uri=item.app_icon;
+        Uri uri = null;
+        if (!image_uri.contains("http")){
+            image_uri= ApiConfig.Base_url+image_uri;
+        }
+        uri=Uri.parse(image_uri);
+
+        Picasso picasso=Picasso.get();
+        assert picasso != null;
+        //load image
+        Uri finalUri = uri;
+        picasso.load(uri).fetch(new Callback() {
+            @Override
+            public void onSuccess() {
+                //imageView.setVisibility(View.VISIBLE);
+                picasso.load(finalUri).into(imageView);
+                loading.cancelAnimation();
+                loading.setVisibility(View.GONE);
+
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        });
+
+
+        //app name
+        String app_names=item.app_name;
+        app_name.setText(app_names);
+
+        //app size
+        String appsize_s=item.size;
+        app_size.setText(appsize_s+" Mb");
+
+        //downloads
         try {
-            //app icon
-            String image_uri=null;
-            image_uri=Variables.array.getJSONObject(position).getString("icon");
-            Uri uri = null;
-            if (!image_uri.contains("http")){
-                image_uri= ApiConfig.Base_url+image_uri;
-            }
-            uri=Uri.parse(image_uri);
-
-             Picasso picasso=Picasso.get();
-            assert picasso != null;
-            //load image
-            Uri finalUri = uri;
-            picasso.load(uri).fetch(new Callback() {
-                @Override
-                public void onSuccess() {
-                    //imageView.setVisibility(View.VISIBLE);
-                    picasso.load(finalUri).into(imageView);
-                    loading.cancelAnimation();
-                    loading.setVisibility(View.GONE);
-
-                }
-
-                @Override
-                public void onError(Exception e) {
-
-                }
-            });
-
-
-            //app name
-            String app_names=Variables.array.getJSONObject(position).getString("name");
-            app_name.setText(app_names);
-
-            //app size
-            String appsize_s=Variables.array.getJSONObject(position).getString("size");
-            app_size.setText(appsize_s+" Mb");
-
-            //downloads
-            try {
-                main_downloads.setText(Functions.Format_numbers(Integer.parseInt(Variables.array.getJSONObject(position).getString("downloads"))));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            String package_name = null;
-            try {
-                if (pm==null){
-                    pm=context.getPackageManager();
-                }
-
-                package_name = Variables.array.getJSONObject(position).getString("package").trim();
-                boolean installed = isPackageInstalled(package_name,pm);
-                if (installed){
-                    app_free.setText("INSTALLED");
-                }else {
-                    app_free.setText("INSTALL");
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-
-
-        } catch (JSONException e) {
+            main_downloads.setText(Functions.Format_numbers(Integer.parseInt(item.downloads)));
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-            return convertView;
+        String package_name = null;
+        try {
+            if (pm==null){
+                pm=context.getPackageManager();
+            }
+
+            package_name = item.package_name.trim();
+            boolean installed = isPackageInstalled(package_name,pm);
+            if (installed){
+                app_free.setText("INSTALLED");
+            }else {
+                app_free.setText("INSTALL");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        return convertView;
         }
 
     private boolean isPackageInstalled(String packageName, PackageManager packageManager) {
@@ -146,5 +157,8 @@ public class MainAdapter extends BaseAdapter {
             return false;
         }
     }
-    }
+
+
+}
+
 

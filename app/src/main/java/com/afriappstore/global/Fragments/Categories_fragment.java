@@ -56,8 +56,8 @@ public class Categories_fragment extends Fragment {
                 datalist=new ArrayList<>();
                 try {
                     if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
-
-                        JSONArray categories = new JSONArray(bundle.getString(ApiConfig.Request_response));
+                        JSONObject resp = new JSONObject(bundle.getString(ApiConfig.Request_response));
+                        JSONArray categories = resp.getJSONArray("msg");
 
                         for (int i=0;i< categories.length();i++){
                             JSONObject singlecat=categories.getJSONObject(i);

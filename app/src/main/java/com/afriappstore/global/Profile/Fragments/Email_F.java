@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.os.CountDownTimer;
@@ -12,6 +13,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +25,15 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afriappstore.global.ApiClasses.DataParsing;
+import com.afriappstore.global.Model.UserModel;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.klinker.android.link_builder.Link;
 import com.klinker.android.link_builder.LinkBuilder;
 import com.klinker.android.link_builder.TouchableMovementMethod;
@@ -34,7 +45,13 @@ import com.afriappstore.global.R;
 import com.afriappstore.global.SimpleClasses.Functions;
 import com.afriappstore.global.SplashActivity;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import io.paperdb.Paper;
 
 public class Email_F extends Fragment {
     Context context;
@@ -67,6 +84,8 @@ public class Email_F extends Fragment {
         SetupScreenData();
         setLisners();
 
+
+
         return view;
     }
 
@@ -78,123 +97,17 @@ public class Email_F extends Fragment {
             public void onClick(View view) {
 
                 if (privacy_check_box.isChecked()){
-                    if (email_checked_switch==0){
-                        //
-                        Functions.showLoader(context);
-                        //
+                    if (email_edit.length()>5){
+                        callAPiLogin();
 
-
-                        loginTermsConditionTxt.setTextColor(Email_F.this.getResources().getColor(R.color.ultra_light_grey));
-                        if (!TextUtils.isEmpty(email_edit.getText())){
-                            ApiRequests.CheckEmailFromServer(context, email_edit.getText().toString().trim(), new FragmentCallBack() {
-                                @Override
-                                public void onResponce(Bundle bundle) {
-                                    Functions.cancelLoader();
-                                    String code = bundle.getString(ApiConfig.Request_code);
-                                    if (code.equals(ApiConfig.RequestSuccess)){
-                                        String type = bundle.getString("type");
-                                        if (type.equals("login")){
-
-                                            email_checked_switch=1;
-                                            update_password_view();
-
-                                        }else if (type.equals("signup")){
-                                            Functions.Showdouble_btn_alert(context, "No account found on this email", "create one?", "Cancel", "Create Account", false, new FragmentCallBack() {
-                                                @Override
-                                                public void onResponce(Bundle bundle) {
-                                                    if (bundle.getString("action").equals("ok")){
-                                                        Intent signup = new Intent(getActivity(), Email_signUp.class);
-                                                        signup.putExtra("email",email_edit.getText().toString());
-
-                                                        startActivity(signup);
-                                                        try {
-                                                            getActivity().overridePendingTransition(R.anim.in_from_right,R.anim.fade_out);
-                                                            Handler handler = new Handler();
-                                                            handler.postDelayed(new Runnable() {
-                                                                @Override
-                                                                public void run() {
-                                                                    getActivity().finish();
-                                                                }
-                                                            },100);
-
-                                                        } catch (Exception e) {
-                                                            e.printStackTrace();
-                                                        }
-
-
-
-                                                    }
-
-                                                }
-                                            });
-
-                                        }
-
-
-                                    }else{
-                                        Toast.makeText(context, "something went wrong please try again later", Toast.LENGTH_SHORT).show();
-                                    }
-
-                                }
-                            });
-
-                        }else{
-                            email_edit.setError("email required");
-                        }
-
-                    }else if (email_checked_switch==1){
-                        if (password_edit.getText().length()>=4){
-                            //
-                            Functions.showLoader(context);
-                            //
-
-                            String email=email_edit.getText().toString().trim();
-                            String pass = password_edit.getText().toString().trim();
-                            ApiRequests.EmailLogin(context, email, pass, new FragmentCallBack() {
-                                @Override
-                                public void onResponce(Bundle bundle) {
-                                    Functions.cancelLoader();
-                                    String code = bundle.getString(ApiConfig.Request_code);
-                                    if (code.equals(ApiConfig.RequestSuccess)){
-                                        //login success
-                                        Toast.makeText(context, "logged in success fully", Toast.LENGTH_SHORT).show();
-
-                                        Intent intent = new Intent(getActivity(),SplashActivity.class);
-                                        //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        startActivity(intent);
-
-
-                                        try {
-                                            getActivity().overridePendingTransition(R.anim.in_from_left,R.anim.out_to_right);
-                                            Handler handler = new Handler(
-                                            );
-                                            handler.postDelayed(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    getActivity().finish();
-                                                }
-                                            },1500);
-                                        }catch (Exception E){
-                                            E.printStackTrace();
-                                        }
-
-
-
-                                    }else if (code.equals(ApiConfig.RequestError)){
-                                        //error password
-                                        password_edit.setError("Wrong password entered");
-                                        forgot_pass_btn.setVisibility(View.VISIBLE);
-
-                                    }else if (code.equals("101")){
-                                        Toast.makeText(context, "server error 101", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
-
-                        }else{
-                            password_edit.setError("password should be 4 characters long");
-                        }
+                    }else{
+                        Toast.makeText(context,"Something wrong with email",Toast.LENGTH_SHORT).show();
                     }
+
+
+
+
+
 
                 }else{
                     loginTermsConditionTxt.setTextColor(Email_F.this.getResources().getColor(R.color.redcolor));
@@ -215,14 +128,8 @@ public class Email_F extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence text, int i, int i1, int i2) {
-                if (email_checked_switch==0){
-                    if (validate_email(text.toString())) {
-                        next_button.setEnabled(true);
 
-                    }else{
-                        next_button.setEnabled(false);
-                    }
-                }
+                validate_email_pass();
 
             }
 
@@ -232,6 +139,27 @@ public class Email_F extends Fragment {
             }
         });
 
+
+
+        password_edit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence text, int i, int i1, int i2) {
+
+
+                validate_email_pass();
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
         forgot_pass_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -264,137 +192,71 @@ public class Email_F extends Fragment {
 
     }
 
-    private void setupotplayout() {
-        verify_otp_layout.setVisibility(View.VISIBLE);
-        login_layout.setVisibility(View.GONE);
-        resend_button.setVisibility(View.GONE);
+    private void callAPiLogin() {
         Functions.showLoader(context);
-
-        ApiRequests.sendemailotp(context, email_edit.getText().toString(), new FragmentCallBack() {
+        StringRequest request = new StringRequest(Request.Method.GET, ApiConfig.Login, new Response.Listener<String>() {
             @Override
-            public void onResponce(Bundle bundle) {
+            public void onResponse(String response) {
+                Log.wtf("response",response);
                 Functions.cancelLoader();
-                if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
+                try {
+                    JSONObject resp = new JSONObject(response);
+                    if (resp.getString("code").equals("200")){
 
-                    email_otp=bundle.getString(ApiConfig.Request_response);
-                    setup_resend_view();
+                    JSONObject user = resp.getJSONObject("msg");
+                    UserModel userModel =DataParsing.parseUserModel(user);
+                        Paper.book().write("user",userModel);
+                        Paper.book().write("isLogin",true);
 
-                }else{
-                    Toast.makeText(context, "failed to send otp", Toast.LENGTH_SHORT).show();
-                }
+
+
+
+                    }else {
+                        Toast.makeText(context, ""+resp.getString("msg"), Toast.LENGTH_SHORT).show();
+                    }
+
+                }catch (Exception e){
+                    e.printStackTrace();                }
+
+
             }
-        });
-
-        View.OnClickListener listener = new View.OnClickListener() {
+        }, new Response.ErrorListener() {
             @Override
-            public void onClick(View view) {
-                if (view==resend_button){
-                    //clicked resend button
-                    Functions.showLoader(context);
-                    ApiRequests.sendemailotp(context, email_edit.getText().toString(), new FragmentCallBack() {
-                    @Override
-                    public void onResponce(Bundle bundle) {
-                        Functions.cancelLoader();
-                        if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
-                            setup_resend_view();
-                        }else{
-                            Toast.makeText(context, "failed to send otp", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+            public void onErrorResponse(VolleyError error) {
+                Log.wtf("error",error.getMessage());
 
-                }else if (view==verify_otp_button){
-                    //clicked verify button
-                    if (verify_otp_button.getText().equals("create password")){
-
-                        if ((!otp_edit.getText().toString().isEmpty()) && otp_edit.getText().length()>5){
-                            Functions.showLoader(context);
-                            ApiRequests.updatePassword(context, email_edit.getText().toString(), otp_edit.getText().toString(), new FragmentCallBack() {
-                                @Override
-                                public void onResponce(Bundle bundle) {
-                                    Functions.cancelLoader();
-                                    if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
-                                        Toast.makeText(context, "password updated successfully", Toast.LENGTH_SHORT).show();
-                                        Functions.showLoader(context);
-                                        verify_otp_layout.setVisibility(View.GONE);
-                                        login_layout.setVisibility(View.VISIBLE);
-                                        forgot_pass_btn.setVisibility(View.INVISIBLE);
-                                        Handler handler = new Handler();
-                                        handler.postDelayed(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                Functions.cancelLoader();
-                                            }
-                                        },500);
-
-
-                                    }else {
-                                        Toast.makeText(context, "failed to update password please try again later", Toast.LENGTH_SHORT).show();
-                                    }
-
-                                }
-                            });
-
-                        }else{
-
-                            otp_edit.setError("password length should be more than 6");
-                        }
-
-                    }else{
-
-                        Functions.showLoader(context);
-                        Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                Functions.cancelLoader();
-                                if (otp_edit.getText().toString().trim().equals(email_otp.trim())) {
-                                    Toast.makeText(context, "otp verified", Toast.LENGTH_SHORT).show();
-                                    setupcreatepassview();
-
-                                } else {
-                                    Toast.makeText(context, "wrong otp", Toast.LENGTH_SHORT).show();
-                                }
-
-                            }
-                        }, 500);
-
-                    }
-
-
-
-                }
-
+               Functions.cancelLoader();
+                Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show();
             }
+        }){
+            @Nullable
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> param = new HashMap<>();
+                param.put("email",email_edit.getText().toString());
+                param.put("password",password_edit.getText().toString());
+                return param;
+            }
+
         };
 
-        resend_button.setOnClickListener(listener);
-        verify_otp_button.setOnClickListener(listener);
+        RequestQueue queue = Volley.newRequestQueue(context.getApplicationContext());
+        queue.add(request);
+    }
 
+    private void setupotplayout() {
+        if(email_edit.length()>5 && email_edit.getText().toString().contains("@")){
+            login_layout.setVisibility(View.GONE);
+            verify_otp_layout.setVisibility(View.VISIBLE);
+            callApiForgetpass();
 
-        otp_edit.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }else {
+            Toast.makeText(context, "Please enter valid email first", Toast.LENGTH_SHORT).show();
+        }
 
-            }
+    }
 
-            @Override
-            public void onTextChanged(CharSequence text, int i, int i1, int i2) {
-                if (text.length()==6){
-                    verify_otp_button.setEnabled(true);
-                    verify_otp_button.setClickable(true);
-                }else {
-                    verify_otp_button.setEnabled(false);
-                    verify_otp_button.setClickable(false);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-
+    private void callApiForgetpass() {
 
 
     }
@@ -533,15 +395,23 @@ public class Email_F extends Fragment {
 
     }
 
-    private Boolean validate_email(String text){
-        boolean b=false;
-        if (text.length()>0){
-            if (text.contains("@")){
-                b= true;
+    private void validate_email_pass(){
+        String email = email_edit.getText().toString();
+        String pass = password_edit.getText().toString();
+        if (email.length()>5){
+            if (email.contains("@")){
+                if (pass.length()>5){
+                    next_button.setEnabled(true);
+                    next_button.setFocusable(true);
+                    return;
+                }
             }
         }
+        next_button.setEnabled(false);
+        next_button.setFocusable(false);
 
-        return b;
+
+
     }
 
 

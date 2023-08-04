@@ -12,6 +12,7 @@ import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.ContentInfo;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,15 +24,26 @@ import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.Toast;
 
+import com.afriappstore.global.Adepters.Business_adapter;
 import com.afriappstore.global.Adepters.MainAdapter;
 import com.afriappstore.global.ApiClasses.ApiConfig;
 import com.afriappstore.global.ApiClasses.ApiRequests;
+import com.afriappstore.global.ApiClasses.DataParsing;
 import com.afriappstore.global.AppDetail;
 import com.afriappstore.global.Interfaces.FragmentCallBack;
 import com.afriappstore.global.MainActivity;
+import com.afriappstore.global.Model.AppModel;
 import com.afriappstore.global.Model.SliderModel;
 import com.afriappstore.global.R;
 import com.afriappstore.global.SimpleClasses.Functions;
+import com.afriappstore.global.SimpleClasses.Variables;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.rd.PageIndicatorView;
 import com.squareup.picasso.Picasso;
@@ -40,6 +52,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class Main_Fragment extends Fragment {
@@ -53,7 +67,9 @@ public class Main_Fragment extends Fragment {
     CountDownTimer slider_autochange_timer;
     ArrayList<SliderModel> slider_list;
     SliderAdapter slider_adapter;
+    MainAdapter adapter;
     int item = 0;
+    ArrayList<AppModel> datalist = new ArrayList<>();
 
     public Main_Fragment(Context context) {
         // Required empty public constructor
@@ -71,22 +87,23 @@ public class Main_Fragment extends Fragment {
         slider_shimmer=view.findViewById(R.id.slider_shimmer);
 
         slider_layout.setVisibility(View.GONE);
-        slider_shimmer.setVisibility(View.VISIBLE);
+        slider_shimmer.setVisibility(View.GONE);
+        Toast.makeText(context, "sssss", Toast.LENGTH_SHORT).show();
+        getAllapps(context);
 
         slider_pager=view.findViewById(R.id.main_slider_pager);
-         gridView = view.findViewById(R.id.grid_view);
-       MainAdapter adapter = new MainAdapter(context);
+        gridView = view.findViewById(R.id.grid_view);
+         adapter = new MainAdapter(context,datalist);
         gridView.setAdapter(adapter);
-       gridView.setOnItemClickListener( new AdapterView.OnItemClickListener()  {
+        gridView.setOnItemClickListener( new AdapterView.OnItemClickListener()  {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                open_appDetails_byPosition(position);
             }
         });
 
-
-       setDynamicHeight(gridView);
-       setUpSlider();
+       //setDynamicHeight(gridView);
+       //setUpSlider();
 
         return view;
     }
@@ -108,11 +125,10 @@ public class Main_Fragment extends Fragment {
 
         float x = 1;
         if( items > 3 ){
-            x = items/3;
-            rows = (int) (x);
+            x = (float) items/ 3f;
+            rows = new Double(Math.ceil(x)).intValue();//(int) Math.ceil(x);
             totalHeight *= rows;
         }
-
         ViewGroup.LayoutParams params = gridView.getLayoutParams();
         params.height = totalHeight;
         gridView.setLayoutParams(params);
@@ -123,6 +139,7 @@ public class Main_Fragment extends Fragment {
             @Override
             public void onResponce(Bundle bundle) {
                 //
+
                 if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
                     try {
                         JSONArray array = new JSONArray(bundle.getString(ApiConfig.Request_response));
@@ -132,7 +149,7 @@ public class Main_Fragment extends Fragment {
                             SliderModel model =null;
                             model=new SliderModel();
 
-                            model.img=row.getString("img");
+                            model.img=row.getString("image");
                             model.title=row.getString("title");
                             model.url=row.getString("url");
 
@@ -140,7 +157,7 @@ public class Main_Fragment extends Fragment {
 
                         }
 
-                        //Toast.makeText(context, ""+slider_list.size(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, ""+slider_list.size(), Toast.LENGTH_SHORT).show();
                         slider_adapter = new SliderAdapter(context,slider_list);
                         slider_pager.setAdapter(slider_adapter);
 
@@ -199,7 +216,7 @@ public class Main_Fragment extends Fragment {
 
     private void close_shimer() {
         slider_shimmer.setVisibility(View.GONE);
-        slider_layout.setVisibility(View.VISIBLE);
+        slider_layout.setVisibility(View.GONE);
     }
 
     private void close_slider() {
@@ -218,7 +235,67 @@ public class Main_Fragment extends Fragment {
             e.printStackTrace();
         }
     }
+    public void getAllapps(Context c) {
+        StringRequest request = new StringRequest(Request.Method.GET, ApiConfig.getAllApps, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
 
+                //Toast.makeText(context, ""+response, Toast.LENGTH_SHORT).show();
+                if (!response.equals("")) {
+                    try {
+
+                        JSONObject resp = new JSONObject(response);
+                        if (resp.getString("code").equalsIgnoreCase("200")){
+                            JSONArray array = resp.getJSONArray("msg");
+                            if (datalist==null){
+                                datalist=new ArrayList<>();
+                            }
+                            for (int i  = 0; i <array.length() ; i++) {
+                                AppModel item = DataParsing.parseAppModel(array.getJSONObject(i));
+                                datalist.add(item);
+                            }
+
+                            updateData();
+
+                        }else{
+                            //no records found
+
+                        }
+
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Functions.ShowToast(c, error.toString());
+                Log.wtf("ollllllllllllllllllllllll okkkkkkk",error);
+
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("api_key","0");
+                return headers;
+            }
+        };
+
+        RequestQueue queue = Volley.newRequestQueue(c);
+        queue.add(request);
+
+    }
+
+    private void updateData() {
+        adapter.notifyDataSetChanged();
+
+
+
+
+    }
 
 
 

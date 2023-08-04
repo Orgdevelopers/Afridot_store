@@ -22,12 +22,9 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        ApiRequests.getAllapps(getApplicationContext(), new FragmentCallBack() {
-            @Override
-            public void onResponce(Bundle bundle) {
+
+
                 proceed();
-            }
-        });
 
         ApiRequests.updateShareUrl(this);
 
@@ -64,6 +61,8 @@ public class SplashActivity extends AppCompatActivity {
 
     }
 
+
+
     private void proceed(){
         Functions.ShowToast(SplashActivity.this,"splash timer");
         Intent intent = new Intent(SplashActivity.this, MainActivity.class);
@@ -85,7 +84,7 @@ public class SplashActivity extends AppCompatActivity {
                 public void run() {
                     finish();
                 }
-            },10);
+            },2000);
         }catch (Exception e){
             e.printStackTrace();
         }

@@ -74,15 +74,15 @@ public class LoginActivity extends AppCompatActivity {
     // this method will change the text and style tabs
     private void setupTabIcons() {
 
-        View view1 = LayoutInflater.from(this).inflate(R.layout.item_tabs_signup, null);
-        TextView text_history = view1.findViewById(R.id.text_history);
-        text_history.setText("phone");
-        tabLayout.getTabAt(0).setCustomView(view1);
+//        View view1 = LayoutInflater.from(this).inflate(R.layout.item_tabs_signup, null);
+//        TextView text_history = view1.findViewById(R.id.text_history);
+//        text_history.setText("phone");
+//        tabLayout.getTabAt(0).setCustomView(view1);
 
-        View view2 = LayoutInflater.from(this).inflate(R.layout.item_tabs_signup, null);
-        TextView text_history1 = view2.findViewById(R.id.text_history);
+        View view1 = LayoutInflater.from(this).inflate(R.layout.item_tabs_signup, null);
+        TextView text_history1 = view1.findViewById(R.id.text_history);
         text_history1.setText("email");
-        tabLayout.getTabAt(1).setCustomView(view2);
+        tabLayout.getTabAt(0).setCustomView(view1);
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
 
@@ -92,11 +92,11 @@ public class LoginActivity extends AppCompatActivity {
                 TextView text_history = v.findViewById(R.id.text_history);
 
                 switch (tab.getPosition()) {
-                    case 0:
-                        text_history.setTextColor(getResources().getColor(R.color.Login_tab_txt_color));
-                        break;
+//                    case 0:
+//                        text_history.setTextColor(getResources().getColor(R.color.Login_tab_txt_color));
+//                        break;
 
-                    case 1:
+                    case 0:
                         text_history.setTextColor(getResources().getColor(R.color.Login_tab_txt_color));
                         break;
                 }
@@ -109,10 +109,10 @@ public class LoginActivity extends AppCompatActivity {
                 TextView text_history = v.findViewById(R.id.text_history);
 
                 switch (tab.getPosition()) {
+//                    case 0:
+//                        text_history.setTextColor(getResources().getColor(R.color.black));
+//                        break;
                     case 0:
-                        text_history.setTextColor(getResources().getColor(R.color.black));
-                        break;
-                    case 1:
                         text_history.setTextColor(getResources().getColor(R.color.black));
                         break;
 
@@ -144,10 +144,10 @@ public class LoginActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             final Fragment result;
             switch (position) {
+//                case 0:
+//                    result = new Phone_F(LoginActivity.this);
+//                    break;
                 case 0:
-                    result = new Phone_F(LoginActivity.this);
-                    break;
-                case 1:
                     result = new Email_F(LoginActivity.this);
                     break;
 
@@ -161,7 +161,7 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return 2;
+            return 1;
         }
 
 

@@ -102,7 +102,7 @@ public class ProfileA extends AppCompatActivity {
 
         //
         setnavigation();
-        set_verification();
+
 
         back_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -298,18 +298,6 @@ public class ProfileA extends AppCompatActivity {
 
     }
 
-    private void set_verification() {
-        verified_tic.setVisibility(View.GONE);
-        ApiRequests.checkverificationstatus(this, Functions.getSharedPreference(this).getString(ShearedPrefs.U_ID, "not"), new FragmentCallBack() {
-            @Override
-            public void onResponce(Bundle bundle) {
-                if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
-                    verified_tic.setVisibility(View.VISIBLE);
-                }
-
-            }
-        });
-    }
 
     private void change_text() {
         firstname.setText(f_nam);

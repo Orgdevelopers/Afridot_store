@@ -1,34 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    xmlns:aapt="http://schemas.android.com/aapt"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:gravity="center">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:padding="1dp"
-        android:orientation="vertical"
+        android:background="@drawable/outilne_less_round_rect"
         android:gravity="center"
-        android:background="@drawable/outilne_less_round_rect">
+        android:orientation="vertical"
+        android:padding="1dp">
 
         <LinearLayout
-            android:padding="10dp"
-            android:background="@drawable/less_round_edge_ractengle_white"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@drawable/less_round_edge_ractengle_white"
+            android:gravity="center"
             android:orientation="vertical"
-            android:gravity="center">
+            android:padding="10dp">
 
             <androidx.cardview.widget.CardView
-                android:layout_marginTop="8dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="11dp"
-                app:cardBackgroundColor="@color/white">
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="11dp">
+
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
@@ -37,39 +40,39 @@
                         android:id="@+id/image_view"
                         android:layout_width="80dp"
                         android:layout_height="80dp"
+                        android:visibility="visible"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="@+id/image_loading" />
 
                     <com.airbnb.lottie.LottieAnimationView
-                        android:background="@color/invisible"
                         android:id="@+id/image_loading"
                         android:layout_width="80dp"
                         android:layout_height="80dp"
+                        android:background="@color/invisible"
+                        android:visibility="visible"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:lottie_autoPlay="true"
                         app:lottie_loop="true"
                         app:lottie_rawRes="@raw/loading_ajax" />
-
                 </androidx.constraintlayout.widget.ConstraintLayout>
-
             </androidx.cardview.widget.CardView>
 
             <TextView
-                android:layout_marginTop="5dp"
+                android:id="@+id/text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/text_view"
-                android:text="numbers"
+                android:layout_marginTop="5dp"
                 android:singleLine="true"
+                android:text="numbers"
                 android:textColor="@color/black"
-                android:textSize="16dp"/>
+                android:textSize="16dp" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="5dp">
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/app_size_text"
@@ -77,8 +80,8 @@
                     android:layout_height="wrap_content"
                     android:text="0.0 mb"
                     android:textAlignment="center"
-                    android:textSize="12dp"
                     android:textColor="@color/app_size_color"
+                    android:textSize="12dp"
                     app:layout_constraintStart_toStartOf="parent"
                     tools:ignore="MissingConstraints" />
 
@@ -86,22 +89,21 @@
                     android:id="@+id/app_free_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    tools:ignore="MissingConstraints"
+                    android:layout_marginEnd="1dp"
                     android:text="free"
-                    android:textSize="11dp"
                     android:textAlignment="center"
                     android:textColor="@color/install_btn_bg"
-                    android:layout_marginEnd="1dp"/>
+                    android:textSize="11dp"
+                    app:layout_constraintEnd_toEndOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/download_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="5dp"
                 android:orientation="horizontal">
-
 
                 <TextView
                     android:id="@+id/main_downloads"
@@ -113,8 +115,7 @@
                     android:textSize="11dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="MissingConstraints" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/textView3"
@@ -126,16 +127,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
-
             </androidx.constraintlayout.widget.ConstraintLayout>
-
         </LinearLayout>
-
     </LinearLayout>
-
-
-
-
-
-
 </LinearLayout>

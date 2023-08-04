@@ -151,30 +151,6 @@ public class Email_signUp extends AppCompatActivity {
         String l_name=lastname_edit.getText().toString().trim();
         String password=create_pass_edit.getText().toString().trim();
 
-        ApiRequests.createEmailUser(Email_signUp.this, email, f_name, l_name, password, profile_pic, new FragmentCallBack() {
-            @Override
-            public void onResponce(Bundle bundle) {
-                Functions.cancelLoader();
-                String code=bundle.getString(ApiConfig.Request_code);
-                if (code.equals(ApiConfig.RequestSuccess)){
-                    Toast.makeText(Email_signUp.this, "Logged in successfully", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(Email_signUp.this, SplashActivity.class);
-                    startActivity(intent);
-                    overridePendingTransition(R.anim.in_from_left,R.anim.out_to_right);
-
-                    Handler handler = new Handler(
-                    );
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            finish();
-                        }
-                    },1500);
-
-                }
-
-            }
-        });
     }
 
     private boolean check_inputs() {

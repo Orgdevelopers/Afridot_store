@@ -4,14 +4,20 @@ import android.os.health.PackageHealthStats;
 
 public class ApiConfig {
 
-    public static final String Base_url="https://afriappstore.com/web/";
-    public static final String Api_url=Base_url+"api.php";
+    public static final String Base_url="https://afriappstore.com/";
+    public static final String Api_url=Base_url+"api/";
     public static final String Terms_url="";
     public static final String Privacy_url="";
     public static final String APPUPLOADURI=Base_url+"uploads/apks/file_recive.php";
     public static final String APPIMAGEUPLOADURI=Base_url+"uploads/file_recive.php";
     public static final String APPICONUPLOADURI=Base_url+"uploads/logos/file_recive.php";
 
+    //
+    public static final String getAllApps = Api_url+"showAllApps";
+    public static final  String getALlSliders = Api_url+"showAllSliders";
+    public static final String showALlCategories = Api_url+"showAllCategories";
+    public static final String Signup = Api_url+"Signup";
+    public static final String Login=Api_url+"index";
 
     //
     public static final String Request="request";
@@ -30,7 +36,7 @@ public class ApiConfig {
     public static final String Request_GetShareUrl="Request_GetShareUrl";
     public static final String Request_PostReview="Request_PostReview";
     public static final String CHECK_SERVER_EMAIL="CHECK_SERVER_EMAIL";
-    public static final String EmailLogin="EmailLogin";
+
     public static final String createEmailUser="createEmailUser";
     public static final String check_myReview="check_myReview";
     public static final String check_review="check_review";

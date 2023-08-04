@@ -1,5 +1,5 @@
 package com.afriappstore.global.Model;
 
 public class SliderModel {
-    public String title,img,url;
+    public String id,title,img,url;
 }

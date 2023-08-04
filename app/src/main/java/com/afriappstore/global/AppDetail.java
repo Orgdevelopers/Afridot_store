@@ -249,7 +249,7 @@ public class AppDetail extends AppCompatActivity {
 
         ///////////////////////////////////////////////////////
 
-        set_reviews(context);
+
 
         ///////////////////////////////////////////////////////
         share_btn.setOnClickListener(listener);
@@ -262,63 +262,8 @@ public class AppDetail extends AppCompatActivity {
             }
         });
 
-        if (is_images_loaded){
-            recyclerView=findViewById(R.id.app_images);
-            AppSlideradapter adapter = new AppSlideradapter(context,p_App_id);
-            recyclerView.setAdapter(adapter);
-            LinearLayoutManager manager = new LinearLayoutManager(context);
-            manager.setOrientation(RecyclerView.HORIZONTAL);
-            recyclerView.setLayoutManager(manager);
-        }else {
-            ApiRequests.getappimage(this, p_App_id, new FragmentCallBack() {
-                @Override
-                public void onResponce(Bundle bundle) {
-                    String code=bundle.getString(ApiConfig.Request_code);
-                    if (code.equals(ApiConfig.RequestSuccess)){
-                        try {
-                            JSONArray temparray = new JSONArray(bundle.getString("resp"));
-                            if (Variables.image_array==null){
-                                Variables.image_array=new JSONArray();
-                            }
-
-                            Variables.image_array.put(Integer.parseInt(p_App_id),temparray);
-                            recyclerView=findViewById(R.id.app_images);
-                            AppSlideradapter adapter = new AppSlideradapter(context,p_App_id);
-                            recyclerView.setAdapter(adapter);
-                            LinearLayoutManager manager = new LinearLayoutManager(context);
-                            manager.setOrientation(RecyclerView.HORIZONTAL);
-                            recyclerView.setLayoutManager(manager);
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                    }else if (code.equals(ApiConfig.RequestError)){
-                        Functions.ShowToast(context,"image load error");
-                    }
-                }
-            });
-        }
         //fetch description
 
-        if (Variables.description_array==null) {
-            get_description_from_server(context);
-        }else{
-            JSONObject object = null;
-            String desc="";
-                try {
-                    object=Variables.description_array.getJSONObject(Integer.parseInt(p_App_id));
-                    desc=object.getString(p_App_id);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                if (object==null){
-                    get_description_from_server(context);
-                }else{
-                    set_local_description(context,desc);
-                }
-            
-        }
 
         try {
             app_name.setText(app.getString("name"));
@@ -432,68 +377,6 @@ public class AppDetail extends AppCompatActivity {
         install_btn.setBackgroundColor(getResources().getColor(R.color.install_btn_bg));
     }
 
-    private void set_reviews(Context context) {
-        ApiRequests.getreviewscount(context, p_App_id, new FragmentCallBack() {
-            @Override
-            public void onResponce(Bundle bundle) {
-                if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
-                    int s1=0 ; int s2=0 ; int s3=0 ; int s4=0; int s5=0; int totalrates=0;
-                    try {
-
-                        JSONObject rating = Variables.rating_count.getJSONObject(Integer.parseInt(p_App_id));
-
-                        s5=Integer.parseInt(rating.getString("s5"));
-                        s4=Integer.parseInt(rating.getString("s4"));
-                        s3=Integer.parseInt(rating.getString("s3"));
-                        s2=Integer.parseInt(rating.getString("s2"));
-                        s1=Integer.parseInt(rating.getString("s1"));
-
-                        totalrates=s5+s4+s3+s2+s1;
-
-                        if (ratingReviews!=null){
-                            ratingReviews=null;
-                        }
-                        ratingReviews = (RatingReviews) findViewById(R.id.rating_reviews);
-
-
-                        int colors= getResources().getColor(R.color.rating_bar_color);
-
-                        int raters[]=new int[]{s5,s4,(s3), (s2),(s1)};
-                        int total_stars=(s1)+(s2*2)+(s3*3)+(s4*4)+(s5*5);
-
-
-
-
-       /* int raters[] = new int[]{
-                new Random().nextInt(100),
-                new Random().nextInt(100),
-                new Random().nextInt(100),
-                new Random().nextInt(100),
-                new Random().nextInt(100)
-        };
-*/
-                        ratingReviews.createRatingBars(totalrates, BarLabels.STYPE3,colors,raters);
-                        total_rates_txt.setText(String.valueOf(totalrates));
-
-                        float avrage=(total_stars*100)/totalrates;
-                        avrage=avrage/100;
-
-                        //Toast.makeText(context, ""+Functions.Convert_rating(avrage), Toast.LENGTH_SHORT).show();
-                        horizontal_bar_review_count.setText(Functions.Format_numbers(totalrates)+"+");
-                        horizontal_bar_rating.setText(String.valueOf(avrage));
-
-                        rating_big_text.setText(String.valueOf(avrage));
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-
-
-                }
-            }
-        });
-
-
-    }
 
     private void init_views() {
 
@@ -805,63 +688,6 @@ public class AppDetail extends AppCompatActivity {
         r_username2 = findViewById(R.id.review_username2);
         r_username3 = findViewById(R.id.review_username3);
 
-        ApiRequests.get3random_ratings(context, p_App_id, new FragmentCallBack() {
-            @Override
-            public void onResponce(Bundle bundle) {
-                if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
-                    try {
-                        JSONArray rating3=Variables.rating3_array.getJSONArray(Integer.parseInt(p_App_id));
-                        if (rating3.length()>0){
-                            if (rating3.length()>1){
-
-                                if (rating3.length()>2){
-
-                                    JSONObject first=rating3.getJSONObject(0);
-                                    JSONObject second=rating3.getJSONObject(1);
-                                    JSONObject third=rating3.getJSONObject(2);
-                                    setall(first,second,third);
-
-                                }else{
-                                    JSONObject first=rating3.getJSONObject(0);
-                                    JSONObject second=rating3.getJSONObject(1);
-                                    settwo(first,second);
-                                    third_review_layout.setVisibility(View.GONE);
-                                    see_all_rev_txt_bottom.setVisibility(View.VISIBLE);
-                                    no_review_found.setVisibility(View.GONE);
-                                    some_reviews.setVisibility(View.VISIBLE);
-                                }
-
-                            }else{
-                                JSONObject first=rating3.getJSONObject(0);
-                                setfirst(first);
-
-                                second_review_layout.setVisibility(View.GONE);
-                                third_review_layout.setVisibility(View.GONE);
-
-                            }
-                            see_all_rev_txt_bottom.setVisibility(View.VISIBLE);
-                            no_review_found.setVisibility(View.GONE);
-                            some_reviews.setVisibility(View.VISIBLE);
-
-                        }else{
-
-                            see_all_rev_txt_bottom.setVisibility(View.GONE);
-                            some_reviews.setVisibility(View.GONE);
-                            no_review_found.setVisibility(View.VISIBLE);
-
-                        }
-
-
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }else{
-                    some_reviews.setVisibility(View.GONE);
-                    no_review_found.setVisibility(View.VISIBLE);
-                    see_all_rev_txt_bottom.setVisibility(View.GONE);
-                }
-            }
-        });
 
         ///////////////////////////////////////////////////////////////
 
@@ -894,43 +720,6 @@ public class AppDetail extends AppCompatActivity {
         });
     }
 
-    private void get_description_from_server(Context context) {
-        ApiRequests.get_app_long_description(context, p_App_id, new FragmentCallBack() {
-            @Override
-            public void onResponce(Bundle bundle) {
-                String code= bundle.getString(ApiConfig.Request_code);
-                if (code.equals(ApiConfig.RequestSuccess)){
-                    save_description(bundle.getString(ApiConfig.Request_response),p_App_id);
-                    app_description.setText(bundle.getString(ApiConfig.Request_response));
-                    read_more.setVisibility(View.VISIBLE);
-                    final Integer[] desc_switch = {0};
-                    read_more.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            if (desc_switch[0] ==0){
-                                read_more.setText("read less");
-                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                                params.setMarginStart(80);
-                                params.setMarginEnd(80);
-                                app_description.setLayoutParams(params);
-                                desc_switch[0] =1;
-                            }else if (desc_switch[0]==1){
-                                read_more.setText("read more");
-                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 110);
-                                params.setMarginStart(80);
-                                params.setMarginEnd(80);
-                                app_description.setLayoutParams(params);
-                                desc_switch[0] =0;
-                            }
-
-                        }
-                    });
-                }else{
-
-                }
-            }
-        });
-    }
 
     private void save_description(String resp, String appid) {
         if (Variables.description_array==null){
@@ -1111,7 +900,7 @@ public class AppDetail extends AppCompatActivity {
     protected void onResume() {
         try {
             my_detailed_review.setText(Variables.my_review);
-            set_reviews(context);
+
             check_myreview();
         }catch (Exception e){
             e.printStackTrace();

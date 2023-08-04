@@ -216,36 +216,6 @@ public class SignupActivity extends AppCompatActivity {
 
         }
 
-        ApiRequests.createPhoneUser(SignupActivity.this, PHONE, f_name,l_name,Auth_ID, image, new FragmentCallBack() {
-            @Override
-            public void onResponce(Bundle bundle) {
-                Functions.cancelLoader();
-                String code = bundle.getString(ApiConfig.Request_code);
-                if (code.equals(ApiConfig.RequestSuccess)){
-                    //success
-                    Bundle b = new Bundle();
-                    b.putString(ApiConfig.Request_PostF_Name,f_name);
-                    b.putString(ApiConfig.Request_PostL_Name,l_name);
-                    b.putString(ApiConfig.AUTH_ID,Auth_ID);
-                    b.putString("image",bundle.getString(ApiConfig.Request_response));
-                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                    Functions.phoneSignUp_updateData(SignupActivity.this,user,b);
-
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            finish();
-                            overridePendingTransition(R.anim.in_from_left,R.anim.out_to_right);
-                        }
-                    },20);
-                    Toast.makeText(SignupActivity.this, "Login success", Toast.LENGTH_SHORT).show();
-
-                }else{
-                    Toast.makeText(SignupActivity.this, ""+bundle.getString(ApiConfig.Request_response), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
 
     }
 

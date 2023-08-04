@@ -369,7 +369,7 @@ public class Phone_F extends Fragment {
 
                             FirebaseUser user = task.getResult().getUser();
                             // Update UI
-                            proceed_phone_API(user);
+
 
                         } else {
                             Functions.cancelLoader();
@@ -390,92 +390,4 @@ public class Phone_F extends Fragment {
                 });
     }
 
-    private void proceed_phone_API(FirebaseUser user) {
-        ApiRequests.callApiForPhoneSignIn(context, user.getPhoneNumber(), new FragmentCallBack() {
-            @Override
-            public void onResponce(Bundle bundle) {
-                Functions.cancelLoader();
-                String req_code=bundle.getString(ApiConfig.Request_code);
-                if (req_code.equals(ApiConfig.RequestSuccess)){
-                    try {
-                        JSONObject data=new JSONObject(bundle.getString(ApiConfig.Request_response));
-                        String action = data.optString(ApiConfig.Request_Phone_respType);
-
-                        if (action.equals(ApiConfig.Request_Phone_respTypeLogin)){
-                            JSONObject user = data.getJSONObject(ApiConfig.Request_parse_user);
-                            //update data in perf
-                            String f_name="";
-                            String l_name="";
-                            String profile_pic="";
-                            FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-                            try {
-                                f_name= user.getString("first_name");
-                                l_name= user.optString("last_name");
-                                profile_pic= user.getString("pic");
-                            }catch (Exception e){
-                                e.printStackTrace();
-                            }
-
-                            if (!f_name.equals("")){
-                                Toast.makeText(context, "Login successfully", Toast.LENGTH_SHORT).show();
-
-                                Bundle b = new Bundle();
-                                b.putString(ApiConfig.Request_PostF_Name,f_name);
-                                b.putString(ApiConfig.Request_PostL_Name,l_name);
-                                b.putString("image",profile_pic);
-                                Functions.phoneSignUp_updateData(context,firebaseUser,b);
-                            }else{
-                                Toast.makeText(context, "Login Failed please try again", Toast.LENGTH_SHORT).show();
-
-                            }
-
-                            Intent intent = new Intent(context, SplashActivity.class);
-                            startActivity(intent);
-                            Handler handler = new Handler();
-                            handler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        getActivity().finish();
-                                    }catch (Exception e)
-                                    {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            },50);
-
-
-
-                        }else if (action.equals(ApiConfig.Request_Phone_respTypeSignup)){
-                            Toast.makeText(context, "Signup success", Toast.LENGTH_SHORT).show();
-                            //update view for getting more data from user
-                            Intent signup = new Intent(context, SignupActivity.class);
-                            signup.putExtra("type","phone");
-                            signup.putExtra("phone",user.getPhoneNumber());
-                            signup.putExtra("auth_id",user.getUid());
-                            startActivity(signup);
-                            getActivity().overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
-
-                            Handler handler = new Handler();
-                            handler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    getActivity().finish();
-
-                                }
-                            },1000);
-
-
-                        }
-
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-
-                }else{
-                    Functions.ShowToast(context,"Error:- "+bundle.getString(ApiConfig.Request_response));
-                }
-            }
-        });
-    }
 }
