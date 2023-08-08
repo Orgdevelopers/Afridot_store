@@ -1,9 +1,7 @@
 package com.afriappstore.global.FileUploadServices;
 
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 
 import com.afriappstore.global.ApiClasses.ApiConfig;
 import com.afriappstore.global.Interfaces.FragmentCallBack;
@@ -106,7 +104,7 @@ public class UploadFileAsync extends AsyncTask<String, Void, String> {
                         Bundle bundle = new Bundle();
                         bundle.putString(ApiConfig.Request_code,ApiConfig.RequestSuccess);
 
-                        callBack.onResponce(bundle);
+                        callBack.onResponse(bundle);
                         // messageText.setText(msg);
                         //Toast.makeText(ctx, "File Upload Complete.",
                               //Toast.LENGTH_SHORT).show();
@@ -117,7 +115,7 @@ public class UploadFileAsync extends AsyncTask<String, Void, String> {
                         Bundle bundle = new Bundle();
                         bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
 
-                        callBack.onResponce(bundle);
+                        callBack.onResponse(bundle);
                     }
 
                     // close the streams //

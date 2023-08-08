@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -79,7 +78,7 @@ public class Selected_uploadimgAdapter extends RecyclerView.Adapter<Selected_upl
                     Bundle bundle = new Bundle();
                     bundle.putString("pos",String.valueOf(holder.getAdapterPosition()));
                     //Toast.makeText(context, ""+datalist.size()+"   "+holder.getAdapterPosition(), Toast.LENGTH_SHORT).show();
-                    callBack.onResponce(bundle);
+                    callBack.onResponse(bundle);
                 }
             });
         }

@@ -17,11 +17,13 @@ import android.view.ContentInfo;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.afriappstore.global.Adepters.Business_adapter;
@@ -68,7 +70,12 @@ public class Main_Fragment extends Fragment {
     ArrayList<SliderModel> slider_list;
     SliderAdapter slider_adapter;
     MainAdapter adapter;
+
+    ProgressBar loading_bar_progress;
     int item = 0;
+
+    boolean is_api_running = false;
+    int page_count = 0;
     ArrayList<AppModel> datalist = new ArrayList<>();
 
     public Main_Fragment(Context context) {
@@ -88,20 +95,39 @@ public class Main_Fragment extends Fragment {
 
         slider_layout.setVisibility(View.GONE);
         slider_shimmer.setVisibility(View.GONE);
-        Toast.makeText(context, "sssss", Toast.LENGTH_SHORT).show();
-        getAllapps(context);
 
         slider_pager=view.findViewById(R.id.main_slider_pager);
         gridView = view.findViewById(R.id.grid_view);
-         adapter = new MainAdapter(context,datalist);
+        this.loading_bar_progress = (ProgressBar) this.view.findViewById(R.id.loading_progress_bar);
+
+
+        adapter = new MainAdapter(context,datalist);
         gridView.setAdapter(adapter);
         gridView.setOnItemClickListener( new AdapterView.OnItemClickListener()  {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-               open_appDetails_byPosition(position);
+//               open_appDetails_byPosition(position);
+                openAppDetails(datalist.get(position).id);
             }
         });
 
+        getAllapps();
+
+        this.gridView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            public void onScrollStateChanged(AbsListView listView, int scrollState) {
+                if (scrollState == 0 && listView.getLastVisiblePosition() >= listView.getCount() - 1) {
+                    if (!is_api_running) {
+                        loading_bar_progress.setVisibility(View.VISIBLE);
+                        loadMore();
+                        return;
+                    }
+                    Toast.makeText(context, "loading already in progress please wait", Toast.LENGTH_SHORT).show();
+                }
+            }
+            public void onScroll(AbsListView absListView, int i, int i1, int i2) {
+
+            }
+        });
        //setDynamicHeight(gridView);
        //setUpSlider();
 
@@ -137,7 +163,7 @@ public class Main_Fragment extends Fragment {
     private void setUpSlider() {
         ApiRequests.getSlider(context, new FragmentCallBack() {
             @Override
-            public void onResponce(Bundle bundle) {
+            public void onResponse(Bundle bundle) {
                 //
 
                 if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
@@ -235,11 +261,30 @@ public class Main_Fragment extends Fragment {
             e.printStackTrace();
         }
     }
-    public void getAllapps(Context c) {
+
+    private void loadMore() {
+        getAllapps();
+    }
+
+    public void openAppDetails(String app_id){
+        Intent intent = new Intent(context, AppDetail.class);
+        intent.putExtra("app_id",app_id);
+        startActivity(intent);
+        try {
+            getActivity().overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getAllapps() {
+        is_api_running = true;
+        loading_bar_progress.setVisibility(View.VISIBLE);
         StringRequest request = new StringRequest(Request.Method.GET, ApiConfig.getAllApps, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-
+                is_api_running = false;
+                loading_bar_progress.setVisibility(View.GONE);
                 //Toast.makeText(context, ""+response, Toast.LENGTH_SHORT).show();
                 if (!response.equals("")) {
                     try {
@@ -255,6 +300,7 @@ public class Main_Fragment extends Fragment {
                                 datalist.add(item);
                             }
 
+                            page_count++;
                             updateData();
 
                         }else{
@@ -271,7 +317,10 @@ public class Main_Fragment extends Fragment {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Functions.ShowToast(c, error.toString());
+                is_api_running = false;
+                loading_bar_progress.setVisibility(View.GONE);
+
+                Functions.ShowToast(context, error.toString());
                 Log.wtf("ollllllllllllllllllllllll okkkkkkk",error);
 
             }
@@ -284,16 +333,13 @@ public class Main_Fragment extends Fragment {
             }
         };
 
-        RequestQueue queue = Volley.newRequestQueue(c);
+        RequestQueue queue = Volley.newRequestQueue(context);
         queue.add(request);
 
     }
 
     private void updateData() {
         adapter.notifyDataSetChanged();
-
-
-
 
     }
 

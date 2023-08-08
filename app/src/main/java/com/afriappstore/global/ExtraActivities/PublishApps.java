@@ -108,7 +108,7 @@ public class PublishApps extends AppCompatActivity {
                             "these permissions required for App's functionality",
                             "Cancel", "Continue", true, new FragmentCallBack() {
                                 @Override
-                                public void onResponce(Bundle bundle) {
+                                public void onResponse(Bundle bundle) {
                                     if (bundle.getString("action").equals("ok")){
                                         //startActivity(new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION,Uri.parse("package:"+ BuildConfig.APPLICATION_ID)));
                                         try {
@@ -178,7 +178,7 @@ public class PublishApps extends AppCompatActivity {
 
         ApiRequests.getallmyapps(this, new FragmentCallBack() {
             @Override
-            public void onResponce(Bundle bundle) {
+            public void onResponse(Bundle bundle) {
                 String code = bundle.getString(ApiConfig.Request_code);
                 if (code.equals(ApiConfig.RequestSuccess)){
                     try {
@@ -285,7 +285,7 @@ public class PublishApps extends AppCompatActivity {
         }else{
             Functions.Showdouble_btn_alert(this, "Are you sure you want to discard app", "Your current progress will be lost", "cancel", "Discard", true, new FragmentCallBack() {
                 @Override
-                public void onResponce(Bundle bundle) {
+                public void onResponse(Bundle bundle) {
 
                     if (bundle.getString("action").equals("ok")){
 
@@ -362,7 +362,7 @@ public class PublishApps extends AppCompatActivity {
                     //Toast.makeText(PublishApps.this, "in progress", Toast.LENGTH_SHORT).show();
                     Functions.show_select_categories(PublishApps.this, new FragmentCallBack() {
                         @Override
-                        public void onResponce(Bundle bundle) {
+                        public void onResponse(Bundle bundle) {
                             categoriesModel=new CategoriesModel();
                             categoriesModel.id=bundle.getString("id");
                             categoriesModel.name=bundle.getString("name");

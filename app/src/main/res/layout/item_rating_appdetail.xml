@@ -49,31 +49,44 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <ImageView
-                    android:id="@+id/review_star_fill11"
-                    android:layout_width="@dimen/_12sdp"
-                    android:layout_height="@dimen/_12sdp"
-                    android:src="@drawable/ic_baseline_star"/>
-                <ImageView
-                    android:id="@+id/review_star_fill21"
-                    android:layout_width="@dimen/_12sdp"
-                    android:layout_height="@dimen/_12sdp"
-                    android:src="@drawable/ic_baseline_star"/>
-                <ImageView
-                    android:id="@+id/review_star_fill31"
-                    android:layout_width="@dimen/_12sdp"
-                    android:layout_height="@dimen/_12sdp"
-                    android:src="@drawable/ic_baseline_star"/>
-                <ImageView
-                    android:id="@+id/review_star_fill41"
-                    android:layout_width="@dimen/_12sdp"
-                    android:layout_height="@dimen/_12sdp"
-                    android:src="@drawable/ic_baseline_star"/>
-                <ImageView
-                    android:id="@+id/review_star_fill51"
-                    android:layout_width="@dimen/_12sdp"
-                    android:layout_height="@dimen/_12sdp"
-                    android:src="@drawable/ic_baseline_star"/>
+<!--                <ImageView-->
+<!--                    android:id="@+id/review_star_fill11"-->
+<!--                    android:layout_width="@dimen/_12sdp"-->
+<!--                    android:layout_height="@dimen/_12sdp"-->
+<!--                    android:src="@drawable/ic_baseline_star"/>-->
+<!--                <ImageView-->
+<!--                    android:id="@+id/review_star_fill21"-->
+<!--                    android:layout_width="@dimen/_12sdp"-->
+<!--                    android:layout_height="@dimen/_12sdp"-->
+<!--                    android:src="@drawable/ic_baseline_star"/>-->
+<!--                <ImageView-->
+<!--                    android:id="@+id/review_star_fill31"-->
+<!--                    android:layout_width="@dimen/_12sdp"-->
+<!--                    android:layout_height="@dimen/_12sdp"-->
+<!--                    android:src="@drawable/ic_baseline_star"/>-->
+<!--                <ImageView-->
+<!--                    android:id="@+id/review_star_fill41"-->
+<!--                    android:layout_width="@dimen/_12sdp"-->
+<!--                    android:layout_height="@dimen/_12sdp"-->
+<!--                    android:src="@drawable/ic_baseline_star"/>-->
+<!--                <ImageView-->
+<!--                    android:id="@+id/review_star_fill51"-->
+<!--                    android:layout_width="@dimen/_12sdp"-->
+<!--                    android:layout_height="@dimen/_12sdp"-->
+<!--                    android:src="@drawable/ic_baseline_star"/>-->
+
+                <RatingBar
+                    android:id="@+id/rating_bar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/RatingBar"
+                    android:numStars="5"
+                    android:rating="2.3"
+                    android:stepSize="0.1"
+                    android:progressBackgroundTint="@color/ultra_light_grey"
+                    android:progressTint="@color/install_btn_bg"
+
+                    />
 
             </LinearLayout>
 

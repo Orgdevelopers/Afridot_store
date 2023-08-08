@@ -224,7 +224,7 @@ public class SignupActivity extends AppCompatActivity {
         super.onBackPressed();
         Functions.Showdouble_btn_alert(SignupActivity.this, "Do you really want to exit", "Your current login progress will be lost", "Go back", "Exit", true, new FragmentCallBack() {
             @Override
-            public void onResponce(Bundle bundle) {
+            public void onResponse(Bundle bundle) {
                 String action = bundle.getString("action");
 
                 if (action.equals("ok")){

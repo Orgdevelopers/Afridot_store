@@ -5,9 +5,7 @@ import static com.afriappstore.global.ApiClasses.ApiConfig.GETALLBUISNESSAPPS;
 import static com.afriappstore.global.ApiClasses.ApiConfig.Request_UpdateProfile;
 import static com.afriappstore.global.ApiClasses.ApiConfig.getALlSliders;
 import static com.afriappstore.global.ApiClasses.ApiConfig.getCategoryapps;
-import static com.afriappstore.global.ApiClasses.ApiConfig.getallcategories;
 import static com.afriappstore.global.ApiClasses.ApiConfig.showALlCategories;
-import static com.airbnb.lottie.L.TAG;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -18,12 +16,8 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 
 import com.afriappstore.global.Interfaces.FragmentCallBack;
-import com.afriappstore.global.Model.AppModel;
-import com.afriappstore.global.R;
 import com.afriappstore.global.SimpleClasses.Functions;
 import com.afriappstore.global.SimpleClasses.ShearedPrefs;
-import com.afriappstore.global.SimpleClasses.Variables;
-import com.airbnb.lottie.L;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -31,14 +25,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.common.api.Api;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -129,14 +118,14 @@ public class ApiRequests {
                 Bundle bundle = new Bundle();
                 bundle.putString(ApiConfig.Request_code,ApiConfig.RequestSuccess);
                 bundle.putString(ApiConfig.Request_response,response);
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Bundle bundle = new Bundle();
                 bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
             }
         }){
             @Nullable
@@ -220,7 +209,7 @@ public class ApiRequests {
                     bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
 
                 }
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
 
             }
         }, new Response.ErrorListener() {
@@ -228,7 +217,7 @@ public class ApiRequests {
             public void onErrorResponse(VolleyError error) {
                 Bundle bundle = new Bundle();
                 bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
                 Log.wtf("error volley",error);
             }
         }){
@@ -306,7 +295,7 @@ public class ApiRequests {
 
                 }
 
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
 
             }
         }, new Response.ErrorListener() {
@@ -315,7 +304,7 @@ public class ApiRequests {
                 Bundle bundle = new Bundle();
                 bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
                 bundle.putString(ApiConfig.Request_response,error.getMessage());
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
             }
         }){
             @Nullable
@@ -364,7 +353,7 @@ public class ApiRequests {
                     bundle.putString(ApiConfig.Request_response,response);
                 }
 
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
 
             }
         }, new Response.ErrorListener() {
@@ -418,7 +407,7 @@ public class ApiRequests {
 
 
                 }
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -427,7 +416,7 @@ public class ApiRequests {
                 bundle.putString(ApiConfig.Request_code,ApiConfig.RequestSuccess);
                 bundle.putString(ApiConfig.Request_response,error.getMessage());
 
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
             }
         }){
             @Nullable
@@ -470,7 +459,7 @@ public class ApiRequests {
                 bundle.putString(ApiConfig.Request_response,response);
                 bundle.putString(ApiConfig.Request_code,ApiConfig.RequestSuccess);
 
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -478,7 +467,7 @@ public class ApiRequests {
                 Bundle bundle = new Bundle();
                 Log.wtf("error",error.getMessage());
                 bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
             }
         }){
             @Nullable
@@ -521,7 +510,7 @@ public class ApiRequests {
 
                 }
 
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
 
 
             }
@@ -531,7 +520,7 @@ public class ApiRequests {
                 Log.wtf("error",error.getMessage());
                 Bundle bundle=new Bundle();
                 bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
 
             }
         }){
@@ -572,7 +561,7 @@ public class ApiRequests {
                     bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
                 }
 
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
 
             }
         }, new Response.ErrorListener() {
@@ -581,7 +570,7 @@ public class ApiRequests {
                 Log.wtf("error",error.getMessage());
                 Bundle bundle =new Bundle();
                 bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
             }
         }){
             @Nullable
@@ -616,7 +605,7 @@ public class ApiRequests {
                         bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
                     }
 
-                    callBack.onResponce(bundle);
+                    callBack.onResponse(bundle);
 
                 }catch (Exception e){
                     e.printStackTrace();
@@ -629,7 +618,7 @@ public class ApiRequests {
                 Log.wtf(error.getMessage(),error);
                 Bundle bundle = new Bundle();
                 bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
             }
         }){
             @Nullable
@@ -667,14 +656,14 @@ public class ApiRequests {
                     bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
                 }
 
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Bundle bundle = new Bundle();
                 bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
 
             }
         }){
@@ -702,14 +691,14 @@ public class ApiRequests {
                     Log.wtf("res",response);
                     bundle.putString(ApiConfig.Request_code,ApiConfig.RequestSuccess);
                     bundle.putString(ApiConfig.Request_response,response);
-                    callBack.onResponce(bundle);
+                    callBack.onResponse(bundle);
 
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
-                    callBack.onResponce(bundle);
+                    callBack.onResponse(bundle);
                 }
             }){
                 @Nullable
@@ -730,7 +719,7 @@ public class ApiRequests {
         }catch (Exception e){
             e.printStackTrace();
             bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
-            callBack.onResponce(bundle);
+            callBack.onResponse(bundle);
         }
 
     }
@@ -758,7 +747,7 @@ public class ApiRequests {
                     e.printStackTrace();
                     bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
                 }
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
 
             }
         }, new Response.ErrorListener() {
@@ -766,7 +755,7 @@ public class ApiRequests {
             public void onErrorResponse(VolleyError error) {
                 Bundle bundle = new Bundle();
                 bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
             }
         }){
             @Nullable
@@ -807,7 +796,7 @@ public class ApiRequests {
                     bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
 
                 }
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -816,7 +805,7 @@ public class ApiRequests {
                 Log.w( "onErrorResponse: ",""+error);
                 Bundle bundle = new Bundle();
                 bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
 
             }
         }){
@@ -855,7 +844,7 @@ public class ApiRequests {
                     bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
                 }
 
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
 
             }
         }, new Response.ErrorListener() {
@@ -864,7 +853,7 @@ public class ApiRequests {
                 Log.wtf("error",error);
                 Bundle bundle = new Bundle();
                 bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
 
             }
         }){
@@ -908,7 +897,7 @@ public class ApiRequests {
 
                 }
 
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
 
             }
         }, new Response.ErrorListener(){
@@ -916,7 +905,7 @@ public class ApiRequests {
             public void onErrorResponse(VolleyError error) {
                 Bundle bundle = new Bundle();
                 bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
 
             }
         }){

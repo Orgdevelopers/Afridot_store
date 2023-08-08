@@ -19,7 +19,7 @@ import com.afriappstore.global.Adepters.All_reviews_Adapter;
 import com.afriappstore.global.ApiClasses.ApiConfig;
 import com.afriappstore.global.ApiClasses.ApiRequests;
 import com.afriappstore.global.Interfaces.FragmentCallBack;
-import com.afriappstore.global.Model.Review_Model;
+import com.afriappstore.global.Model.ReviewModel;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -30,7 +30,7 @@ public class All_ReviewsActivity extends AppCompatActivity {
     RecyclerView all_review_list;
     NestedScrollView main_layout;
     ProgressBar loading;
-    ArrayList<Review_Model> data_list;
+    ArrayList<ReviewModel> data_list;
     int total_reviews=0;
     int app_id;
     Boolean first_time=true;
@@ -101,7 +101,7 @@ public class All_ReviewsActivity extends AppCompatActivity {
 
         ApiRequests.getAllReviews(All_ReviewsActivity.this, String.valueOf(app_id), sp, new FragmentCallBack() {
             @Override
-            public void onResponce(Bundle bundle) {
+            public void onResponse(Bundle bundle) {
                 if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
                     try {
                         String response=bundle.getString(ApiConfig.Request_response);
@@ -122,12 +122,12 @@ public class All_ReviewsActivity extends AppCompatActivity {
                             date=object.getString("date");
                             review= object.getString("review");
 
-                            Review_Model model = new Review_Model();
-                            model.username=username;
-                            model.image=image;
-                            model.stars=stars;
-                            model.date=date;
-                            model.review=review;
+                            ReviewModel model = new ReviewModel();
+//                            model.username=username;
+//                            model.image=image;
+//                            model.stars=stars;
+//                            model.date=date;
+//                            model.review=review;
 
                             data_list.add(model);
 

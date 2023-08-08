@@ -100,7 +100,7 @@ public class PublishAppsSecond extends AppCompatActivity {
                         //
                         ApiRequests.isPackageAvailable(PublishAppsSecond.this, package_name, new FragmentCallBack() {
                             @Override
-                            public void onResponce(Bundle bundle) {
+                            public void onResponse(Bundle bundle) {
                                 Functions.cancelLoader();
                                 if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
                                     publish_enabled=true;
@@ -178,7 +178,7 @@ public class PublishAppsSecond extends AppCompatActivity {
         Functions.showLoader(PublishAppsSecond.this);
         AsyncTask<String,Void,String> task = new UploadFileAsync(app_path,"",new FragmentCallBack() {
             @Override
-            public void onResponce(Bundle bundle) {
+            public void onResponse(Bundle bundle) {
                 Functions.cancelLoader();
                /* if (bundle.getString("t").equals("t")){
                     //Toast.makeText(PublishApps.this, "done", Toast.LENGTH_SHORT).show();
@@ -212,7 +212,7 @@ public class PublishAppsSecond extends AppCompatActivity {
 
         adapter = new Selected_uploadimgAdapter(this, new ArrayList<>(), new FragmentCallBack() {
             @Override
-            public void onResponce(Bundle bundle) {
+            public void onResponse(Bundle bundle) {
                 if (bundle.getString("pos").equals(String.valueOf(main_list.size()))){
                     //here the last image is clicked
                     if (ActivityCompat.checkSelfPermission(PublishAppsSecond.this, Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED){

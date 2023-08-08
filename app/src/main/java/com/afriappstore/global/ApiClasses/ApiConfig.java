@@ -2,6 +2,8 @@ package com.afriappstore.global.ApiClasses;
 
 import android.os.health.PackageHealthStats;
 
+import com.google.android.gms.common.api.Api;
+
 public class ApiConfig {
 
     public static final String Base_url="https://afriappstore.com/";
@@ -14,8 +16,10 @@ public class ApiConfig {
 
     //
     public static final String getAllApps = Api_url+"showAllApps";
+    public static final String getAllAfriApps = Api_url+"showAllAfriApps";
     public static final  String getALlSliders = Api_url+"showAllSliders";
     public static final String showALlCategories = Api_url+"showAllCategories";
+    public static final String showAppDetails = Api_url+"showAppDetails";
     public static final String Signup = Api_url+"Signup";
     public static final String Login=Api_url+"index";
 

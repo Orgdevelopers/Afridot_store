@@ -219,7 +219,7 @@ public class ReviewActivity extends AppCompatActivity {
                 if (view== back_button){
                     Functions.Showdouble_btn_alert(ReviewActivity.this, "discard review?", "", "Cancel", "Discard", true, new FragmentCallBack() {
                         @Override
-                        public void onResponce(Bundle bundle) {
+                        public void onResponse(Bundle bundle) {
                             if (bundle.getString("action").equals("ok")){
                                 finish_animated();
                             }
@@ -237,7 +237,7 @@ public class ReviewActivity extends AppCompatActivity {
                                 detailed_rev.getText().toString(),
                                 new FragmentCallBack() {
                             @Override
-                            public void onResponce(Bundle bundle) {
+                            public void onResponse(Bundle bundle) {
                                 Functions.cancelLoader();
 
                                 String code = bundle.getString(ApiConfig.Request_code);
@@ -297,7 +297,7 @@ public class ReviewActivity extends AppCompatActivity {
     public void onBackPressed() {
         Functions.Showdouble_btn_alert(ReviewActivity.this, "discard review?", "", "Cancel", "Discard", true, new FragmentCallBack() {
             @Override
-            public void onResponce(Bundle bundle) {
+            public void onResponse(Bundle bundle) {
                 if (bundle.getString("action").equals("ok")){
                     finish_animated();
                 }

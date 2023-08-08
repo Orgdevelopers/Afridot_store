@@ -79,7 +79,7 @@ public class CategoryApps extends AppCompatActivity {
 
         ApiRequests.getCategoryapps(this, cat_id, "0", new FragmentCallBack() {
             @Override
-            public void onResponce(Bundle bundle) {
+            public void onResponse(Bundle bundle) {
                 Functions.cancelLoader();
                 if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
 

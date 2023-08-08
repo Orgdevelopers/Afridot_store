@@ -282,7 +282,7 @@ public class ProfileA extends AppCompatActivity {
                             int finalType = type;
                             Functions.Image_to_Base64(pic_path, new FragmentCallBack() {
                                 @Override
-                                public void onResponce(Bundle bundle) {
+                                public void onResponse(Bundle bundle) {
                                     proceed_Api(bundle.getString("img"), finalType);
                                 }
                             });
@@ -326,7 +326,7 @@ public class ProfileA extends AppCompatActivity {
         ApiRequests.update_profile(ProfileA.this, firstname.getText().toString(), lastname.getText().toString(), img, type, new FragmentCallBack() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
-            public void onResponce(Bundle bundle) {
+            public void onResponse(Bundle bundle) {
                 Functions.cancelLoader();
                 String code=bundle.getString(ApiConfig.Request_code);
                 if (code.equals(ApiConfig.RequestSuccess)) {
@@ -440,7 +440,7 @@ public class ProfileA extends AppCompatActivity {
                         Functions.showLoader(ProfileA.this);
                        Functions.isVerified(ProfileA.this, new FragmentCallBack() {
                            @Override
-                           public void onResponce(Bundle bundle) {
+                           public void onResponse(Bundle bundle) {
                                Functions.cancelLoader();
                                if (Variables.is_verify){
                                    Intent intent = new Intent(ProfileA.this, PublishApps.class);
@@ -457,7 +457,7 @@ public class ProfileA extends AppCompatActivity {
                                }else{
                                    Functions.Showdouble_btn_alert(ProfileA.this, "It seems your email is not verified", "you need to verify your email first", "cancel", "Verify", true, new FragmentCallBack() {
                                        @Override
-                                       public void onResponce(Bundle bundle) {
+                                       public void onResponse(Bundle bundle) {
                                            if (bundle.getString("action").equals("ok")){
                                                Intent intent = new Intent(ProfileA.this, VerifyEmail.class);
                                                startActivity(intent);
@@ -480,7 +480,7 @@ public class ProfileA extends AppCompatActivity {
                 }else if (item==logout){
                     Functions.Showdouble_btn_alert(ProfileA.this, "Are you sure you want to logout?", "", "Cancel", "Logout", true, new FragmentCallBack() {
                         @Override
-                        public void onResponce(Bundle bundle) {
+                        public void onResponse(Bundle bundle) {
                             String act= bundle.getString("action");
                             if (act.equals("ok")){
                                 Functions.Log_Out(ProfileA.this);

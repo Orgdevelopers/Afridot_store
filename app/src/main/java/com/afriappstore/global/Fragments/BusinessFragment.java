@@ -1,6 +1,7 @@
 package com.afriappstore.global.Fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -10,15 +11,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.afriappstore.global.Adepters.Business_adapter;
+import com.afriappstore.global.Adepters.MainAdapter;
 import com.afriappstore.global.ApiClasses.ApiConfig;
 import com.afriappstore.global.ApiClasses.ApiRequests;
 import com.afriappstore.global.ApiClasses.DataParsing;
+import com.afriappstore.global.AppDetail;
 import com.afriappstore.global.Interfaces.FragmentCallBack;
 import com.afriappstore.global.Model.AppModel;
 import com.afriappstore.global.Model.Search_result_AppModel;
@@ -41,7 +45,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BusinessFragment extends Fragment {
-    Business_adapter adapter;
+    MainAdapter adapter;
     GridView app_list;
     Context context;
     boolean is_api_running = false;
@@ -51,7 +55,8 @@ public class BusinessFragment extends Fragment {
     ArrayList<Search_result_AppModel> main_list;
     LinearLayout no_apps_found_layout;
     LinearLayout shimmer_layout;
-    int starting_point = 0;
+
+    int page_count = 0;
     ArrayList<AppModel> datalist = new ArrayList<>();
     View view;
 
@@ -64,9 +69,7 @@ public class BusinessFragment extends Fragment {
         this.view = inflater.inflate(R.layout.fragment_buisness, container, false);
         init_views();
 
-        getAllapps(context);
-
-//        call_api_data();
+        getAllapps();
 
 
         return this.view;
@@ -83,16 +86,44 @@ public class BusinessFragment extends Fragment {
                 if (scrollState == 0 && listView.getLastVisiblePosition() >= listView.getCount() - 1) {
                     if (!BusinessFragment.this.is_api_running) {
                         BusinessFragment.this.loading_bar_progress.setVisibility(View.VISIBLE);
-//                        BusinessFragment.this.load_more();
+                        BusinessFragment.this.loadMore();
                         return;
                     }
                     Toast.makeText(BusinessFragment.this.context, "loading already in progress please wait", Toast.LENGTH_SHORT).show();
                 }
             }
-
             public void onScroll(AbsListView absListView, int i, int i1, int i2) {
+
             }
         });
+
+        BusinessFragment.this.adapter = new MainAdapter(BusinessFragment.this.context, BusinessFragment.this.datalist);
+        BusinessFragment.this.app_list.setAdapter(BusinessFragment.this.adapter);
+        BusinessFragment.this.main_layout.setVisibility(View.VISIBLE);
+        BusinessFragment.this.shimmer_layout.setVisibility(View.GONE);
+        BusinessFragment.this.no_apps_found_layout.setVisibility(View.GONE);
+
+        app_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
+                openAppDetails(datalist.get(pos).id);
+            }
+        });
+    }
+
+    private void loadMore() {
+        getAllapps();
+    }
+
+    public void openAppDetails(String app_id){
+        Intent intent = new Intent(context, AppDetail.class);
+        intent.putExtra("app_id",app_id);
+        startActivity(intent);
+        try {
+            getActivity().overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /* access modifiers changed from: private */
@@ -184,10 +215,14 @@ public class BusinessFragment extends Fragment {
 //        });
 //    }
 
-    public void getAllapps(Context c) {
-        StringRequest request = new StringRequest(Request.Method.GET, ApiConfig.getAllApps, new Response.Listener<String>() {
+    public void getAllapps() {
+        is_api_running = true;
+        shimmer_layout.setVisibility(View.VISIBLE);
+        StringRequest request = new StringRequest(Request.Method.GET, ApiConfig.getAllAfriApps, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+                shimmer_layout.setVisibility(View.GONE);
+                is_api_running = false;
 
                 Log.wtf("ollllllllllllllllllllllllllllllllllll", response + "end");
                 Toast.makeText(context, ""+response, Toast.LENGTH_SHORT).show();
@@ -204,7 +239,7 @@ public class BusinessFragment extends Fragment {
                                 AppModel item = DataParsing.parseAppModel(array.getJSONObject(i));
                                 datalist.add(item);
                             }
-
+                            page_count++;
                             updateData();
 
                         }else{
@@ -221,7 +256,9 @@ public class BusinessFragment extends Fragment {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Functions.ShowToast(c, error.toString());
+                Functions.ShowToast(context, error.toString());
+                is_api_running = false;
+                shimmer_layout.setVisibility(View.GONE);
                 Log.wtf("ollllllllllllllllllllllll okkkkkkk",error);
 
             }
@@ -234,20 +271,15 @@ public class BusinessFragment extends Fragment {
             }
         };
 
-        RequestQueue queue = Volley.newRequestQueue(c);
+        RequestQueue queue = Volley.newRequestQueue(context);
         queue.add(request);
 
     }
 
     private void updateData() {
         if (!BusinessFragment.this.datalist.isEmpty()) {
-                            BusinessFragment.this.adapter = new Business_adapter(BusinessFragment.this.context, BusinessFragment.this.datalist);
-                            BusinessFragment.this.app_list.setAdapter(BusinessFragment.this.adapter);
-                            BusinessFragment.this.main_layout.setVisibility(View.VISIBLE);
-                            BusinessFragment.this.shimmer_layout.setVisibility(View.GONE);
-                           BusinessFragment.this.no_apps_found_layout.setVisibility(View.GONE);
-                            return;
-    }else{
+            adapter.notifyDataSetChanged();
+        }else{
             no_apps_found();
         }
 

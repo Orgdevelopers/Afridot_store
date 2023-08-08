@@ -62,7 +62,7 @@ public class VerifyEmail extends AppCompatActivity {
                 Functions.showLoader(VerifyEmail.this);
                 ApiRequests.verifyEmail(VerifyEmail.this, uid, email, new FragmentCallBack() {
                     @Override
-                    public void onResponce(Bundle bundle) {
+                    public void onResponse(Bundle bundle) {
                         Functions.cancelLoader();
                         if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
                             buttons_layout.setVisibility(View.GONE);

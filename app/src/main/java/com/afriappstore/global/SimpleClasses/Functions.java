@@ -22,11 +22,10 @@ import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.afriappstore.global.Adepters.Categories_adapter;
 import com.afriappstore.global.Adepters.DialogAdapters.D_allcatAdaper;
 import com.afriappstore.global.ApiClasses.ApiRequests;
+import com.afriappstore.global.Model.AppModel;
 import com.afriappstore.global.Model.CategoriesModel;
-import com.afriappstore.global.Model.SliderModel;
 import com.airbnb.lottie.LottieAnimationView;
 import com.downloader.Error;
 import com.downloader.OnCancelListener;
@@ -57,8 +56,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Random;
-
-import io.paperdb.Paper;
 
 public class Functions {
 
@@ -147,7 +144,7 @@ public class Functions {
             public void onClick(View view) {
                 Bundle bundle = new Bundle();
                 bundle.putString("action","cancel");
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
                 dialog.dismiss();
             }
         });
@@ -157,7 +154,7 @@ public class Functions {
             public void onClick(View view) {
                 Bundle bundle = new Bundle();
                 bundle.putString("action","ok");
-                callBack.onResponce(bundle);
+                callBack.onResponse(bundle);
                 dialog.dismiss();
             }
         });
@@ -190,7 +187,7 @@ public class Functions {
                 dialog.dismiss();
                 Bundle b =new Bundle();
                 b.putString("click","cancel");
-                callBack.onResponce(b);
+                callBack.onResponse(b);
             }
         });
 
@@ -200,7 +197,7 @@ public class Functions {
                 dialog.dismiss();
                 Bundle b2 = new Bundle();
                 b2.putString("click","download");
-                callBack.onResponce(b2);
+                callBack.onResponse(b2);
             }
         });
 
@@ -208,7 +205,7 @@ public class Functions {
         dialog.show();
     }
 
-    public static void DownloadWithLoading(Context context,String download_uri,String path, String app_name_s,int pos,FragmentCallBack callBack){
+    public static void DownloadWithLoading(Context context, String download_uri, String path, String app_name_s, AppModel item, FragmentCallBack callBack){
         final Dialog download_dialog = new Dialog(context);
         download_dialog.setContentView(R.layout.download_with_loading);
         download_dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
@@ -233,161 +230,73 @@ public class Functions {
         //animation.playAnimation();
 
         open_btn.setBackgroundColor(context.getResources().getColor(R.color.open_btn_untuchable_color));
-
         download_dialog.show();
-         if (Variables.download_information==null){
-             downloadId = PRDownloader.download(download_uri,path, filename)
-                     .build()
-                     .setOnStartOrResumeListener(new OnStartOrResumeListener() {
-                         @Override
-                         public void onStartOrResume() {
 
-                         }
-                     })
-                     .setOnPauseListener(new OnPauseListener() {
-                         @Override
-                         public void onPause() {
+        downloadId = PRDownloader.download(download_uri,path, filename)
+                .build()
+                .setOnStartOrResumeListener(new OnStartOrResumeListener() {
+                    @Override
+                    public void onStartOrResume() {
 
-                         }
-                     })
-                     .setOnCancelListener(new OnCancelListener() {
-                         @Override
-                         public void onCancel() {
+                    }
+                })
+                .setOnPauseListener(new OnPauseListener() {
+                    @Override
+                    public void onPause() {
 
-                         }
-                     })
-                     .setOnProgressListener(new OnProgressListener() {
-                         @Override
-                         public void onProgress(Progress progress) {
-                             long current_bytes=progress.currentBytes;
-                             long total_bytes=progress.totalBytes;
-                             Float percent= Float.valueOf((current_bytes*100/total_bytes));
-                             animation.setProgress(percent/100);
+                    }
+                })
+                .setOnCancelListener(new OnCancelListener() {
+                    @Override
+                    public void onCancel() {
 
-
-                             app_percent.setText(percent+"%");
-                             if (app_size.getText().equals("App size: 0 MB")){
-                                 Float size_inmb=Float.valueOf(total_bytes*1000/1048576);
-                                 app_size.setText("App size: "+size_inmb/1000 +" MB");
-                             }
-                             Log.wtf("progress","current: "+ percent+ "     "+current_bytes+"  " +total_bytes+"   "+percent/100);
-                         }
-                     })
-                     .start(new OnDownloadListener() {
-                         @Override
-                         public void onDownloadComplete() {
-                             open_btn.setBackgroundColor(context.getResources().getColor(R.color.install_btn_bg));
-                             open_btn.setOnClickListener(new View.OnClickListener() {
-                                 @Override
-                                 public void onClick(View view) {
-                                     //Toast.makeText(context,"File stored in "+path+ File.separator+filename, Toast.LENGTH_SHORT).show();
-                                     download_dialog.dismiss();
-                                     Bundle bundle = new Bundle();
-                                     bundle.putString("action","install");
-                                     bundle.putString("path",path+ File.separator+filename);
-                                     callBack.onResponce(bundle);
-                                 }
-                             });
-                             //
-                             Log.wtf("complete","dinufddcbvjdfnvnkvslvnljvnjvdkjnjvdnjcv");
-                         }
-
-                         @Override
-                         public void onError(Error error) {
-                             download_dialog.dismiss();
-                             Log.wtf("error",error.toString());
-                         }
-                     });
-         }else{
-             JSONObject appdata = null;
-             try {
-                 appdata=Variables.download_information.getJSONObject(pos);
-             } catch (JSONException e) {
-                 e.printStackTrace();
-                 appdata=null;
-             }
-
-             if (appdata==null){
-                 downloadId = PRDownloader.download(download_uri,path, filename)
-                         .build()
-                         .setOnStartOrResumeListener(new OnStartOrResumeListener() {
-                             @Override
-                             public void onStartOrResume() {
-
-                             }
-                         })
-                         .setOnPauseListener(new OnPauseListener() {
-                             @Override
-                             public void onPause() {
-
-                             }
-                         })
-                         .setOnCancelListener(new OnCancelListener() {
-                             @Override
-                             public void onCancel() {
-
-                             }
-                         })
-                         .setOnProgressListener(new OnProgressListener() {
-                             @Override
-                             public void onProgress(Progress progress) {
-                                 long current_bytes=progress.currentBytes;
-                                 long total_bytes=progress.totalBytes;
-                                 Float percent= Float.valueOf((current_bytes*100/total_bytes));
-                                 animation.setProgress(percent/100);
+                    }
+                })
+                .setOnProgressListener(new OnProgressListener() {
+                    @Override
+                    public void onProgress(Progress progress) {
+                        long current_bytes=progress.currentBytes;
+                        long total_bytes=progress.totalBytes;
+                        Float percent= Float.valueOf((current_bytes*100/total_bytes));
+                        animation.setProgress(percent/100);
 
 
-                                 app_percent.setText(percent+"%");
-                                 if (app_size.getText().equals("App size: 0 MB")){
-                                     Float size_inmb=Float.valueOf(total_bytes*1000/1048576);
-                                     app_size.setText("App size: "+size_inmb/1000 +" MB");
-                                 }
-                                 Log.wtf("progress","current: "+ percent+ "     "+current_bytes+"  " +total_bytes+"   "+percent/100);
-                             }
-                         })
-                         .start(new OnDownloadListener() {
-                             @Override
-                             public void onDownloadComplete() {
-                                 open_btn.setBackgroundColor(context.getResources().getColor(R.color.install_btn_bg));
-                                 open_btn.setOnClickListener(new View.OnClickListener() {
-                                     @Override
-                                     public void onClick(View view) {
-                                         //Toast.makeText(context,"File stored in "+path+ File.separator+filename, Toast.LENGTH_SHORT).show();
-                                         download_dialog.dismiss();
-                                         Bundle bundle = new Bundle();
-                                         bundle.putString("action","install");
-                                         bundle.putString("path",path+ File.separator+filename);
-                                         callBack.onResponce(bundle);
-                                     }
-                                 });
-                                 //
-                                 Log.wtf("complete","dinufddcbvjdfnvnkvslvnljvnjvdkjnjvdnjcv");
-                             }
+                        app_percent.setText(percent+"%");
+                        if (app_size.getText().equals("App size: 0 MB")){
+                            Float size_inmb=Float.valueOf(total_bytes*1000/1048576);
+                            app_size.setText("App size: "+size_inmb/1000 +" MB");
+                        }
+                        Log.wtf("progress","current: "+ percent+ "     "+current_bytes+"  " +total_bytes+"   "+percent/100);
+                    }
+                })
+                .start(new OnDownloadListener() {
+                    @Override
+                    public void onDownloadComplete() {
+                        open_btn.setBackgroundColor(context.getResources().getColor(R.color.install_btn_bg));
+                        open_btn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                //Toast.makeText(context,"File stored in "+path+ File.separator+filename, Toast.LENGTH_SHORT).show();
+                                download_dialog.dismiss();
+                                Bundle bundle = new Bundle();
+                                bundle.putString("action","install");
+                                bundle.putString("path",path+ File.separator+filename);
+                                callBack.onResponse(bundle);
+                            }
+                        });
+                        //
+                        Log.wtf("complete","dinufddcbvjdfnvnkvslvnljvnjvdkjnjvdnjcv");
+                    }
 
-                             @Override
-                             public void onError(Error error) {
-                                 download_dialog.dismiss();
-                                 Log.wtf("error",error.toString());
-                             }
-                         });
-             }else {
-                 try {
-                     last_download_path=appdata.getString("path");
-                     Bundle bundle = new Bundle();
-                     bundle.putString("action","install");
-                     bundle.putString("path",last_download_path);
-                     callBack.onResponce(bundle);
-                     download_dialog.dismiss();
-                 } catch (Exception e) {
-                     e.printStackTrace();
-                     Bundle bundle = new Bundle();
-                     bundle.putString("action","cancel");
-                     callBack.onResponce(bundle);
-                     download_dialog.dismiss();
-                 }
-             }
-         }
+                    @Override
+                    public void onError(Error error) {
+                        download_dialog.dismiss();
+                        Log.wtf("error",error.toString());
+                    }
+                });
+
         Integer finalDownloadId = downloadId;
+
         cancel_btn.setOnClickListener(new View.OnClickListener() {
              @Override
              public void onClick(View view) {
@@ -400,7 +309,7 @@ public class Functions {
                  Toast.makeText(context, "Download canceled", Toast.LENGTH_SHORT).show();
                  Bundle bundle = new Bundle();
                  bundle.putString("action","cancel");
-                 callBack.onResponce(bundle);
+                 callBack.onResponse(bundle);
              }
          });
 
@@ -607,7 +516,7 @@ public class Functions {
         Bundle bundle = new Bundle();
         bundle.putString("img",base64);
         //Log.wtf("img",base64);
-        callBack.onResponce(bundle);
+        callBack.onResponse(bundle);
     }
 
     public static Boolean Log_in_via_email(Context context ,JSONObject user){
@@ -668,7 +577,7 @@ public class Functions {
 
         }else {
             bundle.putString(ApiConfig.Request_code,ApiConfig.RequestError);
-            callBack.onResponce(new Bundle());
+            callBack.onResponse(new Bundle());
         }
 
     }
@@ -692,7 +601,7 @@ public class Functions {
 
         ApiRequests.getAllCategories(context, new FragmentCallBack() {
             @Override
-            public void onResponce(Bundle bundle) {
+            public void onResponse(Bundle bundle) {
                 loading.setVisibility(View.GONE);
                 cat_list.setVisibility(View.VISIBLE);
                 try {
@@ -716,8 +625,8 @@ public class Functions {
                             LinearLayoutManager manager = new LinearLayoutManager(context);
                             D_allcatAdaper adapter = new D_allcatAdaper(context, datalist, new FragmentCallBack() {
                                 @Override
-                                public void onResponce(Bundle bundle) {
-                                    callBack.onResponce(bundle);
+                                public void onResponse(Bundle bundle) {
+                                    callBack.onResponse(bundle);
                                     dialog.dismiss();
                                 }
                             });

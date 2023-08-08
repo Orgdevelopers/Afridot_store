@@ -1,18 +1,22 @@
 package com.afriappstore.global;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInstaller;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.StrictMode;
+import android.provider.Settings;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -23,30 +27,45 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.afriappstore.global.Adepters.AppSlideradapter;
+import com.afriappstore.global.Adepters.All_reviews_Adapter;
 import com.afriappstore.global.ApiClasses.ApiConfig;
 import com.afriappstore.global.ApiClasses.ApiRequests;
+import com.afriappstore.global.ApiClasses.DataParsing;
 import com.afriappstore.global.ExtraActivities.ReviewActivity;
 import com.afriappstore.global.Interfaces.FragmentCallBack;
+import com.afriappstore.global.Model.AppModel;
+import com.afriappstore.global.Model.AppSettings;
 import com.afriappstore.global.Model.Download_model;
+import com.afriappstore.global.Model.ReviewModel;
 import com.afriappstore.global.Profile.LoginActivity;
 import com.afriappstore.global.SimpleClasses.Functions;
 import com.afriappstore.global.SimpleClasses.ShearedPrefs;
 import com.afriappstore.global.SimpleClasses.Variables;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-import com.taufiqrahman.reviewratings.BarLabels;
+import com.taufiqrahman.reviewratings.Bar;
 import com.taufiqrahman.reviewratings.RatingReviews;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -56,8 +75,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.paperdb.Paper;
@@ -68,7 +90,6 @@ public class AppDetail extends AppCompatActivity {
     ImageView app_icon,back_button,share_btn,rating_1star,rating_2star,rating_3star,rating_4star,rating_5star,show_allrating_arrow;
     TextView app_size, app_name,app_description,read_more,rating_big_text,horizontal_bar_rating,horizontal_bar_review_count,horizontal_bar_dow;
 
-    boolean IS_installed=false;
 
     //rating
     int rating_click_switch=0;
@@ -83,20 +104,30 @@ public class AppDetail extends AppCompatActivity {
     CircleImageView r_profile1,r_profile2,r_profile3,my_review_profile;
     LinearLayout rating_bar_background_layout,shimmer_layout,rating_bar_bg,my_review_layout,some_reviews,first_review_layout,second_review_layout,third_review_layout,no_review_found;
     ScrollView all_stuff;
-    RatingBar ratingBar;
-    RatingReviews ratingReviews;
 
     //rating
     public Integer pos;
 
-    int UnknowSourcePermission=1827;
+    int UnknownSourcePermission=1827;
 
-    JSONObject app = null;
     RecyclerView recyclerView;
-    String p_App_id="";
-    String downloads_count="";
 
+    //new update
     Context context;
+    Picasso picasso;
+
+    //models
+    AppSettings appSettings;
+    AppModel item;
+
+    //variables
+    String app_id = "0";
+    boolean is_installed = false;
+
+    //views
+    RatingBar ratingBar, rating_bar_small, my_rating_bar;
+    RatingReviews ratingReviews;
+    RecyclerView someReviewsRcView;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -104,21 +135,17 @@ public class AppDetail extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_app_detail);
 
-        //checking for data
+        context=AppDetail.this;
+        picasso = Picasso.get();
 
-        if (Variables.array==null){
-            startActivity(new Intent(this,SplashActivity.class));
-            Handler handler=new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    finish();
-                }
-            },200);
-            return;
-        }
+        appSettings = Paper.book().read("appSettings",new AppSettings());
+
+        //views
+        init_views();
+        //init_ratings(context);
 
         getSupportActionBar().hide();
+
         if (Build.VERSION.SDK_INT >= 24) {
             try {
                 Method m = StrictMode.class.getMethod("disableDeathOnFileUriExposure");
@@ -127,132 +154,101 @@ public class AppDetail extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+
         try {
             Intent intent = getIntent();
-        if (intent != null) {
-
-            String code=intent.getStringExtra(ApiConfig.Request_code);
-            if (code.equals(ApiConfig.POST_App_Id)){
-                int id=intent.getIntExtra(ApiConfig.POST_App_Id,0);
-                if (id!=0){
-                    pos=Functions.convert_appid_to_pos(id);
+            if (intent != null && intent.hasExtra("app_id")) {
+                app_id = intent.getStringExtra("app_id");
 
 
-                }else{
-                    finish();
-                }
-
-            }else{
-                pos=intent.getIntExtra("pos",0);
+            } else {
+                finish();
             }
 
-        } else {
-            finish();
-        }
         }catch (Exception e)
         {
             e.printStackTrace();
             finish();
         }
 
-        try {
-            app = Variables.array.getJSONObject(pos);
+//        shimmer_layout.setVisibility(View.VISIBLE);
+//        all_stuff.setVisibility(View.GONE);
 
-            downloads_count=Functions.Format_numbers(Integer.parseInt(app.getString("downloads")));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        install_btn.setBackgroundColor(getResources().getColor(R.color.install_btn_bg));
 
-        if (app == null) {
-            finish();
-        }
+        init_data();
 
-        //checking for data end
+        callApi();
 
-        //shimmer loading
-        CountDownTimer loadin= new CountDownTimer(2000,500) {
+    }
+
+    private void callApi() {
+        shimmer_layout.setVisibility(View.VISIBLE);
+        all_stuff.setVisibility(View.GONE);
+
+        StringRequest request = new StringRequest(Request.Method.POST, ApiConfig.showAppDetails, new Response.Listener<String>() {
             @Override
-            public void onTick(long l) {
+            public void onResponse(String response) {
+                Log.wtf("appDetails",response);
+                shimmer_layout.setVisibility(View.GONE);
+                all_stuff.setVisibility(View.VISIBLE);
 
-            }
-
-            @Override
-            public void onFinish() {
                 try {
-                    shimmer_layout.setVisibility(View.GONE);
-                    all_stuff.setVisibility(View.VISIBLE);
-                }catch (Exception e){
+                    JSONObject resp = new JSONObject(response);
+                    if (resp.getString("code").equalsIgnoreCase("200")){
+
+                        item = DataParsing.parseAppModel(resp.getJSONObject("msg"));
+                        updateData();
+
+                    }else{
+                        Toast.makeText(context, "something went wrong", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+
+                } catch (Exception e) {
                     e.printStackTrace();
+                    Toast.makeText(context, "something went wrong", Toast.LENGTH_SHORT).show();
+                    finish();
                 }
 
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //shimmer_layout.setVisibility(View.GONE);
+                Toast.makeText(context, "something went wrong", Toast.LENGTH_SHORT).show();
+                finish();
+
+            }
+        }){
+            @Nullable
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params = new HashMap<>();
+                params.put("app_id",app_id);
+
+                return params;
             }
         };
-        loadin.start();
 
-        context=AppDetail.this;
+        RequestQueue queue = Volley.newRequestQueue(this);
+        queue.add(request);
 
-        Picasso picasso = Picasso.get();
-        boolean is_images_loaded=false;
-        try {
-            p_App_id=app.getString("id");
-            if (Variables.image_array!=null){
-                try {
-                    if (Variables.image_array.getJSONArray(Integer.parseInt(p_App_id))!=null){
-                        is_images_loaded=true;
-                    }
-                }catch (JSONException e){
-                    e.printStackTrace();
+    }
 
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    private void init_data() {
 
-
-        //find all views
-
-        init_ratings(context);
-        init_views();
-
-        //show loading
-        if (!Functions.is_first(p_App_id)){
-            try {
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        shimmer_layout.setVisibility(View.GONE);
-                    }
-                },800);
-            }catch (Exception e){
-                e.printStackTrace();
-
-            }
-        }
-
-        View.OnClickListener listener = new View.OnClickListener() {
+        share_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (view==share_btn){
-                    String link = Variables.Http+getResources().getString(R.string.appstore_url_domain)+getResources().getString(R.string.appstore_url_domain_pathprefix)+"?id="+p_App_id;
-                    Intent i = new Intent(android.content.Intent.ACTION_SEND);
-                    i.setType("text/plain");
-                    i.putExtra(android.content.Intent.EXTRA_TEXT,link);
-                    startActivity(i);
-                }else{
-                    Toast.makeText(context, "This Feature is still in development", Toast.LENGTH_SHORT).show();
-                }
+                String link = Variables.Http+getResources().getString(R.string.appstore_url_domain)+getResources().getString(R.string.appstore_url_domain_pathprefix)+"?id="+item.id;
+                Intent i = new Intent(android.content.Intent.ACTION_SEND);
+                i.setType("text/plain");
+                i.putExtra(android.content.Intent.EXTRA_TEXT,link);
+                startActivity(i);
 
             }
-        };
-
-        ///////////////////////////////////////////////////////
-
-
-
-        ///////////////////////////////////////////////////////
-        share_btn.setOnClickListener(listener);
+        });
 
         back_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -262,93 +258,118 @@ public class AppDetail extends AppCompatActivity {
             }
         });
 
-        //fetch description
 
 
-        try {
-            app_name.setText(app.getString("name"));
-            String icon;
-            if (!app.getString("icon").contains("http")){
-                icon=ApiConfig.Base_url+app.getString("icon");
+    }
+
+
+    private void updateData(){
+        if (item!= null){
+
+            is_installed = isPackageInstalled(item.package_name, getPackageManager());
+            set_local_description(context,item.long_description);
+
+            //fill data
+            app_name.setText(item.app_name);
+            app_size.setText(item.size+" MB");
+            total_rates_txt.setText(Functions.Format_numbers(item.Ratings.total));
+            horizontal_bar_review_count.setText(Functions.Format_numbers(item.Ratings.total));
+
+            //rating bars
+            String[] labels = new String[]{"5 ","4 ","3 ","2 ","1 "};
+            int[] values = new int[]{item.Ratings.star5,item.Ratings.star4,item.Ratings.star3,item.Ratings.star2, item.Ratings.star1};
+            ratingReviews.createRatingBars(item.Ratings.total,labels, getResources().getColor(R.color.install_btn_bg),values, getResources().getColor(R.color.light_white));
+
+            if (appSettings.user_actual_rating){
+                //use live calculated rating
+                rating_bar_small.setRating(Float.parseFloat(item.Ratings.rating));
+                horizontal_bar_rating.setText(item.Ratings.rating);
+                rating_big_text.setText(item.Ratings.rating);
+
             }else{
-                icon=app.getString("icon");
+                //use fake rating set by admin
+                rating_bar_small.setRating(Float.parseFloat(item.rating));
+                horizontal_bar_rating.setText(item.rating);
+                rating_big_text.setText(item.rating);
+
             }
 
-            picasso.load(Uri.parse(icon)).fetch(new Callback() {
+            // reviews
+            if (item.Reviews != null && item.Reviews.size() > 0){
+                some_reviews.setVisibility(View.VISIBLE);
+                no_review_found.setVisibility(View.GONE);
+                All_reviews_Adapter adapter = new All_reviews_Adapter(AppDetail.this,item.Reviews);
+                LinearLayoutManager manager = new LinearLayoutManager(AppDetail.this);
+
+                someReviewsRcView.setLayoutManager(manager);
+                someReviewsRcView.setAdapter(adapter);
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        int height = item.Reviews.size() * someReviewsRcView.getChildAt(0).getHeight();
+
+                        ViewGroup.LayoutParams layoutParams = someReviewsRcView.getLayoutParams();
+                        layoutParams.height = height;
+                        someReviewsRcView.setLayoutParams(layoutParams);
+
+                    }
+                },10);
+
+            }else{
+                no_review_found.setVisibility(View.VISIBLE);
+                some_reviews.setVisibility(View.GONE);
+
+            }
+
+            picasso.load(item.app_icon).into(app_icon, new Callback() {
                 @Override
                 public void onSuccess() {
-                    try {
-                        picasso.load(Uri.parse(icon)).into(app_icon);
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    //loaded
                 }
 
                 @Override
                 public void onError(Exception e) {
+                    e.printStackTrace();
 
                 }
             });
 
-            app_size.setText(app.getString("size") + " MB");
-            String package_name = app.getString("package").trim();
-            String download_link= app.getString("download_link");
-            //Toast.makeText(this, ""+package_name, Toast.LENGTH_SHORT).show();
-            boolean installed = isPackageInstalled(package_name, getPackageManager());
+            horizontal_bar_dow.setText(Functions.Format_numbers(Integer.parseInt(item.downloads)));
 
-            if (installed) {
-                IS_installed=true;
-                install_btn.setText("OPEN");
-                rating_bar_bg.setVisibility(View.VISIBLE);
-                if (Functions.is_Login(context)){
-                    my_review_layout.setVisibility(View.GONE);
-                }
-                install_btn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent launchIntent = getPackageManager().getLaunchIntentForPackage(package_name);
+
+            install_btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (is_installed){
+                        Intent launchIntent = getPackageManager().getLaunchIntentForPackage(item.package_name);
                         if (launchIntent != null) {
                             startActivity(launchIntent);//null pointer check in case package name was not found
                         } else {
                             Toast.makeText(context, "something went wrong", Toast.LENGTH_SHORT).show();
                         }
-                    }
-                });
-            } else if (package_name.equals("coming soon")) {
-                install_btn.setText("COMING SOON");
-                Toast.makeText(AppDetail.this, "This app will be available soon", Toast.LENGTH_SHORT).show();
-                install_btn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        finish();
-                    }
-                });
-            } else if (package_name.contains("https://")) {
-                install_btn.setText("BROWS");
-                install_btn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
+
+
+                    }else if (item.package_name.equals("coming soon")){
+                        Toast.makeText(AppDetail.this, "This app will be available soon", Toast.LENGTH_SHORT).show();
+
+                    }else if (item.package_name.contains("https://")) {
+
                         Intent it = new Intent();
                         it.setAction(Intent.ACTION_VIEW);
-                        it.setData(Uri.parse(package_name));
+                        it.setData(Uri.parse(item.package_name));
                         startActivity(it);
-                    }
-                });
-            } else {
-                install_btn.setText("INSTALL");
-                install_btn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
 
+                    }else{
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             if (!getPackageManager().canRequestPackageInstalls()){
-                                //Toast.makeText(context, "request permission", Toast.LENGTH_SHORT).show();
 
                                 Functions.Showdouble_btn_alert(context, "Permission needed for auto install", "click on settings and allow permission for enabling auto install", "cancel", "settings", false, new FragmentCallBack() {
                                     @Override
-                                    public void onResponce(Bundle bundle) {
+                                    public void onResponse(Bundle bundle) {
                                         if (bundle.getString("action").equals("ok")){
-                                            startActivityForResult(new Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,Uri.parse("package:"+BuildConfig.APPLICATION_ID)),UnknowSourcePermission);
+                                            startActivity(new Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:"+ BuildConfig.APPLICATION_ID)));
+
                                         }else{
                                             Toast.makeText(context, "permission required for install", Toast.LENGTH_SHORT).show();
                                         }
@@ -365,18 +386,50 @@ public class AppDetail extends AppCompatActivity {
 
                             }
 
+                        }else{
+                            do_rest();
+
+                        }
 
                     }
-                });
+
+
+                }
+            });
+
+
+            if (is_installed) {
+                install_btn.setText("OPEN");
+                rating_bar_bg.setVisibility(View.VISIBLE);
+                if (Functions.is_Login(context)){
+                    my_review_layout.setVisibility(View.GONE);
+                }
+
+            } else if (item.package_name.equals("coming soon")) {
+                install_btn.setText("COMING SOON");
+
+            } else if (item.package_name.contains("https://")) {
+                install_btn.setText("BROWS");
+
+            } else {
+                install_btn.setText("INSTALL");
 
             }
 
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
-        install_btn.setBackgroundColor(getResources().getColor(R.color.install_btn_bg));
     }
 
+
+    public ActivityResultLauncher<Intent> mStartForResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent intent = result.getData();
+                        // Handle the Intent
+                    }
+                }
+            });
 
     private void init_views() {
 
@@ -389,8 +442,8 @@ public class AppDetail extends AppCompatActivity {
         app_description=findViewById(R.id.description_txt);
         read_more=findViewById(R.id.read_more);
         read_more.setVisibility(View.INVISIBLE);
-        //rating
-
+        someReviewsRcView = findViewById(R.id.some_reviews_rcView);
+        ratingReviews = findViewById(R.id.rating_reviews);
 
         //vertical bar
         horizontal_bar_dow=findViewById(R.id.horizontal_bar_dow);
@@ -400,15 +453,19 @@ public class AppDetail extends AppCompatActivity {
 
 
         rating_big_text=findViewById(R.id.big_rating_text);
-        rating_1star=findViewById(R.id.rating_star_fill1);
-        rating_2star=findViewById(R.id.rating_star_fill2);
-        rating_3star=findViewById(R.id.rating_star_fill3);
-        rating_4star=findViewById(R.id.rating_star_fill4);
-        rating_5star=findViewById(R.id.rating_star_fill5);
+//        rating_1star=findViewById(R.id.rating_star_fill1);
+//        rating_2star=findViewById(R.id.rating_star_fill2);
+//        rating_3star=findViewById(R.id.rating_star_fill3);
+//        rating_4star=findViewById(R.id.rating_star_fill4);
+//        rating_5star=findViewById(R.id.rating_star_fill5);
         show_allrating_arrow=findViewById(R.id.show_all_ratings_arrow);
         rating_bar_background_layout=findViewById(R.id.rating_bar_background_layout);
         total_rates_txt=findViewById(R.id.total_rates_txt);
+
         ratingBar=findViewById(R.id.rating_bar);
+        rating_bar_small = findViewById(R.id.rating_bar_small);
+        my_rating_bar = findViewById(R.id.my_review_rating_bar);
+
         rating_bar_bg=findViewById(R.id.rating_bar_bgbgb);
 
         my_review_layout=findViewById(R.id.my_review_layout);
@@ -417,11 +474,11 @@ public class AppDetail extends AppCompatActivity {
         second_review_layout=findViewById(R.id.second_review_layout);
         third_review_layout=findViewById(R.id.third_review_layout);
 
-        myrevstar1=findViewById(R.id.my_review_star1);
-        myrevstar2=findViewById(R.id.my_review_star2);
-        myrevstar3=findViewById(R.id.my_review_star3);
-        myrevstar4=findViewById(R.id.my_review_star4);
-        myrevstar5=findViewById(R.id.my_review_star5);
+//        myrevstar1=findViewById(R.id.my_review_star1);
+//        myrevstar2=findViewById(R.id.my_review_star2);
+//        myrevstar3=findViewById(R.id.my_review_star3);
+//        myrevstar4=findViewById(R.id.my_review_star4);
+//        myrevstar5=findViewById(R.id.my_review_star5);
         my_review_username=findViewById(R.id.my_review_username);
         my_review_date=findViewById(R.id.my_review_date);
         my_detailed_review=findViewById(R.id.my_detailed_review);
@@ -461,7 +518,7 @@ public class AppDetail extends AppCompatActivity {
                         ratingBar.setRating(0);
                         Functions.Showdouble_btn_alert(context, "You are not Logged in", "log in to see your profile and enjoy other benefits", "Cancel", "Log in", true, new FragmentCallBack() {
                             @Override
-                            public void onResponce(Bundle bundle) {
+                            public void onResponse(Bundle bundle) {
                                 if (bundle.getString("action").equals("ok")){
                                     logIn();
                                 }
@@ -498,7 +555,7 @@ public class AppDetail extends AppCompatActivity {
         rating_bar_background_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                see_all_reviews(p_App_id);
+                see_all_reviews(item.id);
 
             }
         });
@@ -508,30 +565,28 @@ public class AppDetail extends AppCompatActivity {
         see_all_rev_txt_bottom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                see_all_reviews(p_App_id);
+                see_all_reviews(item.id);
+
             }
         });
 
         show_allrating_arrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                see_all_reviews(p_App_id);
+                see_all_reviews(item.id);
+
             }
         });
 
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        horizontal_bar_dow.setText(downloads_count);
 
     }
 
     private void check_myreview() {
 
-
         if (Functions.is_Login(context)){
-            ApiRequests.checkReviewForThisApp(context, p_App_id, new FragmentCallBack() {
+            ApiRequests.checkReviewForThisApp(context, item.id, new FragmentCallBack() {
                 @Override
-                public void onResponce(Bundle bundle) {
+                public void onResponse(Bundle bundle) {
                     String code = bundle.getString(ApiConfig.Request_code);
                     if (code.equals(ApiConfig.RequestSuccess)){
 
@@ -653,11 +708,11 @@ public class AppDetail extends AppCompatActivity {
 
     private void init_ratings(Context context){
 
-        r_star11=findViewById(R.id.review_star_fill11);
-        r_star12=findViewById(R.id.review_star_fill21);
-        r_star13=findViewById(R.id.review_star_fill31);
-        r_star14=findViewById(R.id.review_star_fill41);
-        r_star15=findViewById(R.id.review_star_fill51);
+//        r_star11=findViewById(R.id.review_star_fill11);
+//        r_star12=findViewById(R.id.review_star_fill21);
+//        r_star13=findViewById(R.id.review_star_fill31);
+//        r_star14=findViewById(R.id.review_star_fill41);
+//        r_star15=findViewById(R.id.review_star_fill51);
 
         r_star21=findViewById(R.id.review_star_fill12);
         r_star22=findViewById(R.id.review_star_fill22);
@@ -720,106 +775,106 @@ public class AppDetail extends AppCompatActivity {
         });
     }
 
-
-    private void save_description(String resp, String appid) {
-        if (Variables.description_array==null){
-            Variables.description_array=new JSONArray();
-        }
-        
-        JSONObject object = new JSONObject();
-        try {
-            object.put(appid,resp);
-            Variables.description_array.put(Integer.parseInt(appid),object);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
+//
+//    private void save_description(String resp, String appid) {
+//        if (Variables.description_array==null){
+//            Variables.description_array=new JSONArray();
+//        }
+//
+//        JSONObject object = new JSONObject();
+//        try {
+//            object.put(appid,resp);
+//            Variables.description_array.put(Integer.parseInt(appid),object);
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     private void do_rest(){
-        String packagename = "";
-        try {
-            packagename = app.getString("package");
-        } catch (JSONException e) {
-            e.printStackTrace();
+        ArrayList<Download_model> downloaded_apps = Paper.book().read("downloads",new ArrayList<>());
+        if (downloaded_apps != null){
+            for (int i = 0; i < downloaded_apps.size(); i++) {
+                Download_model model = downloaded_apps.get(i);
+                if (model.app_id.equalsIgnoreCase(item.id) && model.version.equalsIgnoreCase(item.version)){
+                    //already downloaded
+                    installApp(model.file_path);
+                    return;
+                }
+
+            }
         }
 
+        //download and install
         try {
             File folder = new File(Variables.AppDownloadpath);
             if(!folder.exists()){
                 folder.mkdirs();
+
             }
 
-            Functions.showDownloadConfirmer(context, app.getString("name"), app.getString("size"), false, new FragmentCallBack() {
+
+
+            Functions.showDownloadConfirmer(context, item.app_name, item.size, false, new FragmentCallBack() {
                 @Override
-                public void onResponce(Bundle bundle) {
+                public void onResponse(Bundle bundle) {
                     if (bundle.getString("click").equals("download")) {
 
-                        try {
-                            String download_link;
-                            if(app.getString("download_link").contains("http")){
-                                download_link=app.getString("download_link");
-                            }else {
-                                download_link=ApiConfig.Base_url+app.getString("download_link");
-                            }
-                            Functions.DownloadWithLoading(context,download_link, Variables.AppDownloadpath, app.getString("name"), pos, new FragmentCallBack() {
-                                @Override
-                                public void onResponce(Bundle bundle) {
-                                    if (bundle.getString("action").equals("install")) {
-                                        String path = bundle.getString("path");
-
-                                        String package_name = null;
-                                        String version = null;
-                                        try {
-                                            package_name = app.getString("package");
-                                            version = app.getString("version");
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }
-                                        //add value in array
-                                        if (Variables.download_information == null) {
-                                            Variables.download_information = new JSONArray();
-                                        }
-                                        JSONObject object = new JSONObject();
-                                        try {
-                                            object.put("path", path);
-                                            object.put("package", package_name);
-
-                                            Variables.download_information.put(pos, object);
-
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }
-
-
-                                        Uri app_uri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", new File(path));
-
-                                        //installPackage(apk);
-                                        Intent install = new Intent(Intent.ACTION_VIEW);
-                                        install.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                        install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                        install.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true);
-                                        install.setData(app_uri);
-                                        //install.setDataAndType(Uri.fromFile(apk), "application/vnd.android.package-archive");
-                                        startActivity(install);
-
-
-                                    } else {
-                                        //Toast.makeText(context, "", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                        String download_link;
+                        if(item.download_link.contains("http")){
+                            download_link = item.download_link;
+                        }else {
+                            download_link=ApiConfig.Base_url + item.download_link;
                         }
+
+                        Functions.DownloadWithLoading(context,download_link, Variables.AppDownloadpath, item.app_name, item, new FragmentCallBack() {
+                            @Override
+                            public void onResponse(Bundle bundle) {
+                                if (bundle.getString("action").equals("install")) {
+                                    String path = bundle.getString("path");
+
+                                    Download_model model = new Download_model();
+                                    model.app_id = item.id;
+                                    model.version = item.version;
+                                    model.file_path = path;
+
+                                    ArrayList<Download_model> downloaded_apps = Paper.book().read("downloads",new ArrayList<>());
+
+                                    if (downloaded_apps == null) downloaded_apps = new ArrayList<>();
+
+                                    downloaded_apps.add(model);
+                                    Paper.book().write("downloads", downloaded_apps);
+
+                                    installApp(path);
+
+
+                                } else {
+                                    //Toast.makeText(context, "", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
 
 
                     }
                     //Toast.makeText(context, ""+bundle.getString("click"), Toast.LENGTH_SHORT).show();
                 }
             });
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void installApp(String apk_path){
+        Uri app_uri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", new File(apk_path));
+
+        //installPackage(apk);
+        Intent install = new Intent(Intent.ACTION_VIEW);
+        install.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        install.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true);
+        install.setData(app_uri);
+        //install.setDataAndType(Uri.fromFile(apk), "application/vnd.android.package-archive");
+        startActivity(install);
+
     }
 
     private boolean isPackageInstalled(String packageName, PackageManager packageManager) {
@@ -1150,11 +1205,8 @@ public class AppDetail extends AppCompatActivity {
             e.printStackTrace();
         }
 
+
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
-        super.onActivityResult(requestCode, resultCode, data);
-    }
 }

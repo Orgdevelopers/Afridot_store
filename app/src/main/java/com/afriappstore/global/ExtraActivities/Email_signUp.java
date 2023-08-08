@@ -120,7 +120,7 @@ public class Email_signUp extends AppCompatActivity {
                         if (!profile_pic.equals("default")){
                             Functions.Image_to_Base64(profile_pic, new FragmentCallBack() {
                                 @Override
-                                public void onResponce(Bundle bundle) {
+                                public void onResponse(Bundle bundle) {
                                     profile_pic=bundle.getString("img");
                                     proceed_api();
 

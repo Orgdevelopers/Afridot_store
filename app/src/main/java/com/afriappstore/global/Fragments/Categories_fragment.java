@@ -52,7 +52,7 @@ public class Categories_fragment extends Fragment {
 
         ApiRequests.getAllCategories(context, new FragmentCallBack() {
             @Override
-            public void onResponce(Bundle bundle) {
+            public void onResponse(Bundle bundle) {
                 datalist=new ArrayList<>();
                 try {
                     if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){

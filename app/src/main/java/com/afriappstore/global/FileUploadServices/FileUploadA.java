@@ -76,7 +76,7 @@ public class FileUploadA extends AppCompatActivity {
         //Functions.showLoader(this);
         AsyncTask<String,Void,String> uploading_apk = new UploadFileAsync(app_advanced_details.apk_path,ApiConfig.APPUPLOADURI, new FragmentCallBack() {
             @Override
-            public void onResponce(Bundle bundle) {
+            public void onResponse(Bundle bundle) {
                 if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
 
                     runOnUiThread(new Runnable() {
@@ -148,7 +148,7 @@ public class FileUploadA extends AppCompatActivity {
                                 //////////////////////////////////////////////////////////////////////////////////////
                                 ApiRequests.Rollout_my_app(FileUploadA.this, data, new FragmentCallBack() {
                                     @Override
-                                    public void onResponce(Bundle bundle) {
+                                    public void onResponse(Bundle bundle) {
                                         Functions.cancelLoader();
                                         if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
                                             Toast.makeText(FileUploadA.this, "app sent for verification", Toast.LENGTH_SHORT).show();
@@ -199,7 +199,7 @@ public class FileUploadA extends AppCompatActivity {
         //this method will try to upload apk again
         AsyncTask<String,Void,String> upload_apk_again=new UploadFileAsync(app_advanced_details.apk_path, ApiConfig.APPUPLOADURI, new FragmentCallBack() {
             @Override
-            public void onResponce(Bundle bundle) {
+            public void onResponse(Bundle bundle) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -344,7 +344,7 @@ public class FileUploadA extends AppCompatActivity {
                     public void run() {
                         AsyncTask<String,Void,String> upload_image = new UploadFileAsync(pic_name, ApiConfig.APPIMAGEUPLOADURI, new FragmentCallBack() {
                             @Override
-                            public void onResponce(Bundle bundle) {
+                            public void onResponse(Bundle bundle) {
                                 runOnUiThread(new Runnable() {
                                     public void run() {
                                         if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
@@ -417,7 +417,7 @@ public class FileUploadA extends AppCompatActivity {
 
         AsyncTask<String,Void,String> icon_upload = new UploadFileAsync(copy_file, ApiConfig.APPICONUPLOADURI, new FragmentCallBack() {
             @Override
-            public void onResponce(Bundle bundle) {
+            public void onResponse(Bundle bundle) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

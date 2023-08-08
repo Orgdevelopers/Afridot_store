@@ -77,7 +77,7 @@ public class D_allcatAdaper extends RecyclerView.Adapter<D_allcatAdaper.DViewHol
                     Bundle bundle = new Bundle();
                     bundle.putString("id",main_list.get(holder.getAdapterPosition()).id);
                     bundle.putString("name",main_list.get(holder.getAdapterPosition()).name);
-                    callBack.onResponce(bundle);
+                    callBack.onResponse(bundle);
 
                 }
             });

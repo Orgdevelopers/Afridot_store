@@ -194,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
     private void getAllbigsliders() {
         ApiRequests.getAllbigslider(MainActivity.this, new FragmentCallBack() {
             @Override
-            public void onResponce(Bundle bundle) {
+            public void onResponse(Bundle bundle) {
                 if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
 
                     try {
@@ -261,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
                         "these permissions required for App's functionality",
                         "Cancel", "Continue", true, new FragmentCallBack() {
                     @Override
-                    public void onResponce(Bundle bundle) {
+                    public void onResponse(Bundle bundle) {
                         if (bundle.getString("action").equals("ok")){
                             ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},1001);
 
@@ -278,7 +278,7 @@ public class MainActivity extends AppCompatActivity {
     private void check_update() {
         ApiRequests.check_update(this, new FragmentCallBack() {
             @Override
-            public void onResponce(Bundle bundle) {
+            public void onResponse(Bundle bundle) {
                 String code = bundle.getString(ApiConfig.Request_code);
                 if (code.equals(ApiConfig.RequestSuccess)){
 
@@ -291,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
                         if (server_v>my_ver){
                             Functions.Showdouble_btn_alert(MainActivity.this, "New update available", subheader, "cancel", "Update", false, new FragmentCallBack() {
                                 @Override
-                                public void onResponce(Bundle bundle) {
+                                public void onResponse(Bundle bundle) {
                                     if (bundle.getString("action").equals("ok")){
 
                                         Toast.makeText(MainActivity.this, "update", Toast.LENGTH_SHORT).show();
@@ -430,7 +430,7 @@ public class MainActivity extends AppCompatActivity {
                     close_drawer();
                     Functions.Showdouble_btn_alert(MainActivity.this, "Do you really want to Exit","", "Cancel", "Exit", true, new FragmentCallBack() {
                         @Override
-                        public void onResponce(Bundle bundle) {
+                        public void onResponse(Bundle bundle) {
                             if (bundle.getString("action").equals("ok")){
                                 finish();
                             }
@@ -443,7 +443,7 @@ public class MainActivity extends AppCompatActivity {
                             Functions.showLoader(MainActivity.this);
                             Functions.isVerified(MainActivity.this, new FragmentCallBack() {
                                 @Override
-                                public void onResponce(Bundle bundle) {
+                                public void onResponse(Bundle bundle) {
                                     Functions.cancelLoader();
                                     if (Variables.is_verify){
                                         Intent intent = new Intent(MainActivity.this, PublishApps.class);
@@ -453,7 +453,7 @@ public class MainActivity extends AppCompatActivity {
                                     }else{
                                         Functions.Showdouble_btn_alert(MainActivity.this, "It seems your email is not verified", "you need to verify your email first", "cancel", "Verify", true, new FragmentCallBack() {
                                             @Override
-                                            public void onResponce(Bundle bundle) {
+                                            public void onResponse(Bundle bundle) {
                                                 if (bundle.getString("action").equals("ok")){
                                                     Intent intent = new Intent(MainActivity.this, VerifyEmail.class);
                                                     startActivity(intent);
@@ -504,7 +504,7 @@ public class MainActivity extends AppCompatActivity {
 
         Functions.isVerified(this, new FragmentCallBack() {
             @Override
-            public void onResponce(Bundle bundle) {
+            public void onResponse(Bundle bundle) {
 
             }
         });
@@ -514,7 +514,7 @@ public class MainActivity extends AppCompatActivity {
     private void logOut(){
         Functions.Showdouble_btn_alert(MainActivity.this, "Are you sure you want to logout?", "", "Cancel", "Logout", true, new FragmentCallBack() {
             @Override
-            public void onResponce(Bundle bundle) {
+            public void onResponse(Bundle bundle) {
                 String act= bundle.getString("action");
                 if (act.equals("ok")){
                     Functions.Log_Out(MainActivity.this);
@@ -563,7 +563,7 @@ public class MainActivity extends AppCompatActivity {
         }else {
             Functions.Showdouble_btn_alert(MainActivity.this, "You are not Logged in", "log in to see your profile and enjoy other benefits", "Cancel", "Log in", true, new FragmentCallBack() {
                 @Override
-                public void onResponce(Bundle bundle) {
+                public void onResponse(Bundle bundle) {
                     if (bundle.getString("action").equals("ok")){
                         logIn();
                     }
