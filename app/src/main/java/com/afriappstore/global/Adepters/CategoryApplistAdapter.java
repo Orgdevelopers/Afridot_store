@@ -98,9 +98,9 @@ public class CategoryApplistAdapter extends RecyclerView.Adapter<CategoryApplist
                 public void onClick(View view) {
 
                     Intent intent = new Intent(context, AppDetail.class);
-                    intent.putExtra(ApiConfig.Request_code,"pos");
-                    intent.putExtra("pos",Functions.convert_appid_to_pos(Integer.parseInt(list.get(holder.getAdapterPosition()).app_id)));
+                    intent.putExtra("app_id",list.get(holder.getAdapterPosition()).app_id);
                     context.startActivity(intent);
+
 
                 }
             });

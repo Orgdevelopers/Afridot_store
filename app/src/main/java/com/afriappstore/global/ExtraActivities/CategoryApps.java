@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.afriappstore.global.Adepters.CategoryApplistAdapter;
 import com.afriappstore.global.ApiClasses.ApiConfig;
 import com.afriappstore.global.ApiClasses.ApiRequests;
+import com.afriappstore.global.ApiClasses.DataParsing;
 import com.afriappstore.global.Interfaces.FragmentCallBack;
 import com.afriappstore.global.Model.CatAppModel;
 import com.afriappstore.global.Model.Search_result_AppModel;
@@ -66,6 +67,7 @@ public class CategoryApps extends AppCompatActivity {
         back_btn=findViewById(R.id.back_btn);
         cat_name_txt=findViewById(R.id.cat_name_txt);
 
+
         cat_name_txt.setText(cat_name);
 
         back_btn.setOnClickListener(new View.OnClickListener() {
@@ -76,6 +78,7 @@ public class CategoryApps extends AppCompatActivity {
         });
 
         Functions.showLoader(this);
+
 
         ApiRequests.getCategoryapps(this, cat_id, "0", new FragmentCallBack() {
             @Override
@@ -88,22 +91,8 @@ public class CategoryApps extends AppCompatActivity {
 
                         dataList=new ArrayList<>();
                         for (int i = 0; i<list.length(); i++){
-                            CatAppModel item = null;
                             JSONObject app = list.getJSONObject(i);
-
-                            item=new CatAppModel();
-                            item.app_id=app.getString("id");
-                            item.app_name=app.getString("name");
-                            item.app_icon=app.getString("icon");
-                            item.version=app.getString("version");
-                            item.description=app.getString("desc");
-                            item.size=app.getString("size");
-                            item.downloads=app.getString("downloads");
-                            item.download_link=app.getString("download_link");
-                            item.tags=app.getString("tags");
-                            item.rating=app.getString("rating");
-                            item.package_name=app.getString("package");
-
+                            CatAppModel item = DataParsing.parseCatApp(app);
                             dataList.add(item);
                         }
 
@@ -128,6 +117,15 @@ public class CategoryApps extends AppCompatActivity {
                     animationView.setFrame(1);
                     animationView.playAnimation();
                     //Toast.makeText(CategoryApps.this, "no records found", Toast.LENGTH_SHORT).show();
+                }
+                if (dataList.isEmpty()){
+                    applist.setVisibility(View.GONE);
+                    nothing_found_layout.setVisibility(View.VISIBLE);
+                    nothing_found_text.setText(nothing_found_text.getText().toString().replace("this category",cat_name));
+
+                    animationView.setFrame(1);
+                    animationView.playAnimation();
+
                 }
 
             }
