@@ -13,7 +13,7 @@
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_280sdp"
+            android:layout_height="@dimen/_300sdp"
             android:layout_gravity="center"
             app:cardCornerRadius="@dimen/_10sdp"
             android:elevation="@dimen/_10sdp"

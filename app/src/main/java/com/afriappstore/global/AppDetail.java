@@ -50,6 +50,7 @@ import com.afriappstore.global.Model.AppModel;
 import com.afriappstore.global.Model.AppSettings;
 import com.afriappstore.global.Model.Download_model;
 import com.afriappstore.global.Model.ReviewModel;
+import com.afriappstore.global.Model.UserModel;
 import com.afriappstore.global.Profile.LoginActivity;
 import com.afriappstore.global.SimpleClasses.Functions;
 import com.afriappstore.global.SimpleClasses.ShearedPrefs;
@@ -86,11 +87,6 @@ import io.paperdb.Paper;
 
 public class AppDetail extends AppCompatActivity {
 
-    Button install_btn;
-    ImageView app_icon,back_button,share_btn,rating_1star,rating_2star,rating_3star,rating_4star,rating_5star,show_allrating_arrow;
-    TextView app_size, app_name,app_description,read_more,rating_big_text,horizontal_bar_rating,horizontal_bar_review_count,horizontal_bar_dow;
-
-
     //rating
     int rating_click_switch=0;
 
@@ -98,19 +94,12 @@ public class AppDetail extends AppCompatActivity {
     TextView r_username1,r_username2,r_username3,see_all_rev_txt_bottom,total_rates_txt;
     TextView r_discription1,r_discription2,r_discription3;
     TextView r_date1,r_date2,r_date3;
-    TextView my_review_username,my_detailed_review,my_review_date,edit_review_btn;
     ImageView myrevstar1,myrevstar2,myrevstar3,myrevstar4,myrevstar5;
     ImageView r_star11,r_star12,r_star13,r_star14,r_star15,r_star21,r_star22,r_star23,r_star24,r_star25,r_star31,r_star32,r_star33,r_star34,r_star35;
     CircleImageView r_profile1,r_profile2,r_profile3,my_review_profile;
     LinearLayout rating_bar_background_layout,shimmer_layout,rating_bar_bg,my_review_layout,some_reviews,first_review_layout,second_review_layout,third_review_layout,no_review_found;
     ScrollView all_stuff;
 
-    //rating
-    public Integer pos;
-
-    int UnknownSourcePermission=1827;
-
-    RecyclerView recyclerView;
 
     //new update
     Context context;
@@ -119,6 +108,7 @@ public class AppDetail extends AppCompatActivity {
     //models
     AppSettings appSettings;
     AppModel item;
+    UserModel user;
 
     //variables
     String app_id = "0";
@@ -127,7 +117,17 @@ public class AppDetail extends AppCompatActivity {
     //views
     RatingBar ratingBar, rating_bar_small, my_rating_bar;
     RatingReviews ratingReviews;
-    RecyclerView someReviewsRcView;
+    RecyclerView someReviewsRcView, appImageRcView;
+
+    TextView app_size, app_name,app_description,read_more,rating_big_text,horizontal_bar_rating,horizontal_bar_review_count,horizontal_bar_dow;
+    TextView my_review_username,my_detailed_review,my_review_date,edit_review_btn;
+
+    ImageView app_icon, back_button, share_btn, show_allrating_arrow;
+    Button install_btn;
+
+
+
+
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -139,6 +139,9 @@ public class AppDetail extends AppCompatActivity {
         picasso = Picasso.get();
 
         appSettings = Paper.book().read("appSettings",new AppSettings());
+        if (Functions.is_Login(this)){
+            user = Paper.book().read("user",new UserModel());
+        }
 
         //views
         init_views();
@@ -226,6 +229,9 @@ public class AppDetail extends AppCompatActivity {
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String,String> params = new HashMap<>();
                 params.put("app_id",app_id);
+                if (Functions.is_Login(AppDetail.this)){
+                    params.put("user_id",user.id);
+                }
 
                 return params;
             }
@@ -444,6 +450,7 @@ public class AppDetail extends AppCompatActivity {
         read_more.setVisibility(View.INVISIBLE);
         someReviewsRcView = findViewById(R.id.some_reviews_rcView);
         ratingReviews = findViewById(R.id.rating_reviews);
+        appImageRcView = findViewById(R.id.app_images);
 
         //vertical bar
         horizontal_bar_dow=findViewById(R.id.horizontal_bar_dow);
@@ -494,10 +501,12 @@ public class AppDetail extends AppCompatActivity {
 
 
         check_myreview();
+
         //rating bar setup
-        rating_bar_bg.setVisibility(View.GONE);
+        //rating_bar_bg.setVisibility(View.GONE);
         ratingBar.setRating(0);
         ratingBar.setStepSize(1);
+
         ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float v, boolean b) {
@@ -509,7 +518,9 @@ public class AppDetail extends AppCompatActivity {
                         Intent reviewsA = new Intent(context, ReviewActivity.class);
                         reviewsA.putExtra("mode","post");
                         reviewsA.putExtra("rating",ratingBar.getRating());
-                        reviewsA.putExtra("pos",pos);
+                        reviewsA.putExtra("app_id", item.id);
+                        reviewsA.putExtra("app_icon", item.app_icon);
+                        reviewsA.putExtra("app_name", item.app_icon);
 
                         startActivity(reviewsA);
                         overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
@@ -584,116 +595,40 @@ public class AppDetail extends AppCompatActivity {
     private void check_myreview() {
 
         if (Functions.is_Login(context)){
-            ApiRequests.checkReviewForThisApp(context, item.id, new FragmentCallBack() {
-                @Override
-                public void onResponse(Bundle bundle) {
-                    String code = bundle.getString(ApiConfig.Request_code);
-                    if (code.equals(ApiConfig.RequestSuccess)){
+            if (item.user_review != null){
 
-                        try {
-                            my_review_layout.setVisibility(View.VISIBLE);
-                            ratingBar.setVisibility(View.GONE);
-                            JSONObject rev = new JSONObject(bundle.getString(ApiConfig.Request_response));
-                            String name = Functions.getSharedPreference(context).getString(ShearedPrefs.U_FNAME,"")+" "+Functions.getSharedPreference(context).getString(ShearedPrefs.U_LNAME,"");
-                            my_review_username.setText(name);
-                            Variables.my_review=rev.getString("review");
-                            my_detailed_review.setText(rev.getString("review"));
-                            my_review_date.setText(rev.getString("date"));
-                            String star = rev.getString("star");
-                            String pic = Functions.getSharedPreference(context).getString(ShearedPrefs.U_PIC,"");
+                my_review_layout.setVisibility(View.VISIBLE);
+                ratingBar.setVisibility(View.GONE);
 
-                            edit_review_btn.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    Intent edit_review = new Intent(AppDetail.this,ReviewActivity.class);
-                                    edit_review.putExtra("mode","edit");
-                                    edit_review.putExtra("rating",Float.valueOf(star));
-                                    edit_review.putExtra("review",my_detailed_review.getText());
-                                    edit_review.putExtra("pos",pos);
-                                    //Toast.makeText(context, "bfbdjjrhudbfiu", Toast.LENGTH_SHORT).show();
-                                    startActivity(edit_review);
-                                }
-                            });
+                my_review_username.setText(item.user_review.user.first_name +" "+item.user_review.user.first_name);
+                my_detailed_review.setText(item.user_review.review);
+                my_review_date.setText(item.user_review.created_at);
 
-                            //Toast.makeText(context, ""+star, Toast.LENGTH_SHORT).show();
+                picasso.load(item.user_review.user.profile_pic).into(my_review_profile);
 
-                            if (star.equals("5")){
-                                //
-                                myrevstar5.setColorFilter(getResources().getColor(R.color.install_btn_bg));
-                                myrevstar4.setColorFilter(getResources().getColor(R.color.install_btn_bg));
-                                myrevstar3.setColorFilter(getResources().getColor(R.color.install_btn_bg));
-                                myrevstar2.setColorFilter(getResources().getColor(R.color.install_btn_bg));
-                            }else if (star.equals("4")){
-                                //uncheck stars
-                                myrevstar5.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                                //check stars
-                                myrevstar4.setColorFilter(getResources().getColor(R.color.install_btn_bg));
-                                myrevstar3.setColorFilter(getResources().getColor(R.color.install_btn_bg));
-                                myrevstar2.setColorFilter(getResources().getColor(R.color.install_btn_bg));
+                edit_review_btn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent edit_review = new Intent(AppDetail.this,ReviewActivity.class);
+                        edit_review.putExtra("mode","edit");
+                        edit_review.putExtra("rating",Float.parseFloat(item.user_review.stars));
+                        edit_review.putExtra("review",my_detailed_review.getText());
+                        edit_review.putExtra("app_id", item.id);
+                        edit_review.putExtra("app_icon",item.app_icon);
+                        edit_review.putExtra("app_name", item.app_icon);
 
-                            }else if (star.equals("3")){
-                                myrevstar5.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                                myrevstar4.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                                //
-                                myrevstar3.setColorFilter(getResources().getColor(R.color.install_btn_bg));
-                                myrevstar2.setColorFilter(getResources().getColor(R.color.install_btn_bg));
-
-                            }else if (star.equals("2")){
-                                myrevstar5.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                                myrevstar4.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                                myrevstar3.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                                //
-                                myrevstar2.setColorFilter(getResources().getColor(R.color.install_btn_bg));
-
-                            }else if (star.equals("1")){
-                                myrevstar5.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                                myrevstar4.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                                myrevstar3.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-                                myrevstar2.setColorFilter(getResources().getColor(R.color.ultra_light_grey));
-
-                            }
-
-
-                            if (!pic.equals("default")){
-                                Picasso picasso = Picasso.get();
-                                picasso.setLoggingEnabled(false);
-                                pic=ApiConfig.Base_url+pic;
-
-                                String finalPic = pic;
-                                picasso.load(pic).fetch(new Callback() {
-                                    @Override
-                                    public void onSuccess() {
-                                        picasso.load(finalPic).into(my_review_profile);
-                                        picasso.setLoggingEnabled(true);
-                                    }
-
-                                    @Override
-                                    public void onError(Exception e) {
-                                        picasso.setLoggingEnabled(true);
-                                        my_review_profile.setImageDrawable(getResources().getDrawable(R.drawable.ic_user_icon));
-                                    }
-                                });
-                            }
-
-                            //set_reviews(context);
-                            //Toast.makeText(context, ""+bundle.getString(ApiConfig.Request_response), Toast.LENGTH_SHORT).show();
-
-                        }catch (Exception e){
-                            e.printStackTrace();
-                            my_review_layout.setVisibility(View.GONE);
-                            ratingBar.setVisibility(View.VISIBLE);
-                        }
-
-
-
-                    }else{
-                        //Toast.makeText(context,bundle.getString(ApiConfig.Request_response),Toast.LENGTH_SHORT).show();
-                        my_review_layout.setVisibility(View.GONE);
-                        ratingBar.setVisibility(View.VISIBLE);
+                        //Toast.makeText(context, "bfbdjjrhudbfiu", Toast.LENGTH_SHORT).show();
+                        startActivity(edit_review);
                     }
+                });
 
-                }
-            });
+
+
+            }else{
+                my_review_layout.setVisibility(View.GONE);
+                ratingBar.setVisibility(View.VISIBLE);
+            }
+
         }else{
             my_review_layout.setVisibility(View.GONE);
             ratingBar.setVisibility(View.VISIBLE);

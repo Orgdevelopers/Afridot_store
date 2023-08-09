@@ -95,6 +95,12 @@ public class DataParsing {
 
             item.Ratings = model;
 
+
+            //user review
+            if (object.has("user_review")){
+                item.user_review = DataParsing.parseReviewModel(object.getJSONObject("user_review"));
+            }
+
         } catch (Exception e) {
             item = null;
             e.printStackTrace();

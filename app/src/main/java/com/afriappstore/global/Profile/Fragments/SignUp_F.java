@@ -15,14 +15,11 @@ public class SignUp_F extends Fragment {
 
     View view;
    Context context;
+
     public SignUp_F(Context context) {
         // Required empty public constructor
         this.context = context;
     }
-
-
-
-
 
 
     @Override

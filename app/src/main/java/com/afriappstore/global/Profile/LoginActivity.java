@@ -1,6 +1,7 @@
 package com.afriappstore.global.Profile;
 
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -137,8 +138,9 @@ public class LoginActivity extends AppCompatActivity {
 
         SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
 
-        public ViewPagerAdapter( FragmentManager fm) {
-            super(fm,FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+        @SuppressLint("WrongConstant")
+        public ViewPagerAdapter(FragmentManager fm) {
+            super(fm,BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         }
 
         @Override

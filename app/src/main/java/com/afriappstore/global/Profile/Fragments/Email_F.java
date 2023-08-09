@@ -8,10 +8,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.os.CountDownTimer;
-import android.os.Handler;
 import android.text.Editable;
 import android.text.InputType;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afriappstore.global.ApiClasses.DataParsing;
+import com.afriappstore.global.MainActivity;
 import com.afriappstore.global.Model.UserModel;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -38,12 +37,8 @@ import com.klinker.android.link_builder.Link;
 import com.klinker.android.link_builder.LinkBuilder;
 import com.klinker.android.link_builder.TouchableMovementMethod;
 import com.afriappstore.global.ApiClasses.ApiConfig;
-import com.afriappstore.global.ApiClasses.ApiRequests;
-import com.afriappstore.global.ExtraActivities.Email_signUp;
-import com.afriappstore.global.Interfaces.FragmentCallBack;
 import com.afriappstore.global.R;
 import com.afriappstore.global.SimpleClasses.Functions;
-import com.afriappstore.global.SplashActivity;
 
 import org.json.JSONObject;
 
@@ -82,14 +77,14 @@ public class Email_F extends Fragment {
         view =inflater.inflate(R.layout.fragment_email, container, false);
         initViews();
         SetupScreenData();
-        setLisners();
+        setListeners();
 
 
 
         return view;
     }
 
-    private void setLisners() {
+    private void setListeners() {
 
         //next button
         next_button.setOnClickListener(new View.OnClickListener() {
@@ -101,12 +96,8 @@ public class Email_F extends Fragment {
                         callAPiLogin();
 
                     }else{
-                        Toast.makeText(context,"Something wrong with email",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context,"please enter valid email",Toast.LENGTH_SHORT).show();
                     }
-
-
-
-
 
 
                 }else{
@@ -203,13 +194,22 @@ public class Email_F extends Fragment {
                     JSONObject resp = new JSONObject(response);
                     if (resp.getString("code").equals("200")){
 
-                    JSONObject user = resp.getJSONObject("msg");
-                    UserModel userModel =DataParsing.parseUserModel(user);
+                        JSONObject user = resp.getJSONObject("msg");
+                        UserModel userModel = DataParsing.parseUserModel(user);
+
                         Paper.book().write("user",userModel);
                         Paper.book().write("isLogin",true);
 
+                        Intent intent = new Intent(context, MainActivity.class);
+                        startActivity(intent);
 
+                        try {
+                            getActivity().finish();
+                            getActivity().overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
 
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
 
                     }else {
                         Toast.makeText(context, ""+resp.getString("msg"), Toast.LENGTH_SHORT).show();

@@ -16,6 +16,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afriappstore.global.Model.UserModel;
 import com.airbnb.lottie.LottieAnimationView;
 import com.klinker.android.link_builder.Link;
 import com.klinker.android.link_builder.LinkBuilder;
@@ -35,23 +36,24 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import io.paperdb.Paper;
 
 public class ReviewActivity extends AppCompatActivity {
 
     float rating;
-    int position;
     ImageView back_button,app_image;
     CircleImageView user_image;
-    TextView app_name,post_btn,review_limit,username,privacy_text;
+    TextView app_name_txt,post_btn,review_limit,username,privacy_text;
     EditText detailed_rev;
     LottieAnimationView user_img_loading;
     String mode="post",review="";
 
     RatingBar ratingBar;
 
-    String app_id,appmame,icon,vimg;
+    String app_id, appName, app_icon;
 
     Picasso picasso;
+    UserModel user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,26 +65,16 @@ public class ReviewActivity extends AppCompatActivity {
             Intent intent = getIntent();
             mode=intent.getStringExtra("mode");
             rating=intent.getFloatExtra("rating",0);
-            position=intent.getIntExtra("pos",999);
 
             if (mode.equals("edit")){
                 review=intent.getStringExtra("review");
             }
 
-            if(position==999){
-                finish_animated();
-            }
+            app_id = intent.getStringExtra("app_id");
+            app_icon = intent.getStringExtra("app_icon");
+            appName = intent.getStringExtra("app_name");
 
-            try {
-                JSONObject app = Variables.array.getJSONObject(position);
-                appmame=app.getString("name");
-                app_id=app.getString("id");
-                icon=app.getString("icon");
-
-
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+            user = Paper.book().read("user",new UserModel());
 
         }catch (Exception e){
             e.printStackTrace();
@@ -102,12 +94,12 @@ public class ReviewActivity extends AppCompatActivity {
     }
 
     private void setup_screen_data() {
-        app_name.setText(appmame);
+        app_name_txt.setText(appName);
 
-        picasso.load(icon).fetch(new Callback() {
+        picasso.load(app_icon).fetch(new Callback() {
             @Override
             public void onSuccess() {
-                picasso.load(icon).into(app_image);
+                picasso.load(app_icon).into(app_image);
             }
 
             @SuppressLint("UseCompatLoadingForDrawables")
@@ -117,9 +109,7 @@ public class ReviewActivity extends AppCompatActivity {
             }
         });
 
-        String img = Functions.getSharedPreference(this).getString(ShearedPrefs.U_PIC,"default");
-        vimg=ApiConfig.Base_url+img;
-        String uname =Functions.getSharedPreference(ReviewActivity.this).getString(ShearedPrefs.U_FNAME,"")+" "+Functions.getSharedPreference(ReviewActivity.this).getString(ShearedPrefs.U_LNAME,"");
+        String img = user.profile_pic;
 
         if (img.equals("default")) {
             user_image.setImageDrawable(getResources().getDrawable(R.drawable.ic_user_icon));
@@ -127,10 +117,10 @@ public class ReviewActivity extends AppCompatActivity {
         }else{
             picasso.setLoggingEnabled(false);
 
-            picasso.load(Uri.parse(vimg)).fetch(new Callback() {
+            picasso.load(Uri.parse(img)).fetch(new Callback() {
                 @Override
                 public void onSuccess() {
-                    picasso.load(Uri.parse(vimg)).into(user_image);
+                    picasso.load(Uri.parse(img)).into(user_image);
                     user_img_loading.cancelAnimation();
                     user_img_loading.setVisibility(View.GONE);
                     picasso.setLoggingEnabled(true);
@@ -149,11 +139,12 @@ public class ReviewActivity extends AppCompatActivity {
 
                 }
             });
-            Log.wtf("vimg",vimg);
+
         }
 
-        username.setText(uname);
+        username.setText(user.first_name+" "+user.last_name);
         ratingBar.setRating(rating);
+
         try{
             if (mode.equals("edit")){
                 detailed_rev.setText(review);
@@ -163,6 +154,7 @@ public class ReviewActivity extends AppCompatActivity {
         }catch (Exception e){
             e.printStackTrace();
         }
+
         ratingBar.setStepSize(1);
 
         detailed_rev.addTextChangedListener(new TextWatcher() {
@@ -173,7 +165,7 @@ public class ReviewActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence text, int i, int i1, int i2) {
-                review_limit.setText(text.length()+"/350");
+                review_limit.setText(text.length()+"/250");
             }
 
             @Override
@@ -271,7 +263,7 @@ public class ReviewActivity extends AppCompatActivity {
     private void find_allviews() {
         back_button=findViewById(R.id.allRev_us_back);
         app_image=findViewById(R.id.app_image);
-        app_name=findViewById(R.id.app_name);
+        app_name_txt=findViewById(R.id.app_name);
         post_btn=findViewById(R.id.post_rev_btn);
         user_image=findViewById(R.id.user_img);
         username=findViewById(R.id.username);
@@ -284,11 +276,6 @@ public class ReviewActivity extends AppCompatActivity {
     }
 
     private void finish_animated(){
-        try {
-            picasso.invalidate(Uri.parse(vimg));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         finish();
         overridePendingTransition(R.anim.in_from_left,R.anim.out_to_right);
     }

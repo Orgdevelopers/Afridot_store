@@ -10,5 +10,6 @@ public class AppModel {
     public ArrayList<AppImageModel> app_images;
     public ArrayList<ReviewModel> Reviews;
     public RatingsModel Ratings;
+    public ReviewModel user_review;
 
 }

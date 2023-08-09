@@ -16,18 +16,18 @@
         <RelativeLayout
             android:visibility="visible"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_260sdp"
-            android:padding="@dimen/_8sdp"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/_5sdp"
             android:layout_marginTop="@dimen/_5sdp"
-            android:layout_marginStart="@dimen/_12sdp"
-            android:layout_marginEnd="@dimen/_12sdp"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginEnd="@dimen/_10sdp"
             android:layout_marginBottom="@dimen/_5sdp">
 
             <RelativeLayout
                 android:id="@+id/login_layout"
                 android:visibility="visible"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_260sdp">
+                android:layout_height="wrap_content">
 
 
 
@@ -136,7 +136,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true" />
+                        android:layout_centerVertical="true"
+                        android:buttonTint="@color/ultra_light_grey"
+                        />
 
                     <TextView
                         android:id="@+id/login_terms_condition_txt"
