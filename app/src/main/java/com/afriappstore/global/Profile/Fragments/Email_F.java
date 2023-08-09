@@ -75,11 +75,10 @@ public class Email_F extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view =inflater.inflate(R.layout.fragment_email, container, false);
+
         initViews();
         SetupScreenData();
         setListeners();
-
-
 
         return view;
     }
@@ -216,7 +215,9 @@ public class Email_F extends Fragment {
                     }
 
                 }catch (Exception e){
-                    e.printStackTrace();                }
+                    e.printStackTrace();
+
+                }
 
 
             }
@@ -346,6 +347,7 @@ public class Email_F extends Fragment {
         verify_otp_button=view.findViewById(R.id.verify_otp_button);
         enter_otp=view.findViewById(R.id.enter_otp);
         create_password=view.findViewById(R.id.create_password);
+
 
     }
 

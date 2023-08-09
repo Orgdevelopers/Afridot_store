@@ -21,9 +21,12 @@ public class ApiConfig {
     public static final String showALlCategories = Api_url+"showAllCategories";
     public static final String showAppDetails = Api_url+"showAppDetails";
     public static final String Signup = Api_url+"Signup";
-    public static final String Login=Api_url+"index";
+    public static final String Login=Api_url+"login";
     public static final String showAllReviews = Api_url+"showAllReviews";
     public static final String getCategoryapps=Api_url+"showCategoryApps";
+
+    public static final String forgetPassword = Api_url+"forgetPassword";
+    public static final String updatePassword = Api_url+"updatePassword";
 
 
     //
