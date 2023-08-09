@@ -22,8 +22,18 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afriappstore.global.ApiClasses.DataParsing;
+import com.afriappstore.global.Model.UserModel;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.afriappstore.global.ApiClasses.ApiConfig;
@@ -31,17 +41,29 @@ import com.afriappstore.global.ApiClasses.ApiRequests;
 import com.afriappstore.global.Interfaces.FragmentCallBack;
 import com.afriappstore.global.R;
 import com.afriappstore.global.SimpleClasses.Functions;
+import com.klinker.android.link_builder.Link;
+import com.klinker.android.link_builder.LinkBuilder;
+import com.klinker.android.link_builder.TouchableMovementMethod;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import io.paperdb.Paper;
 
 public class SignupActivity extends AppCompatActivity {
 
-    EditText firstname,lastname;
+    EditText firstname,lastname,email_edit,password_edit;
     Button complete_signup_btn;
     CircleImageView pick_image;
+    TextView loginTermsConditionTxt;
 
     Integer PICK_PROFILE_PIC=101;
     Integer ASK_PERMISSION=200;
@@ -58,34 +80,39 @@ public class SignupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
-        try {
-            Intent intent = getIntent();
-            String type = intent.getStringExtra("type");
-            if (type.equals("phone")){
-                TYPE="phone";
-                PHONE= intent.getStringExtra("phone");
-                Auth_ID=intent.getStringExtra("auth_id");
-            }else {
-                TYPE="email";
-                EMAIL= intent.getStringExtra("email");
-                Auth_ID=intent.getStringExtra("auth_id");
-
-            }
-
-            if (TYPE.equals("NULL") && EMAIL.equals("NULL") && PHONE.equals("NULL") && Auth_ID.equals("NULL")){
-                finish();
-                overridePendingTransition(R.anim.in_from_left,R.anim.out_to_right);
-
-            }
-        }catch (Exception e){
-            finish();
-            overridePendingTransition(R.anim.in_from_left,R.anim.out_to_right);
-        }
+//        try {
+//            Intent intent = getIntent();
+//            String type = intent.getStringExtra("type");
+//            if (type.equals("phone")){
+//                TYPE="phone";
+//                PHONE= intent.getStringExtra("phone");
+//                Auth_ID=intent.getStringExtra("auth_id");
+//            }else {
+//                TYPE="email";
+//                EMAIL= intent.getStringExtra("email");
+//                Auth_ID=intent.getStringExtra("auth_id");
+//
+//            }
+//
+//            if (TYPE.equals("NULL") && EMAIL.equals("NULL") && PHONE.equals("NULL") && Auth_ID.equals("NULL")){
+//                finish();
+//                overridePendingTransition(R.anim.in_from_left,R.anim.out_to_right);
+//
+//            }
+//        }catch (Exception e){
+//            finish();
+//            overridePendingTransition(R.anim.in_from_left,R.anim.out_to_right);
+//        }
 
         firstname=findViewById(R.id.firstname_txt);
         lastname=findViewById(R.id.lastname_txt);
         complete_signup_btn=findViewById(R.id.sign_up_btn);
+        email_edit = findViewById(R.id.email_edit);
+        password_edit =findViewById(R.id.password_edit);
         pick_image=findViewById(R.id.profile_picker);
+        loginTermsConditionTxt=findViewById(R.id.login_terms_condition_txt);
+        SetupScreenData();
+
         pick_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -134,24 +161,91 @@ public class SignupActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String f_name=firstname.getText().toString();
                 String l_name=lastname.getText().toString();
-                if (!f_name.equals("") && !l_name.equals("")){
-                    if (!(f_name.length()<4)){
-                        call_signup_api();
-                    }else{
-                        firstname.setError("Firstname should be min 4 characters long");
-                    }
+                String email = email_edit.getText().toString();
+                String pass = password_edit.getText().toString();
 
-                }else{
-                    if (f_name.equals("")){
-                        firstname.setError("First name is required");
+                if (f_name.length()>3){
+                    if (l_name.length()>1){
+                        if (email.contains("@")& email.length()>4){
+                            if (pass.length()>5){
+
+
+                                call_signup_api();
+
+
+                            }else {
+                                password_edit.setError("minimum length 6");
+                                password_edit.requestFocus();
+                            }
+                        }else{
+                            email_edit.setError("Please enter a email");
+                            email_edit.requestFocus();
+
+                        }
+
                     }else{
                         lastname.setError("Last name is required");
+                        lastname.requestFocus();
+
                     }
+                }else{
+                    firstname.setError("min length 4");
+                    firstname.requestFocus();
                 }
+
+
+
+
+
             }
         });
 
         }
+
+    private void SetupScreenData() {
+
+        Link link = new Link(getString(R.string.terms_of_use));
+        link.setTextColor(getResources().getColor(R.color.black));
+        link.setTextColorOfHighlightedLink(getResources().getColor(R.color.Login_tab_txt_color));
+        link.setUnderlined(true);
+        link.setBold(false);
+        link.setHighlightAlpha(.20f);
+        link.setOnClickListener(new Link.OnClickListener() {
+            @Override
+            public void onClick(String clickedText) {
+                openWebUrl(getString(R.string.terms_of_use), ApiConfig.Terms_url);
+            }
+        });
+
+        Link link2 = new Link(getString(R.string.privacy_policy));
+        link2.setTextColor(getResources().getColor(R.color.black));
+        link2.setTextColorOfHighlightedLink(getResources().getColor(R.color.Login_tab_txt_color));
+        link2.setUnderlined(true);
+        link2.setBold(false);
+        link2.setHighlightAlpha(.20f);
+        link2.setOnClickListener(new Link.OnClickListener() {
+            @Override
+            public void onClick(String clickedText) {
+                openWebUrl(getString(R.string.privacy_policy),ApiConfig.Privacy_url);
+            }
+        });
+        ArrayList<Link> links = new ArrayList<>();
+        links.add(link);
+        links.add(link2);
+        CharSequence sequence = LinkBuilder.from(SignupActivity.this, loginTermsConditionTxt.getText().toString())
+                .addLinks(links)
+                .build();
+        loginTermsConditionTxt.setText(sequence);
+        loginTermsConditionTxt.setMovementMethod(TouchableMovementMethod.getInstance());
+    }
+
+    private void openWebUrl(String string, String terms_url) {
+
+        Intent intent = new Intent(Intent.ACTION_VIEW,Uri.parse(terms_url));
+        startActivity(intent);
+
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -196,6 +290,8 @@ public class SignupActivity extends AppCompatActivity {
         Functions.showLoader(SignupActivity.this);
         String f_name= firstname.getText().toString();
         String l_name=lastname.getText().toString();
+        String email = email_edit.getText().toString();
+        String pass = password_edit.getText().toString();
         String image=profile_pic;
 
         if (profile_pic.equals("default")){
@@ -216,8 +312,77 @@ public class SignupActivity extends AppCompatActivity {
 
         }
 
+        callApiSignup(f_name,l_name,email,pass);
+
 
     }
+
+
+        private void callApiSignup(String f_name,String l_name,String email,String pass) {
+            StringRequest request = new StringRequest(Request.Method.POST, ApiConfig.Signup, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+
+                    try {
+                        JSONObject resp = new JSONObject(response);
+                        if (resp.getString("code").equalsIgnoreCase("200")){
+
+                            JSONObject user = resp.getJSONObject("msg");
+
+
+                            UserModel model = DataParsing.parseUserModel(user);
+                            Paper.book().write("user",model);
+                            Paper.book().write("isLogin",true);
+
+
+
+                            try {
+                                finish();
+                                overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+                        }else {
+                            Toast.makeText(SignupActivity.this, ""+resp.getString("msg"), Toast.LENGTH_SHORT).show();
+                        }
+
+
+
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                }
+            }){
+                @Nullable
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String,String> params = new HashMap<>();
+                    params.put("firstname", f_name);
+                    params.put("lastname", l_name);
+                    params.put("email", email);
+                    params.put("password", pass);
+                    return params;
+                }
+            };
+
+            RequestQueue queue = Volley.newRequestQueue(SignupActivity.this);
+            queue.add(request);
+
+
+
+        }
+
+
 
     @Override
     public void onBackPressed() {
