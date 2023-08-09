@@ -22,6 +22,8 @@ public class ApiConfig {
     public static final String showAppDetails = Api_url+"showAppDetails";
     public static final String Signup = Api_url+"Signup";
     public static final String Login=Api_url+"index";
+    public static final String showAllReviews = Api_url+"showAllReviews";
+
 
     //
     public static final String Request="request";

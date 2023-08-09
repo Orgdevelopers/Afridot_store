@@ -110,9 +110,9 @@ public class ApiRequests {
 //    }
 //    }
 
-    public static void getAllReviews(Context context,String app_id,int Starting_point, FragmentCallBack callBack){
+    public static void getAllReviews(Context context,String app_id, FragmentCallBack callBack){
 
-        StringRequest request = new StringRequest(Request.Method.POST, ApiConfig.Api_url, new Response.Listener<String>() {
+        StringRequest request = new StringRequest(Request.Method.POST, ApiConfig.showAllReviews, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Bundle bundle = new Bundle();
@@ -134,7 +134,6 @@ public class ApiRequests {
                 Map<String,String> params = new HashMap<String, String>();
                 params.put(ApiConfig.Request,ApiConfig.Request_getAllReviews);
                 params.put(ApiConfig.POST_App_Id,app_id);
-                params.put("start_point",String.valueOf(Starting_point));
                 return params;
             }
         };
