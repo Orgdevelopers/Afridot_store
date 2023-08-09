@@ -14,6 +14,8 @@ import com.afriappstore.global.Interfaces.FragmentCallBack;
 import com.afriappstore.global.SimpleClasses.Functions;
 import com.afriappstore.global.SimpleClasses.Variables;
 
+import io.paperdb.Paper;
+
 @SuppressLint("CustomSplashScreen")
 public class SplashActivity extends AppCompatActivity {
     String appid="";
@@ -22,6 +24,8 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
+        Paper.init(this);
 
         proceed();
 

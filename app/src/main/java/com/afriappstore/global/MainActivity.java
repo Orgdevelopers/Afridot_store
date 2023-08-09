@@ -106,8 +106,6 @@ public class MainActivity extends AppCompatActivity {
          */
 
         //init the paper db
-        Paper.init(this);
-
         //check permission
         //check_permission();
 
@@ -523,24 +521,19 @@ public class MainActivity extends AppCompatActivity {
 
                         setNavigation();
                         Toast.makeText(MainActivity.this, "successfully Logged Out", Toast.LENGTH_SHORT).show();
-                        /*
+
                         Handler handler = new Handler();
                         handler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
                                 Intent intent = new Intent(MainActivity.this,SplashActivity.class);
                                 startActivity(intent);
+
+                                finish();
                                 overridePendingTransition(R.anim.in_from_left,R.anim.out_to_right);
 
-                                Handler handler = new Handler();
-                                handler.postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        finish();
-                                    }
-                                },50);
                             }
-                        },10);*/
+                        },10);
                     }catch (Exception e){
                         e.printStackTrace();
                     }

@@ -57,6 +57,8 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Random;
 
+import io.paperdb.Paper;
+
 public class Functions {
 
     static Dialog loading_dialog=null;
@@ -426,9 +428,7 @@ public class Functions {
 
     public static Boolean is_Login(Context context){
 
-        Boolean is_login = Functions.getSharedPreference(context).getBoolean(ShearedPrefs.IS_LOGIN,false);
-
-        return is_login;
+        return Paper.book().read("isLogin",false);
     }
 
     public static String Login_Type(Context context){
@@ -449,34 +449,11 @@ public class Functions {
 
     public static void Log_Out(Context context){
         try {
-            String login_type=Functions.getSharedPreference(context).getString(ShearedPrefs.SIGN_IN_TYPE,"not");
             FirebaseAuth auth = FirebaseAuth.getInstance();
             FirebaseUser user = auth.getCurrentUser();
 
-            if (login_type.equals(ShearedPrefs.SIGN_IN_TYPE_PHONE)){
-                if (user!=null){
-                    auth.signOut();
-                    clear_saves(context);
-                }
-            }else if (login_type.equals(ShearedPrefs.SIGN_IN_TYPE_EMAIL)){
-                if (user!=null){
-                    auth.signOut();
-
-                }
-                clear_saves(context);
-
-            }else if (login_type.equals(ShearedPrefs.SIGN_IN_TYPE_GOOGLE)){
-                if (user!=null){
-                    auth.signOut();
-                    clear_saves(context);
-                }
-
-            }else if (login_type.equals("not")){
-                if (user!=null){
-                    auth.signOut();
-                    clear_saves(context);
-                }
-            }
+            Paper.book().destroy();
+            auth.signOut();
         }catch (Exception e){
             e.printStackTrace();
         }

@@ -181,7 +181,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="don't have an account? Signup."
-                    android:textSize="@dimen/_14sdp"
+                    android:textSize="@dimen/_11sdp"
                     android:textColor="@color/black"
                     android:layout_below="@id/login_btn"
                     android:layout_marginStart="@dimen/_20sdp"
@@ -195,7 +195,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="forget password"
-                    android:textSize="@dimen/_12sdp"
+                    android:textSize="@dimen/_11sdp"
                     android:textColor="@color/black"
                     android:layout_below="@id/password_edit_layout"
                     android:layout_marginStart="@dimen/_20sdp"
@@ -204,29 +204,35 @@
 
                     />
 
-                <LinearLayout
+                <RelativeLayout
                     android:id="@+id/email_edit_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/less_round_edge_ractengle_white"
                     android:layout_below="@id/login_txt"
                     android:layout_marginStart="@dimen/_15sdp"
                     android:layout_marginEnd="@dimen/_15sdp"
                     android:layout_marginTop="@dimen/_15sdp"
-
+                    android:background="@drawable/less_round_edge_ractengle_white"
                     >
+
 
                     <EditText
                         android:id="@+id/email_edit"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="enter your email"
-                        android:background="@color/white"
-                        android:layout_margin="@dimen/_5sdp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="@dimen/_10sdp"
+                        android:layout_marginEnd="@dimen/_10sdp"
+                        android:backgroundTint="@color/invisible"
+                        android:hint="Email"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/ultra_light_grey"
+                        android:textSize="@dimen/_11sdp"
                         android:inputType="textEmailAddress"
                         />
 
-                </LinearLayout>
+                </RelativeLayout>
+
 
                 <RelativeLayout
                     android:id="@+id/password_edit_layout"
@@ -244,12 +250,16 @@
                         android:id="@+id/password_edit"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="enter password"
-                        android:background="@color/white"
-                        android:layout_margin="@dimen/_5sdp"
+                        android:layout_marginStart="@dimen/_10sdp"
+                        android:layout_marginEnd="@dimen/_10sdp"
                         android:layout_toStartOf="@id/iv_hide"
+                        android:backgroundTint="@color/invisible"
+                        android:hint="Password"
+                        android:layout_centerVertical="true"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/ultra_light_grey"
                         android:inputType="textPassword"
-                        />
+                        android:textSize="@dimen/_11sdp" />
 
                     <ImageView
                         android:id="@+id/iv_hide"

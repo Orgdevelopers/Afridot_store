@@ -300,6 +300,9 @@ public class AppDetail extends AppCompatActivity {
 
             }
 
+            check_myreview();
+
+
             // reviews
             if (item.Reviews != null && item.Reviews.size() > 0){
                 some_reviews.setVisibility(View.VISIBLE);
@@ -498,9 +501,6 @@ public class AppDetail extends AppCompatActivity {
         //shimmer
         shimmer_layout=findViewById(R.id.shimmer_layout_app_detail);
         all_stuff=findViewById(R.id.all_stuff);
-
-
-        check_myreview();
 
         //rating bar setup
         //rating_bar_bg.setVisibility(View.GONE);

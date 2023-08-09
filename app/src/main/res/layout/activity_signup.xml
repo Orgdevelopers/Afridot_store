@@ -44,7 +44,7 @@
                 android:layout_below="@+id/main_div"
                 android:layout_marginStart="@dimen/_20sdp"
                 android:layout_marginEnd="@dimen/_20sdp"
-                android:layout_marginTop="@dimen/_20sdp"
+                android:layout_marginTop="@dimen/_15sdp"
 
                 android:background="@drawable/less_round_edge_ractengle_white">
 
@@ -64,15 +64,16 @@
                     android:maxLength="20"
                     android:textSize="@dimen/_11sdp" />
             </RelativeLayout>
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/main_div"
                 android:layout_marginStart="@dimen/_20sdp"
                 android:layout_marginEnd="@dimen/_20sdp"
-                android:layout_marginTop="@dimen/_20sdp"
-
-                android:background="@drawable/less_round_edge_ractengle_white">
+                android:layout_marginTop="@dimen/_15sdp"
+                android:background="@drawable/less_round_edge_ractengle_white"
+                >
 
 
                 <EditText
@@ -89,6 +90,7 @@
                     android:textColorHint="@color/ultra_light_grey"
                     android:maxLength="15"
                     android:textSize="@dimen/_11sdp" />
+
             </RelativeLayout>
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -96,7 +98,7 @@
                 android:layout_below="@+id/main_div"
                 android:layout_marginStart="@dimen/_20sdp"
                 android:layout_marginEnd="@dimen/_20sdp"
-                android:layout_marginTop="@dimen/_20sdp"
+                android:layout_marginTop="@dimen/_15sdp"
 
                 android:background="@drawable/less_round_edge_ractengle_white">
 
@@ -113,7 +115,6 @@
                     android:inputType="text"
                     android:textColor="@color/black"
                     android:textColorHint="@color/ultra_light_grey"
-                    android:maxLength="15"
                     android:textSize="@dimen/_11sdp" />
             </RelativeLayout>
 
@@ -123,7 +124,7 @@
                 android:layout_below="@+id/main_div"
                 android:layout_marginStart="@dimen/_20sdp"
                 android:layout_marginEnd="@dimen/_20sdp"
-                android:layout_marginTop="@dimen/_20sdp"
+                android:layout_marginTop="@dimen/_15sdp"
 
                 android:background="@drawable/less_round_edge_ractengle_white">
 
@@ -140,7 +141,6 @@
                     android:inputType="text"
                     android:textColor="@color/black"
                     android:textColorHint="@color/ultra_light_grey"
-                    android:maxLength="15"
                     android:textSize="@dimen/_11sdp" />
             </RelativeLayout>
 
@@ -187,8 +187,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_38sdp"
                 android:layout_margin="@dimen/_22sdp"
-                android:clickable="false"
-                android:enabled="false"
+                android:clickable="true"
+                android:enabled="true"
                 android:gravity="center"
                 android:text="Continue"
                 android:textColor="@color/white"

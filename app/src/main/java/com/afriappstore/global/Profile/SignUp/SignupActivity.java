@@ -69,16 +69,15 @@ public class SignupActivity extends AppCompatActivity {
     Integer ASK_PERMISSION=200;
     String profile_pic="default";
 
-    String TYPE="NULL";
-    String PHONE="NULL";
-    String EMAIL="NULL";
-    String Auth_ID="NULL";
+    UserModel user;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
+
+        user = Paper.book().read("user");
 
 //        try {
 //            Intent intent = getIntent();
@@ -128,32 +127,32 @@ public class SignupActivity extends AppCompatActivity {
             }
         });
 
-        firstname.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence text, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                if (editable.length()>1){
-                    if (!complete_signup_btn.isEnabled()){
-                        complete_signup_btn.setEnabled(true);
-                        complete_signup_btn.setClickable(true);
-                    }
-                }else{
-                    if (complete_signup_btn.isEnabled()){
-                        complete_signup_btn.setEnabled(false);
-                        complete_signup_btn.setClickable(false);
-                    }
-                }
-            }
-        });
+//        firstname.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+//
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence text, int i, int i1, int i2) {
+//
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable editable) {
+//                if (editable.length()>1){
+//                    if (!complete_signup_btn.isEnabled()){
+//                        complete_signup_btn.setEnabled(true);
+//                        complete_signup_btn.setClickable(true);
+//                    }
+//                }else{
+//                    if (complete_signup_btn.isEnabled()){
+//                        complete_signup_btn.setEnabled(false);
+//                        complete_signup_btn.setClickable(false);
+//                    }
+//                }
+//            }
+//        });
 
         complete_signup_btn.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
@@ -292,95 +291,92 @@ public class SignupActivity extends AppCompatActivity {
         String l_name=lastname.getText().toString();
         String email = email_edit.getText().toString();
         String pass = password_edit.getText().toString();
-        String image=profile_pic;
 
-        if (profile_pic.equals("default")){
-            image=profile_pic;
-        }else{
+        if (!profile_pic.equals("default")){
             try {
                 ByteArrayOutputStream baos =new ByteArrayOutputStream();
                 Bitmap bitmap = BitmapFactory.decodeFile(profile_pic);
-                bitmap.compress(Bitmap.CompressFormat.JPEG,50,baos);
+                bitmap.compress(Bitmap.CompressFormat.PNG,50,baos);
                 byte[] image_bytes=baos.toByteArray();
-                image= Base64.getEncoder().encodeToString(image_bytes);
+                profile_pic = Base64.getEncoder().encodeToString(image_bytes);
 
             }catch (Exception e){
                 e.printStackTrace();
-                image=profile_pic;
             }
 
 
         }
 
-        callApiSignup(f_name,l_name,email,pass);
+        Functions.showLoader(this);
+
+        StringRequest request = new StringRequest(Request.Method.POST, ApiConfig.Signup, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Functions.cancelLoader();
+                try {
+                    JSONObject resp = new JSONObject(response);
+                    if (resp.getString("code").equalsIgnoreCase("200")){
+
+                        JSONObject user = resp.getJSONObject("msg");
 
 
-    }
-
-
-        private void callApiSignup(String f_name,String l_name,String email,String pass) {
-            StringRequest request = new StringRequest(Request.Method.POST, ApiConfig.Signup, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-
-                    try {
-                        JSONObject resp = new JSONObject(response);
-                        if (resp.getString("code").equalsIgnoreCase("200")){
-
-                            JSONObject user = resp.getJSONObject("msg");
-
-
-                            UserModel model = DataParsing.parseUserModel(user);
-                            Paper.book().write("user",model);
-                            Paper.book().write("isLogin",true);
+                        UserModel model = DataParsing.parseUserModel(user);
+                        Paper.book().write("user",model);
+                        Paper.book().write("isLogin",true);
 
 
 
-                            try {
-                                finish();
-                                overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
+                        try {
+                            finish();
+                            overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
 
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-
-                        }else {
-                            Toast.makeText(SignupActivity.this, ""+resp.getString("msg"), Toast.LENGTH_SHORT).show();
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
 
-
-
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    }else {
+                        Toast.makeText(SignupActivity.this, ""+resp.getString("msg"), Toast.LENGTH_SHORT).show();
                     }
 
 
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(SignupActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
                 }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
 
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Functions.cancelLoader();
+                Toast.makeText(SignupActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+            }
+        }){
+            @Nullable
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params = new HashMap<>();
+                params.put("first_name", f_name);
+                params.put("last_name", l_name);
+                params.put("email", email);
+                params.put("password", pass);
+
+                if (!profile_pic.equalsIgnoreCase("default")){
+                    params.put("profile_pic",profile_pic);
                 }
-            }){
-                @Nullable
-                @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-                    Map<String,String> params = new HashMap<>();
-                    params.put("firstname", f_name);
-                    params.put("lastname", l_name);
-                    params.put("email", email);
-                    params.put("password", pass);
-                    return params;
-                }
-            };
+                return params;
+            }
+        };
 
-            RequestQueue queue = Volley.newRequestQueue(SignupActivity.this);
-            queue.add(request);
+        RequestQueue queue = Volley.newRequestQueue(SignupActivity.this);
+        queue.add(request);
 
 
 
-        }
+    }
 
 
 
