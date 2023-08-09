@@ -91,7 +91,6 @@ public class All_ReviewsActivity extends AppCompatActivity {
 
 
 
-
     }
 
     private void getData() {
