@@ -7,6 +7,7 @@ import static com.afriappstore.global.ApiClasses.ApiConfig.getALlSliders;
 import static com.afriappstore.global.ApiClasses.ApiConfig.getCategoryapps;
 import static com.afriappstore.global.ApiClasses.ApiConfig.showALlCategories;
 
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -527,9 +528,7 @@ public class ApiRequests {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String,String> params = new HashMap<String, String>();
-                params.put(ApiConfig.Request,ApiConfig.getCategoryapps);
-                params.put("cat_id",cat_id);
-                params.put("sp",startingpoint);
+                params.put("category_id",cat_id);
                 return params;
             }
         };

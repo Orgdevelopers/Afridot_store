@@ -23,6 +23,7 @@ public class ApiConfig {
     public static final String Signup = Api_url+"Signup";
     public static final String Login=Api_url+"index";
     public static final String showAllReviews = Api_url+"showAllReviews";
+    public static final String getCategoryapps=Api_url+"showCategoryApps";
 
 
     //
@@ -47,7 +48,7 @@ public class ApiConfig {
     public static final String check_myReview="check_myReview";
     public static final String check_review="check_review";
     public static final String getallcategories="getallcategories";
-    public static final String getCategoryapps="getCategoryapps";
+
     public static final String isverified="isverified";
     public static final String verifyEmail="verifyEmail";
     public static final String getallmyapps="getallmyapps";

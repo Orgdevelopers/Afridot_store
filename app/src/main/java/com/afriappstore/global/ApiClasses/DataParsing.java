@@ -2,6 +2,7 @@ package com.afriappstore.global.ApiClasses;
 
 import com.afriappstore.global.Model.AppImageModel;
 import com.afriappstore.global.Model.AppModel;
+import com.afriappstore.global.Model.CatAppModel;
 import com.afriappstore.global.Model.RatingsModel;
 import com.afriappstore.global.Model.ReviewModel;
 import com.afriappstore.global.Model.UserModel;
@@ -170,6 +171,31 @@ public class DataParsing {
         }
 
 
+        return item;
+    }
+    public static CatAppModel parseCatApp(JSONObject app){
+        CatAppModel item = new CatAppModel();
+
+        try {
+            item=new CatAppModel();
+            item.app_id=app.getString("id");
+            item.app_name=app.getString("app_name");
+            item.app_icon=app.getString("app_icon");
+            item.version=app.getString("version");
+            item.description=app.getString("description");
+            item.size=app.getString("size");
+            item.downloads=app.getString("downloads");
+            item.download_link=app.getString("download_link");
+            item.tags=app.getString("tags");
+            item.rating=app.getString("rating");
+            item.package_name=app.getString("package_name");
+            item.created = app.getString("created_at");
+            item.category = app.getString("category");
+            item.is_afri_app = app.getString("is_afri_app");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return item;
     }
 
