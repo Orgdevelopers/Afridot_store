@@ -7,12 +7,14 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.widget.ImageView;
 
 import com.afriappstore.global.ApiClasses.ApiConfig;
 import com.afriappstore.global.ApiClasses.ApiRequests;
 import com.afriappstore.global.Interfaces.FragmentCallBack;
 import com.afriappstore.global.SimpleClasses.Functions;
 import com.afriappstore.global.SimpleClasses.Variables;
+import com.squareup.picasso.Picasso;
 
 import io.paperdb.Paper;
 
@@ -26,8 +28,14 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         Paper.init(this);
-
         proceed();
+
+        ImageView imageView = findViewById(R.id.imageView);
+        try {
+            Picasso.get().load(R.drawable.afristore_splash).centerCrop().into(imageView);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         ApiRequests.updateShareUrl(this);
 

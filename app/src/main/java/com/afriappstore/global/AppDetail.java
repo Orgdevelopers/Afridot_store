@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.provider.Settings;
@@ -41,10 +42,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.afriappstore.global.Adepters.All_reviews_Adapter;
+import com.afriappstore.global.Adepters.AppSlideradapter;
 import com.afriappstore.global.ApiClasses.ApiConfig;
 import com.afriappstore.global.ApiClasses.ApiRequests;
 import com.afriappstore.global.ApiClasses.DataParsing;
 import com.afriappstore.global.ExtraActivities.ReviewActivity;
+import com.afriappstore.global.Interfaces.ApiCallback;
 import com.afriappstore.global.Interfaces.FragmentCallBack;
 import com.afriappstore.global.Model.AppModel;
 import com.afriappstore.global.Model.AppSettings;
@@ -300,6 +303,20 @@ public class AppDetail extends AppCompatActivity {
 
             }
 
+
+            //app images
+            if (item.app_images != null && item.app_images.size()>0){
+                appImageRcView.setVisibility(View.VISIBLE);
+
+                AppSlideradapter adapter = new AppSlideradapter(this,item.app_images);
+                LinearLayoutManager manager= new LinearLayoutManager(this);
+                manager.setOrientation(RecyclerView.HORIZONTAL);
+
+                appImageRcView.setLayoutManager(manager);
+                appImageRcView.setAdapter(adapter);
+
+            }
+
             check_myreview();
 
 
@@ -406,12 +423,17 @@ public class AppDetail extends AppCompatActivity {
                 }
             });
 
+            ratingBar.setVisibility(View.GONE);
 
             if (is_installed) {
                 install_btn.setText("OPEN");
                 rating_bar_bg.setVisibility(View.VISIBLE);
                 if (Functions.is_Login(context)){
                     my_review_layout.setVisibility(View.GONE);
+                }
+
+                if (item.user_review == null){
+                    ratingBar.setVisibility(View.VISIBLE);
                 }
 
             } else if (item.package_name.equals("coming soon")) {
@@ -520,7 +542,7 @@ public class AppDetail extends AppCompatActivity {
                         reviewsA.putExtra("rating",ratingBar.getRating());
                         reviewsA.putExtra("app_id", item.id);
                         reviewsA.putExtra("app_icon", item.app_icon);
-                        reviewsA.putExtra("app_name", item.app_icon);
+                        reviewsA.putExtra("app_name", item.app_name);
 
                         startActivity(reviewsA);
                         overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
@@ -615,7 +637,7 @@ public class AppDetail extends AppCompatActivity {
                         edit_review.putExtra("review",my_detailed_review.getText());
                         edit_review.putExtra("app_id", item.id);
                         edit_review.putExtra("app_icon",item.app_icon);
-                        edit_review.putExtra("app_name", item.app_icon);
+                        edit_review.putExtra("app_name", item.app_name);
 
                         //Toast.makeText(context, "bfbdjjrhudbfiu", Toast.LENGTH_SHORT).show();
                         startActivity(edit_review);
@@ -626,12 +648,12 @@ public class AppDetail extends AppCompatActivity {
 
             }else{
                 my_review_layout.setVisibility(View.GONE);
-                ratingBar.setVisibility(View.VISIBLE);
+                //ratingBar.setVisibility(View.VISIBLE);
             }
 
         }else{
             my_review_layout.setVisibility(View.GONE);
-            ratingBar.setVisibility(View.VISIBLE);
+            //ratingBar.setVisibility(View.VISIBLE);
         }
     }
 
@@ -747,8 +769,6 @@ public class AppDetail extends AppCompatActivity {
 
             }
 
-
-
             Functions.showDownloadConfirmer(context, item.app_name, item.size, false, new FragmentCallBack() {
                 @Override
                 public void onResponse(Bundle bundle) {
@@ -761,7 +781,21 @@ public class AppDetail extends AppCompatActivity {
                             download_link=ApiConfig.Base_url + item.download_link;
                         }
 
-                        Functions.DownloadWithLoading(context,download_link, Variables.AppDownloadpath, item.app_name, item, new FragmentCallBack() {
+
+                        String download_uri = "";
+                        //if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P){
+                        download_uri = Functions.getAppFolder(AppDetail.this);
+                       // }else{
+                        //    download_uri = Variables.AppDownloadpath;
+                        //}
+
+                        File file = new File(download_uri);
+
+                        if (!file.exists()){
+                            file.mkdirs();
+                        }
+
+                        Functions.DownloadWithLoading(context,download_link, download_uri, item.app_name, item, new FragmentCallBack() {
                             @Override
                             public void onResponse(Bundle bundle) {
                                 if (bundle.getString("action").equals("install")) {
@@ -779,6 +813,7 @@ public class AppDetail extends AppCompatActivity {
                                     downloaded_apps.add(model);
                                     Paper.book().write("downloads", downloaded_apps);
 
+                                    callApiDownload(model.app_id);
                                     installApp(path);
 
 
@@ -796,6 +831,29 @@ public class AppDetail extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void callApiDownload(String app_id) {
+        JSONObject params = new JSONObject();
+        try {
+            params.put("app_id",app_id);
+            params.put("user_id",user.id);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        ApiRequests.postRequest(this, ApiConfig.download, params, new ApiCallback() {
+            @Override
+            public void onResponse(String response) {
+
+            }
+
+            @Override
+            public void onError(String error) {
+
+            }
+        });
     }
 
     private void installApp(String apk_path){

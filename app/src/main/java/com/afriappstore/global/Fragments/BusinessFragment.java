@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -17,13 +18,12 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.afriappstore.global.Adepters.Business_adapter;
 import com.afriappstore.global.Adepters.MainAdapter;
 import com.afriappstore.global.ApiClasses.ApiConfig;
 import com.afriappstore.global.ApiClasses.ApiRequests;
 import com.afriappstore.global.ApiClasses.DataParsing;
 import com.afriappstore.global.AppDetail;
-import com.afriappstore.global.Interfaces.FragmentCallBack;
+import com.afriappstore.global.Interfaces.ApiCallback;
 import com.afriappstore.global.Model.AppModel;
 import com.afriappstore.global.Model.Search_result_AppModel;
 import com.afriappstore.global.R;
@@ -35,7 +35,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.measurement.api.AppMeasurementSdk;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -69,7 +68,8 @@ public class BusinessFragment extends Fragment {
         this.view = inflater.inflate(R.layout.fragment_buisness, container, false);
         init_views();
 
-        getAllapps();
+        shimmer_layout.setVisibility(View.VISIBLE);
+        getAllApps();
 
 
         return this.view;
@@ -81,6 +81,7 @@ public class BusinessFragment extends Fragment {
         this.no_apps_found_layout = (LinearLayout) this.view.findViewById(R.id.no_apps_found_layout);
         this.app_list = (GridView) this.view.findViewById(R.id.business_app_list);
         this.loading_bar_progress = (ProgressBar) this.view.findViewById(R.id.loading_progress_bar);
+
         this.app_list.setOnScrollListener(new AbsListView.OnScrollListener() {
             public void onScrollStateChanged(AbsListView listView, int scrollState) {
                 if (scrollState == 0 && listView.getLastVisiblePosition() >= listView.getCount() - 1) {
@@ -112,7 +113,7 @@ public class BusinessFragment extends Fragment {
     }
 
     private void loadMore() {
-        getAllapps();
+        getAllApps();
     }
 
     public void openAppDetails(String app_id){
@@ -215,17 +216,24 @@ public class BusinessFragment extends Fragment {
 //        });
 //    }
 
-    public void getAllapps() {
+    public void getAllApps() {
+        if(is_api_running) return;
         is_api_running = true;
-        shimmer_layout.setVisibility(View.VISIBLE);
-        StringRequest request = new StringRequest(Request.Method.GET, ApiConfig.getAllAfriApps, new Response.Listener<String>() {
+
+        JSONObject params = new JSONObject();
+        try {
+            params.put("page",page_count+"");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        ApiRequests.postRequest(context, ApiConfig.getAllAfriApps, params, new ApiCallback() {
             @Override
             public void onResponse(String response) {
                 shimmer_layout.setVisibility(View.GONE);
+                loading_bar_progress.setVisibility(View.GONE);
                 is_api_running = false;
 
-                Log.wtf("ollllllllllllllllllllllllllllllllllll", response + "end");
-                Toast.makeText(context, ""+response, Toast.LENGTH_SHORT).show();
                 if (!response.equals("")) {
                     try {
 
@@ -237,16 +245,66 @@ public class BusinessFragment extends Fragment {
                             }
                             for (int i  = 0; i <array.length() ; i++) {
                                 AppModel item = DataParsing.parseAppModel(array.getJSONObject(i));
-                                datalist.add(item);
+                                if (!datalist.contains(item)){
+                                    datalist.add(item);
+                                }
                             }
                             page_count++;
-                            updateData();
+
 
                         }else{
                             //no records found
 
                         }
+                        updateData();
 
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+
+            }
+        });
+
+
+        if (true) return;
+
+        StringRequest request = new StringRequest(Request.Method.POST, ApiConfig.getAllAfriApps, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                shimmer_layout.setVisibility(View.GONE);
+                loading_bar_progress.setVisibility(View.GONE);
+                is_api_running = false;
+
+                if (!response.equals("")) {
+                    try {
+
+                        JSONObject resp = new JSONObject(response);
+                        if (resp.getString("code").equalsIgnoreCase("200")){
+                            JSONArray array = resp.getJSONArray("msg");
+                            if (datalist==null){
+                                datalist=new ArrayList<>();
+                            }
+                            for (int i  = 0; i <array.length() ; i++) {
+                                AppModel item = DataParsing.parseAppModel(array.getJSONObject(i));
+                                if (!datalist.contains(item)){
+                                    datalist.add(item);
+                                }
+                            }
+                            if (array.length()>0){
+                                page_count++;
+                            }
+
+
+                        }else{
+                            //no records found
+
+                        }
+                        updateData();
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -259,10 +317,18 @@ public class BusinessFragment extends Fragment {
                 Functions.ShowToast(context, error.toString());
                 is_api_running = false;
                 shimmer_layout.setVisibility(View.GONE);
-                Log.wtf("ollllllllllllllllllllllll okkkkkkk",error);
-
+                loading_bar_progress.setVisibility(View.GONE);
             }
         }){
+            @Nullable
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("page",page_count+"");
+                Log.wtf( "getParams: ",params.toString());
+                return params;
+            }
+
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headers = new HashMap<>();

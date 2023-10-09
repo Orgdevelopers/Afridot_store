@@ -26,7 +26,7 @@ public class DataParsing {
 
             //
             if (!item.app_icon.contains("http")){
-                item.app_icon = ApiConfig.Base_url+item.app_icon;
+                item.app_icon = ApiConfig.S3Url+item.app_icon;
             }
             //
 
@@ -35,6 +35,11 @@ public class DataParsing {
             item.size = object.getString("size");
             item.downloads = object.getString("downloads");
             item.download_link = object.getString("download_link");
+
+            if (!item.download_link.contains("http")){
+                item.download_link = ApiConfig.S3Url+item.download_link;
+            }
+
             item.tags = object.getString("tags");
             item.rating = object.getString("rating");
             item.package_name = object.getString("package_name");
@@ -43,7 +48,11 @@ public class DataParsing {
             item.created_at = object.getString("created_at");
             item.category = object.getString("category");
 
-            item.long_description = object.optString("long_description");
+            if (object.has("long_description")){
+                item.long_description = object.getJSONObject("long_description").getString("description");
+            }else{
+                item.long_description = "";
+            }
 
             JSONArray app_images_array = object.optJSONArray("app_images");
             ArrayList<AppImageModel> app_images = new ArrayList<>();
@@ -141,6 +150,10 @@ public class DataParsing {
             item.app_id = app_image.getString("app_id");
             item.url = app_image.getString("url");
 
+            if (!item.url.contains("http")){
+                item.url = ApiConfig.S3Url+item.url;
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             item = null;
@@ -153,17 +166,22 @@ public class DataParsing {
         UserModel item = new UserModel();
 
         try {
-            item.id = object.getString("id");
-            item.first_name = object.getString("first_name");
-            item.last_name = object.getString("last_name");
-            item.email = object.getString("email");
-            item.phone = object.getString("phone");
-            item.password = object.getString("password");
-            item.verified = object.getString("verified");
-            item.profile_pic = object.getString("profile_pic");
-            item.type = object.getString("type");
-            item.auth_id = object.getString("auth_id");
-            item.created_at = object.getString("created_at");
+            item.id = object.optString("id");
+            item.first_name = object.optString("first_name");
+            item.last_name = object.optString("last_name");
+            item.email = object.optString("email");
+            item.phone = object.optString("phone");
+            item.password = object.optString("password");
+            item.verified = object.optString("verified");
+            item.profile_pic = object.optString("profile_pic");
+
+            if (!item.profile_pic.contains("http")){
+                item.profile_pic = ApiConfig.S3Url+item.profile_pic;
+            }
+
+            item.type = object.optString("type");
+            item.auth_id = object.optString("auth_id");
+            item.created_at = object.optString("created_at");
 
         } catch (Exception e) {
             item = null;

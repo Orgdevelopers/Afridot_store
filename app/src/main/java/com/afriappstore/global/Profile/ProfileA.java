@@ -37,6 +37,7 @@ import com.afriappstore.global.ExtraActivities.CategoryApps;
 import com.afriappstore.global.ExtraActivities.PublishApps;
 import com.afriappstore.global.ExtraActivities.VerifyEmail;
 import com.afriappstore.global.MainActivity;
+import com.afriappstore.global.Model.UserModel;
 import com.afriappstore.global.SimpleClasses.Variables;
 import com.afriappstore.global.SplashActivity;
 import com.airbnb.lottie.LottieAnimationView;
@@ -52,6 +53,7 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import io.paperdb.Paper;
 
 public class ProfileA extends AppCompatActivity {
 
@@ -75,12 +77,21 @@ public class ProfileA extends AppCompatActivity {
     boolean pfp_clickable=false;
     int Switch=0,pic_switch=0;
 
+    UserModel user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         getSupportActionBar().hide();
+
+        user = Paper.book().read("user",null);
+        if (user == null){
+            finish_animated();
+            Toast.makeText(this, "something went wrong", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
 
         email_phone_txt = findViewById(R.id.email_phone_txt);
         verified_tic=findViewById(R.id.verified_tic);
@@ -112,60 +123,16 @@ public class ProfileA extends AppCompatActivity {
         });
 
         try {
-            f_nam=Functions.getSharedPreference(this).getString(ShearedPrefs.U_FNAME,"");
-            l_nam=Functions.getSharedPreference(this).getString(ShearedPrefs.U_LNAME,"");
+            email_phone_txt.setText(user.email);
 
-            if (Functions.getSharedPreference(this).getString(ShearedPrefs.SIGN_IN_TYPE,"not").equals(ShearedPrefs.SIGN_IN_TYPE_EMAIL)){
-                email_phone_txt.setText(Functions.getSharedPreference(this).getString(ShearedPrefs.U_EMAIL,"not"));
+            firstname.setText(user.first_name);
+            lastname.setText(user.last_name);
 
-            }else if (Functions.getSharedPreference(this).getString(ShearedPrefs.SIGN_IN_TYPE,"not").equals(ShearedPrefs.SIGN_IN_TYPE_PHONE)){
-                email_phone_txt.setText(Functions.getSharedPreference(this).getString(ShearedPrefs.U_PHONE,"not"));
+            Picasso picasso = Picasso.get();
+            picasso.setLoggingEnabled(false);
 
-            }
-
-            firstname.setText(f_nam);
-            lastname.setText(l_nam);
-            String img1 = Functions.getSharedPreference(this).getString(ShearedPrefs.U_PIC,"");
-
-            Log.wtf("image",img1);
-
-            String img=img1;
-            if (!img1.contains("http")){
-                img=ApiConfig.Base_url+img1;
-            }
-            if (!img1.equals("default")){
-                Picasso picasso = Picasso.get();
-                picasso.setLoggingEnabled(false);
-
-                String finalImg = img;
-                picasso.load(Uri.parse(img)).fetch(new Callback() {
-                    @Override
-                    public void onSuccess() {
-                        picasso.load(Uri.parse(finalImg)).into(pfp);
-                        profile_image_loading.setVisibility(View.GONE);
-                        profile_image_loading.cancelAnimation();
-                        picasso.invalidate(Uri.parse(finalImg));
-                        Log.wtf("image",img1);
-
-                        picasso.setLoggingEnabled(true);
-
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        pfp.setImageDrawable(getDrawable(R.drawable.ic_user_icon));
-                        profile_image_loading.setVisibility(View.GONE);
-                        profile_image_loading.cancelAnimation();
-                        Log.wtf("fail   ",img1+" failed");
-
-                        picasso.setLoggingEnabled(true);
-
-                    }
-                });
-            }else{
-                profile_image_loading.setVisibility(View.GONE);
-                profile_image_loading.cancelAnimation();
-            }
+            profile_image_loading.setVisibility(View.GONE);
+            picasso.load(Uri.parse(user.profile_pic)).into(pfp);
 
             pfp.setOnClickListener(new View.OnClickListener() {
                 @Override

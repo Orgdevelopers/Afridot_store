@@ -19,6 +19,7 @@ import com.afriappstore.global.ApiClasses.ApiConfig;
 import com.afriappstore.global.ApiClasses.ApiRequests;
 import com.afriappstore.global.ApiClasses.DataParsing;
 import com.afriappstore.global.Interfaces.FragmentCallBack;
+import com.afriappstore.global.Model.AppModel;
 import com.afriappstore.global.Model.CatAppModel;
 import com.afriappstore.global.Model.Search_result_AppModel;
 import com.afriappstore.global.R;
@@ -34,7 +35,7 @@ import java.util.ArrayList;
 public class CategoryApps extends AppCompatActivity {
 
     RecyclerView applist;
-    ArrayList<CatAppModel> dataList;
+    ArrayList<AppModel> dataList;
     String cat_id="1";
     RelativeLayout nothing_found_layout;
     LottieAnimationView animationView;
@@ -92,7 +93,7 @@ public class CategoryApps extends AppCompatActivity {
                         dataList=new ArrayList<>();
                         for (int i = 0; i<list.length(); i++){
                             JSONObject app = list.getJSONObject(i);
-                            CatAppModel item = DataParsing.parseCatApp(app);
+                            AppModel item = DataParsing.parseAppModel(app);
                             dataList.add(item);
                         }
 

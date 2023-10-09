@@ -44,17 +44,27 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.afriappstore.global.Adepters.MyappsAdapter;
 import com.afriappstore.global.ApiClasses.ApiConfig;
 import com.afriappstore.global.ApiClasses.ApiRequests;
+import com.afriappstore.global.ApiClasses.DataParsing;
 import com.afriappstore.global.BuildConfig;
 import com.afriappstore.global.FileUploadServices.UploadFileAsync;
 import com.afriappstore.global.Interfaces.FragmentCallBack;
 import com.afriappstore.global.MainActivity;
+import com.afriappstore.global.Model.AppModel;
 import com.afriappstore.global.Model.CategoriesModel;
 import com.afriappstore.global.Model.MyappModel;
 import com.afriappstore.global.Model.PublishAppModel;
+import com.afriappstore.global.Model.UserModel;
 import com.afriappstore.global.R;
 import com.afriappstore.global.SimpleClasses.Functions;
 import com.afriappstore.global.SimpleClasses.Variables;
 import com.airbnb.lottie.LottieAnimationView;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -62,6 +72,10 @@ import org.json.JSONObject;
 
 import java.security.Permission;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import io.paperdb.Paper;
 
 public class PublishApps extends AppCompatActivity {
 
@@ -72,7 +86,7 @@ public class PublishApps extends AppCompatActivity {
     RelativeLayout no_apps_found_layout;
     LinearLayout create_app_btn;
     int switchlauout=0;
-    ArrayList<MyappModel> datalist;
+    ArrayList<AppModel> dataList = new ArrayList<>();
     
     int PICK_PROFILE_PIC=101;
     int ASK_PERMISSION=9909,ASK_MANAGE_STORAGE_PERMISSION=6463;
@@ -85,6 +99,9 @@ public class PublishApps extends AppCompatActivity {
 
     CategoriesModel categoriesModel;
 
+    //
+    UserModel user;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,6 +112,13 @@ public class PublishApps extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        user = Paper.book().read("user");
+        if (user== null || !Functions.is_Login(this)){
+            Toast.makeText(this, "you need to log in via email in order to use this feature", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
         initviews();
         loadmyapps();
         setuppublishappform();
@@ -103,36 +127,37 @@ public class PublishApps extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View view) {
-                if (!checkPermission()){
-                    Functions.Showdouble_btn_alert(PublishApps.this, "Permission alert",
-                            "these permissions required for App's functionality",
-                            "Cancel", "Continue", true, new FragmentCallBack() {
-                                @Override
-                                public void onResponse(Bundle bundle) {
-                                    if (bundle.getString("action").equals("ok")){
-                                        //startActivity(new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION,Uri.parse("package:"+ BuildConfig.APPLICATION_ID)));
-                                        try {
-                                            Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-                                            intent.addCategory("android.intent.category.DEFAULT");
-                                            intent.setData(Uri.parse(String.format("package:%s",getApplicationContext().getPackageName())));
-                                            startActivityForResult(intent, 2296);
-                                        } catch (Exception e) {
-                                            Intent intent = new Intent();
-                                            intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                                            startActivityForResult(intent, 2296);
-                                        }
-
-
-                                    }else{
-                                        Toast.makeText(PublishApps.this, "Permission required for publishing apps", Toast.LENGTH_SHORT).show();
-                                    }
-
-                                }
-                            });
-
-                }else{
-                    showCreateapplayout();
-                }
+                showCreateapplayout();
+//                if (!checkPermission()){
+//                    Functions.Showdouble_btn_alert(PublishApps.this, "Permission alert",
+//                            "these permissions required for App's functionality",
+//                            "Cancel", "Continue", true, new FragmentCallBack() {
+//                                @Override
+//                                public void onResponse(Bundle bundle) {
+//                                    if (bundle.getString("action").equals("ok")){
+//                                        //startActivity(new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION,Uri.parse("package:"+ BuildConfig.APPLICATION_ID)));
+//                                        try {
+//                                            Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+//                                            intent.addCategory("android.intent.category.DEFAULT");
+//                                            intent.setData(Uri.parse(String.format("package:%s",getApplicationContext().getPackageName())));
+//                                            startActivityForResult(intent, 2296);
+//                                        } catch (Exception e) {
+//                                            Intent intent = new Intent();
+//                                            intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+//                                            startActivityForResult(intent, 2296);
+//                                        }
+//
+//
+//                                    }else{
+//                                        Toast.makeText(PublishApps.this, "Permission required for publishing apps", Toast.LENGTH_SHORT).show();
+//                                    }
+//
+//                                }
+//                            });
+//
+//                }else{
+//
+//                }
 
 
 
@@ -175,56 +200,107 @@ public class PublishApps extends AppCompatActivity {
     }
 
     private void loadmyapps() {
+        Functions.showLoader(this);
 
-        ApiRequests.getallmyapps(this, new FragmentCallBack() {
+        StringRequest request = new StringRequest(Request.Method.POST, ApiConfig.showUserApps, new Response.Listener<String>() {
             @Override
-            public void onResponse(Bundle bundle) {
-                String code = bundle.getString(ApiConfig.Request_code);
-                if (code.equals(ApiConfig.RequestSuccess)){
-                    try {
-                        datalist=new ArrayList<>();
-                        JSONArray array = new JSONArray(bundle.getString(ApiConfig.Request_response));
-                        for (int i=0;i<array.length();i++){
-                            MyappModel item = new MyappModel();
-                            JSONObject app = array.getJSONObject(i);
-                            item.app_id=app.getString("id");
-                            item.app_name=app.getString("name");
-                            item.app_icon=app.getString("icon");
-                            item.version=app.getString("version");
-                            item.description=app.getString("desc");
-                            item.size=app.getString("size");
-                            item.downloads=app.getString("downloads");
-                            item.download_link=app.getString("download_link");
-                            item.tags=app.getString("tags");
-                            item.rating=app.getString("rating");
-                            item.package_name=app.getString("package");
-                            item.owner=app.getString("owner_id");
-                            item.status=app.getString("status");
+            public void onResponse(String response) {
+                Functions.cancelLoader();
+                try {
+                    JSONObject resp = new JSONObject(response);
 
-                            datalist.add(item);
+                    if (resp.getString("code").equalsIgnoreCase("200")){
+                        JSONArray array = resp.getJSONArray("msg");
+                        for (int i = 0; i < array.length(); i++) {
+                            AppModel model = DataParsing.parseAppModel(array.getJSONObject(i));
+                            if (model!=null)
+                                dataList.add(model);
+
                         }
-
-                        MyappsAdapter adapter = new MyappsAdapter(PublishApps.this,datalist);
-                        LinearLayoutManager manager = new LinearLayoutManager(PublishApps.this);
-
-                        my_apps_list.setAdapter(adapter);
-                        my_apps_list.setLayoutManager(manager);
-
-                    }catch (Exception e){
-                        e.printStackTrace();
-                        noappsfound();
                     }
 
-                }else{
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+                if (dataList.isEmpty()){
                     noappsfound();
                 }
 
             }
-        });
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Functions.cancelLoader();
+                noappsfound();
+
+            }
+        }){
+            @Nullable
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("user_id",user.id);
+
+                return params;
+            }
+        };
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+        queue.add(request);
+
+//        ApiRequests.getallmyapps(this, new FragmentCallBack() {
+//            @Override
+//            public void onResponse(Bundle bundle) {
+//                String code = bundle.getString(ApiConfig.Request_code);
+//                if (code.equals(ApiConfig.RequestSuccess)){
+//                    try {
+//                        datalist=new ArrayList<>();
+//                        JSONArray array = new JSONArray(bundle.getString(ApiConfig.Request_response));
+//                        for (int i=0;i<array.length();i++){
+//                            MyappModel item = new MyappModel();
+//                            JSONObject app = array.getJSONObject(i);
+//                            item.app_id=app.getString("id");
+//                            item.app_name=app.getString("name");
+//                            item.app_icon=app.getString("icon");
+//                            item.version=app.getString("version");
+//                            item.description=app.getString("desc");
+//                            item.size=app.getString("size");
+//                            item.downloads=app.getString("downloads");
+//                            item.download_link=app.getString("download_link");
+//                            item.tags=app.getString("tags");
+//                            item.rating=app.getString("rating");
+//                            item.package_name=app.getString("package");
+//                            item.owner=app.getString("owner_id");
+//                            item.status=app.getString("status");
+//
+//                            datalist.add(item);
+//                        }
+//
+//                        MyappsAdapter adapter = new MyappsAdapter(PublishApps.this,datalist);
+//                        LinearLayoutManager manager = new LinearLayoutManager(PublishApps.this);
+//
+//                        my_apps_list.setAdapter(adapter);
+//                        my_apps_list.setLayoutManager(manager);
+//
+//                    }catch (Exception e){
+//                        e.printStackTrace();
+//                        noappsfound();
+//                    }
+//
+//                }else{
+//                    noappsfound();
+//                }
+//
+//            }
+//        });
 
     }
 
     private void noappsfound() {
+        if (!dataList.isEmpty()){
+            return;
+        }
         my_apps_list.setVisibility(View.GONE);
         no_apps_found_layout.setVisibility(View.VISIBLE);
         no_apps_found_animation.setFrame(1);
@@ -378,9 +454,10 @@ public class PublishApps extends AppCompatActivity {
                         if (categoriesModel!=null && app_icon_path!=null){
                             setupdata();
 
-                            Intent intent = new Intent(PublishApps.this,PublishAppsSecond.class);
-                            startActivity(intent);
-                            overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
+//                            Intent intent = new Intent(PublishApps.this,PublishAppsSecond.class);
+//                            startActivity(intent);
+//                            overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
+                            Toast.makeText(PublishApps.this, "The feature is under development", Toast.LENGTH_SHORT).show();
 
                             Handler handler = new Handler();
                             handler.postDelayed(new Runnable() {

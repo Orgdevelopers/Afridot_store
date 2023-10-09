@@ -40,6 +40,7 @@ import com.afriappstore.global.Fragments.Categories_fragment;
 import com.afriappstore.global.Fragments.Main_Fragment;
 import com.afriappstore.global.Model.AppModel;
 import com.afriappstore.global.Model.SliderModel;
+import com.afriappstore.global.Model.UserModel;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -81,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     Picasso picasso;
+    UserModel user;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -90,8 +92,9 @@ public class MainActivity extends AppCompatActivity {
         Functions.make_app_dirs();
         picasso = Picasso.get();
 
-
-
+        if (Functions.is_Login(this)){
+            user = Paper.book().read("user");
+        }
 
         /*gridView = findViewById(R.id.grid_view);
        MainAdapter adapter = new MainAdapter(MainActivity.this);
@@ -141,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Intent about_us=new Intent(MainActivity.this, AboutUs_A.class);
+                Intent about_us = new Intent(MainActivity.this, AboutUs_A.class);
                 startActivity(about_us);
                 overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
                 //Toast.makeText(MainActivity.this, "This Feature is still in development", Toast.LENGTH_SHORT).show();
@@ -169,12 +172,12 @@ public class MainActivity extends AppCompatActivity {
             Intent it = getIntent();
             if (it!=null && !it.getStringExtra(ApiConfig.POST_App_Id).equals(""))
             {
-                String data=it.getStringExtra(ApiConfig.POST_App_Id);
+                String data = it.getStringExtra(ApiConfig.POST_App_Id);
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run(){
-                        open_appDetails_byApp_id(Integer.parseInt(data));
+                        openAppDetails(data);
                     }
 
                 },200);
@@ -203,6 +206,10 @@ public class MainActivity extends AppCompatActivity {
                         SliderModel item = new SliderModel();
                         item.img=single.getString("image");
                         item.url=single.getString("url");
+
+                        if (!item.url.contains("http")){
+                            item.url = ApiConfig.S3Url+item.url;
+                        }
 
                         dataList.add(item);
 
@@ -281,7 +288,7 @@ public class MainActivity extends AppCompatActivity {
                 if (code.equals(ApiConfig.RequestSuccess)){
 
                     try {
-                        Float server_v=Float.valueOf(bundle.getString("version"));
+                        Float server_v = Float.valueOf(bundle.getString("version"));
                         Float my_ver = Float.valueOf(BuildConfig.VERSION_NAME);
 
                         String subheader = " Current version: "+my_ver+"\n Latest version: "+server_v;
@@ -317,20 +324,31 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void open_appDetails_byApp_id(int id) {
-        int pos = Functions.convert_appid_to_pos(id);
-        if (pos!=101){
-            open_appDetails_byPosition(pos);
+    public void openAppDetails(String app_id){
+        Intent intent = new Intent(this, AppDetail.class);
+        intent.putExtra("app_id",app_id);
+        startActivity(intent);
+        try {
+            overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    public void open_appDetails_byPosition(int position) {
-        Intent intent = new Intent(MainActivity.this,AppDetail.class);
-        intent.putExtra(ApiConfig.Request_code,"pos");
-        intent.putExtra("pos",position);
-        startActivity(intent);
-        overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
-    }
+//    public void open_appDetails_byApp_id(int id) {
+//        int pos = Functions.convert_appid_to_pos(id);
+//        if (pos!=101){
+//            open_appDetails_byPosition(pos);
+//        }
+//    }
+//
+//    public void open_appDetails_byPosition(int position) {
+//        Intent intent = new Intent(MainActivity.this,AppDetail.class);
+//        intent.putExtra(ApiConfig.Request_code,"pos");
+//        intent.putExtra("pos",position);
+//        startActivity(intent);
+//        overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
+//    }
 
     // override the onOptionsItemSelected()
     // function to implement
@@ -416,7 +434,7 @@ public class MainActivity extends AppCompatActivity {
                     }else{
                         logOut();
                     }
-                }else if (menuItem==settings){ //settings is share button
+                }else if (menuItem==settings){ //share button
                     close_drawer();
                     String link = Functions.getSharedPreference(MainActivity.this).getString(ShearedPrefs.AppShareUrl,"");
                     Intent i = new Intent(android.content.Intent.ACTION_SEND);
@@ -434,41 +452,29 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
                     });
+
                 }else if (menuItem==publish_your_app){
-                    if (Functions.is_Login(MainActivity.this)){
-                        if (Functions.getSharedPreference(MainActivity.this).getString(ShearedPrefs.SIGN_IN_TYPE,"not").equals(ShearedPrefs.SIGN_IN_TYPE_EMAIL)){
-                            close_drawer();
-                            Functions.showLoader(MainActivity.this);
-                            Functions.isVerified(MainActivity.this, new FragmentCallBack() {
+                    if (user != null){
+                        if (user.verified.equalsIgnoreCase("1")){
+//                            Intent intent = new Intent(MainActivity.this, PublishApps.class);
+//                            startActivity(intent);
+//                            overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
+                            Toast.makeText(MainActivity.this, "The feature is under development", Toast.LENGTH_SHORT).show();
+
+                        }else{
+                            Functions.Showdouble_btn_alert(MainActivity.this, "It seems your email is not verified", "you need to verify your email first", "cancel", "Verify", true, new FragmentCallBack() {
                                 @Override
                                 public void onResponse(Bundle bundle) {
-                                    Functions.cancelLoader();
-                                    if (Variables.is_verify){
-                                        Intent intent = new Intent(MainActivity.this, PublishApps.class);
+                                    if (bundle.getString("action").equals("ok")){
+                                        Intent intent = new Intent(MainActivity.this, VerifyEmail.class);
                                         startActivity(intent);
                                         overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
-
-                                    }else{
-                                        Functions.Showdouble_btn_alert(MainActivity.this, "It seems your email is not verified", "you need to verify your email first", "cancel", "Verify", true, new FragmentCallBack() {
-                                            @Override
-                                            public void onResponse(Bundle bundle) {
-                                                if (bundle.getString("action").equals("ok")){
-                                                    Intent intent = new Intent(MainActivity.this, VerifyEmail.class);
-                                                    startActivity(intent);
-                                                    overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
-
-                                                }
-
-                                            }
-                                        });
 
                                     }
 
                                 }
                             });
 
-                        }else {
-                            Toast.makeText(MainActivity.this, "you need to log in via email in order to use this feature", Toast.LENGTH_SHORT).show();
                         }
                     }else{
                         close_drawer();

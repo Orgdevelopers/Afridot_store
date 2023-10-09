@@ -11,31 +11,35 @@ import android.widget.Toast;
 import com.afriappstore.global.ApiClasses.ApiConfig;
 import com.afriappstore.global.ApiClasses.ApiRequests;
 import com.afriappstore.global.Interfaces.FragmentCallBack;
+import com.afriappstore.global.Model.UserModel;
 import com.afriappstore.global.R;
 import com.afriappstore.global.SimpleClasses.Functions;
 import com.afriappstore.global.SimpleClasses.ShearedPrefs;
+
+import io.paperdb.Paper;
 
 public class VerifyEmail extends AppCompatActivity {
 
     TextView email_txt,cancel_button,verify_button,header_txt;
     LinearLayout buttons_layout;
-    String email="";
-    String uid="";
+
+    UserModel user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_verify_email);
+
+        user = Paper.book().read("user");
+        if (user == null){
+            finish();
+            Toast.makeText(this, "something went wrong", Toast.LENGTH_SHORT).show();
+            return;
+        }
         try {
             getSupportActionBar().hide();
         } catch (Exception e) {
             e.printStackTrace();
-        }
-        email= Functions.getSharedPreference(this).getString(ShearedPrefs.U_EMAIL,"");
-        uid= Functions.getSharedPreference(this).getString(ShearedPrefs.U_ID,"");
-        if (!(!email.equals("") && !uid.equals(""))){
-            Toast.makeText(this, "email account error", Toast.LENGTH_SHORT).show();
-            finish();
         }
 
         email_txt=findViewById(R.id.email_txt);
@@ -45,7 +49,7 @@ public class VerifyEmail extends AppCompatActivity {
         buttons_layout=findViewById(R.id.button_layout);
 
 
-        email_txt.setText(email_txt.getText().toString().replace("adrrr",email));
+        email_txt.setText(email_txt.getText().toString().replace("adrrr",user.email));
 
         cancel_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,7 +64,7 @@ public class VerifyEmail extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Functions.showLoader(VerifyEmail.this);
-                ApiRequests.verifyEmail(VerifyEmail.this, uid, email, new FragmentCallBack() {
+                ApiRequests.verifyEmail(VerifyEmail.this, user.id, user.email, new FragmentCallBack() {
                     @Override
                     public void onResponse(Bundle bundle) {
                         Functions.cancelLoader();

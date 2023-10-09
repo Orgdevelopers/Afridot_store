@@ -6,99 +6,70 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Fragments.Main_Fragment">
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="none">
+        android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/shimmer_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
-            >
+            android:visibility="gone">
 
-            <com.facebook.shimmer.ShimmerFrameLayout
-                android:id="@+id/slider_shimmer"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/_130sdp"
-                android:visibility="gone">
+            <include layout="@layout/shimmer_layout" />
+        </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="@dimen/_5sdp"
-                    android:background="@drawable/round_corner_drawable"/>
-
-            </com.facebook.shimmer.ShimmerFrameLayout>
+        <LinearLayout
+            android:id="@+id/main_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:visibility="visible">
 
             <LinearLayout
-                android:orientation="vertical"
-                android:id="@+id/slider_layout"
-                android:visibility="gone"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/_130sdp">
+                android:id="@+id/idNestedSV"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
-                    <androidx.viewpager.widget.ViewPager
-                        android:visibility="visible"
+
+                    <GridView
+                        android:id="@+id/business_app_list"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:id="@+id/main_slider_pager"
-                        android:layout_marginTop="@dimen/_5sdp"
-                        android:layout_marginStart="@dimen/_15sdp"
-                        android:layout_marginEnd="@dimen/_15sdp"
-                        android:layout_marginBottom="@dimen/_5sdp"
-                        android:padding="@dimen/_5sdp"
-                        />
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="@dimen/_10sdp"
+                        android:numColumns="3" />
 
-                    <com.rd.PageIndicatorView
-                        android:id="@+id/main_slider_pager_indicator"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                    <ProgressBar
+                        android:id="@+id/loading_progress_bar"
+                        android:layout_width="@dimen/_24sdp"
+                        android:layout_height="@dimen/_24sdp"
                         android:layout_alignParentBottom="true"
                         android:layout_centerHorizontal="true"
-                        android:layout_marginBottom="@dimen/_5sdp"
-                        app:piv_animationType="worm"
-                        app:piv_dynamicCount="true"
-                        app:piv_interactiveAnimation="true"
-                        app:piv_radius="@dimen/_2sdp"
-                        app:piv_selectedColor="@color/teal_200"
-                        app:piv_unselectedColor="@color/ultra_light_grey"
-                        app:piv_viewPager="@id/main_slider_pager"/>
-
+                        android:visibility="gone" />
                 </RelativeLayout>
-
             </LinearLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:overScrollMode="never">
-
-                <GridView
-                    android:layout_marginTop="@dimen/_10sdp"
-                    android:id="@+id/grid_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:numColumns="3"
-                    />
-
-                <ProgressBar
-                    android:id="@+id/loading_progress_bar"
-                    android:layout_width="@dimen/_24sdp"
-                    android:layout_height="@dimen/_24sdp"
-                    android:layout_alignParentBottom="true"
-                    android:layout_centerHorizontal="true"
-                    android:visibility="gone" />
-
-            </RelativeLayout>
-
         </LinearLayout>
 
-    </ScrollView>
+        <LinearLayout
+            android:id="@+id/no_apps_found_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="no business apps found"/>
 
-
-
+        </LinearLayout>
+    </LinearLayout>
 </FrameLayout>

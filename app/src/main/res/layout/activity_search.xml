@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ExtraActivities.SearchActivity"
-    android:background="@color/light_white">
+    android:background="@color/white">
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:id="@+id/progress_circular"
+        android:visibility="gone"
+        />
 
     <LinearLayout
-        android:visibility="invisible"
+        android:visibility="visible"
         android:id="@+id/no_search_result_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -37,12 +45,13 @@
         android:id="@+id/Search_layout_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/_5sdp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/white"
+        android:paddingTop="@dimen/_5sdp">
 
         <ImageView
             android:id="@+id/search_back_button"
@@ -52,72 +61,64 @@
             android:src="@drawable/ic_baseline_arrow_back_24"
             app:tint="#000000" />
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_35sdp"
-            android:layout_marginStart="@dimen/_10sdp"
-            android:layout_marginTop="@dimen/_10sdp"
-            android:layout_marginEnd="@dimen/_20sdp"
-            android:layout_marginBottom="@dimen/_10sdp"
 
-            app:cardBackgroundColor="@color/Login_tab_txt_color"
-            app:cardCornerRadius="@dimen/_10sdp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <androidx.cardview.widget.CardView
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="@dimen/_1sdp"
-                app:cardBackgroundColor="@color/searchbar_bg"
-                app:cardCornerRadius="@dimen/_10sdp">
+                android:layout_height="match_parent">
 
-                <LinearLayout
+                <EditText
+                    android:id="@+id/search_input"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="@dimen/_10sdp"
+                    android:layout_marginEnd="@dimen/_10sdp"
+                    android:background="@null"
+                    android:hint="Search..."
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/gainsbro"
+                    android:imeOptions="actionSearch"
+                    android:layout_centerVertical="true"
+                    android:singleLine="true"
+                    />
 
-                    <ImageView
-                        android:id="@+id/search_button"
-                        android:layout_width="@dimen/_30sdp"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="@dimen/_10sdp"
-                        android:padding="@dimen/_2sdp"
-                        android:src="@drawable/ic_baseline_search" />
+                <ImageView
+                    android:id="@+id/search_button"
+                    android:layout_width="@dimen/_30sdp"
+                    android:layout_height="match_parent"
+                    android:padding="@dimen/_2sdp"
+                    android:src="@drawable/ic_baseline_search"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="@dimen/_20sdp"
+                    app:tint="@color/black" />
 
-                    <EditText
-                        android:id="@+id/search_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="@dimen/_10sdp"
-                        android:layout_marginEnd="@dimen/_10sdp"
-                        android:background="@null"
-                        android:hint="Search..."
-                        android:textColor="@color/light_white"
-                        android:textColorHint="#9F9F9F" />
 
-                </LinearLayout>
+            </RelativeLayout>
 
-            </androidx.cardview.widget.CardView>
 
-        </androidx.cardview.widget.CardView>
 
 
     </LinearLayout>
 
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_1sdp"
+        android:background="@color/gainsbro"
+        android:layout_below="@id/Search_layout_main"/>
+
+    <LinearLayout
         android:id="@+id/search_result_list_main_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/_60sdp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Search_layout_main" >
+        android:layout_below="@+id/Search_layout_main">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/search_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/_15sdp"/>
+            android:layout_marginStart="@dimen/_5sdp"
+            android:layout_marginEnd="@dimen/_5sdp"
+            />
 
     </LinearLayout>
 
@@ -125,4 +126,4 @@
 
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

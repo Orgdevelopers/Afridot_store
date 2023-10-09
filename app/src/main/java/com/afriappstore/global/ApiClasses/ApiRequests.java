@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
+import com.afriappstore.global.Interfaces.ApiCallback;
 import com.afriappstore.global.Interfaces.FragmentCallBack;
 import com.afriappstore.global.SimpleClasses.Functions;
 import com.afriappstore.global.SimpleClasses.ShearedPrefs;
@@ -27,16 +28,77 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class ApiRequests {
 
 
+    public static void postRequest(Context context, String url, JSONObject params, ApiCallback callBack){
+        request(context,url,Request.Method.POST,params,callBack);
+    }
+
+    public static void getRequest(Context context, String url, JSONObject params, ApiCallback callBack){
+        request(context,url,Request.Method.GET,params,callBack);
+    }
 
 
+    private static void request(Context context, String url,int method, JSONObject params, ApiCallback callBack){
+        StringRequest request = new StringRequest(method, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.wtf(url+"@"+params.toString(),response);
+                callBack.onResponse(response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.wtf(url+"@"+params.toString(),error);
+                callBack.onError(error.getMessage());
+
+            }
+        }){
+            @Nullable
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                return JsonTOMap(params);
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                return super.getHeaders();
+            }
+        };
+
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(request);
+
+        //log
+        Log.d(url,params.toString());
+
+    }
+
+    public static Map<String,String> JsonTOMap(JSONObject params){
+        Map<String,String> map = new HashMap<>();
+        JSONArray keys = params.names();
+        if (keys == null){
+            keys = new JSONArray();
+        }
+        for (int i = 0; i < keys.length(); i++) {
+            try {
+                map.put((String) keys.get(i), (String) params.get((String) keys.get(i)));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        return map;
+    }
 
 //    public static void getreviewscount(Context context,String appid,FragmentCallBack callBack){
 //        if (Variables.rating_count==null){
@@ -540,7 +602,7 @@ public class ApiRequests {
 
 
     public static void verifyEmail(Context context,String uid,String email,FragmentCallBack callBack){
-        StringRequest request = new StringRequest(Request.Method.POST, Api_url, new Response.Listener<String>() {
+        StringRequest request = new StringRequest(Request.Method.POST, ApiConfig.sendVerificationEmail, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.wtf("response",response);
@@ -575,9 +637,7 @@ public class ApiRequests {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String,String> params =new HashMap<String, String>();
-                params.put(ApiConfig.Request,ApiConfig.verifyEmail);
-                params.put(ApiConfig.POST_Email,email);
-                params.put(ApiConfig.AUTH_ID,uid);
+                params.put("user_id",uid);
                 return params;
             }
         };

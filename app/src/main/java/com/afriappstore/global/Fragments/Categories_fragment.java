@@ -68,6 +68,10 @@ public class Categories_fragment extends Fragment {
                             model.name=singlecat.getString("name");
                             model.pic=singlecat.getString("pic");
 
+                            if (!model.pic.contains("http")) {
+                                model.pic = ApiConfig.S3Url+model.pic;
+                            }
+
                             datalist.add(model);
 
                         }

@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.PagerAdapter;
@@ -32,9 +33,11 @@ import com.afriappstore.global.ApiClasses.ApiConfig;
 import com.afriappstore.global.ApiClasses.ApiRequests;
 import com.afriappstore.global.ApiClasses.DataParsing;
 import com.afriappstore.global.AppDetail;
+import com.afriappstore.global.Interfaces.ApiCallback;
 import com.afriappstore.global.Interfaces.FragmentCallBack;
 import com.afriappstore.global.MainActivity;
 import com.afriappstore.global.Model.AppModel;
+import com.afriappstore.global.Model.Search_result_AppModel;
 import com.afriappstore.global.Model.SliderModel;
 import com.afriappstore.global.R;
 import com.afriappstore.global.SimpleClasses.Functions;
@@ -60,23 +63,21 @@ import java.util.Map;
 
 public class Main_Fragment extends Fragment {
 
-    View view;
-    GridView gridView;
-    LinearLayout slider_layout;
-    ShimmerFrameLayout slider_shimmer;
-    ViewPager slider_pager;
-    Context context;
-    CountDownTimer slider_autochange_timer;
-    ArrayList<SliderModel> slider_list;
-    SliderAdapter slider_adapter;
     MainAdapter adapter;
-
-    ProgressBar loading_bar_progress;
-    int item = 0;
-
+    GridView app_list;
+    Context context;
     boolean is_api_running = false;
+    ArrayList<Search_result_AppModel> load_more_list;
+    ProgressBar loading_bar_progress;
+    LinearLayout main_layout;
+    ArrayList<Search_result_AppModel> main_list;
+    LinearLayout no_apps_found_layout;
+    LinearLayout shimmer_layout;
+
     int page_count = 0;
     ArrayList<AppModel> datalist = new ArrayList<>();
+    View view;
+
 
     public Main_Fragment(Context context) {
         // Required empty public constructor
@@ -88,50 +89,51 @@ public class Main_Fragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        view= inflater.inflate(R.layout.fragment_main_, container, false);
+        view = inflater.inflate(R.layout.fragment_main_, container, false);
+        init_views();
 
-        slider_layout=view.findViewById(R.id.slider_layout);
-        slider_shimmer=view.findViewById(R.id.slider_shimmer);
+        shimmer_layout.setVisibility(View.VISIBLE);
+        getAllApps();
 
-        slider_layout.setVisibility(View.GONE);
-        slider_shimmer.setVisibility(View.GONE);
 
-        slider_pager=view.findViewById(R.id.main_slider_pager);
-        gridView = view.findViewById(R.id.grid_view);
+        return this.view;
+    }
+
+    private void init_views() {
+        this.main_layout = (LinearLayout) this.view.findViewById(R.id.main_layout);
+        this.shimmer_layout = (LinearLayout) this.view.findViewById(R.id.shimmer_layout);
+        this.no_apps_found_layout = (LinearLayout) this.view.findViewById(R.id.no_apps_found_layout);
+        this.app_list = (GridView) this.view.findViewById(R.id.business_app_list);
         this.loading_bar_progress = (ProgressBar) this.view.findViewById(R.id.loading_progress_bar);
 
-
-        adapter = new MainAdapter(context,datalist);
-        gridView.setAdapter(adapter);
-        gridView.setOnItemClickListener( new AdapterView.OnItemClickListener()  {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//               open_appDetails_byPosition(position);
-                openAppDetails(datalist.get(position).id);
-            }
-        });
-
-        getAllapps();
-
-        this.gridView.setOnScrollListener(new AbsListView.OnScrollListener() {
+        this.app_list.setOnScrollListener(new AbsListView.OnScrollListener() {
             public void onScrollStateChanged(AbsListView listView, int scrollState) {
                 if (scrollState == 0 && listView.getLastVisiblePosition() >= listView.getCount() - 1) {
-                    if (!is_api_running) {
-                        loading_bar_progress.setVisibility(View.VISIBLE);
-                        loadMore();
+                    if (!Main_Fragment.this.is_api_running) {
+                        Main_Fragment.this.loading_bar_progress.setVisibility(View.VISIBLE);
+                        Main_Fragment.this.loadMore();
                         return;
                     }
-                    Toast.makeText(context, "loading already in progress please wait", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Main_Fragment.this.context, "loading already in progress please wait", Toast.LENGTH_SHORT).show();
                 }
             }
             public void onScroll(AbsListView absListView, int i, int i1, int i2) {
 
             }
         });
-       //setDynamicHeight(gridView);
-       //setUpSlider();
 
-        return view;
+        adapter = new MainAdapter(context, datalist);
+        app_list.setAdapter(adapter);
+        main_layout.setVisibility(View.VISIBLE);
+        shimmer_layout.setVisibility(View.GONE);
+        no_apps_found_layout.setVisibility(View.GONE);
+
+        app_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
+                openAppDetails(datalist.get(pos).id);
+            }
+        });
     }
 
     private void setDynamicHeight(GridView gridView) {
@@ -159,111 +161,8 @@ public class Main_Fragment extends Fragment {
         params.height = totalHeight;
         gridView.setLayoutParams(params);
     }
-
-    private void setUpSlider() {
-        ApiRequests.getSlider(context, new FragmentCallBack() {
-            @Override
-            public void onResponse(Bundle bundle) {
-                //
-
-                if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
-                    try {
-                        JSONArray array = new JSONArray(bundle.getString(ApiConfig.Request_response));
-                        slider_list=new ArrayList<>();
-                        for (int i=0;i<array.length();i++){
-                            JSONObject row = array.getJSONObject(i);
-                            SliderModel model =null;
-                            model=new SliderModel();
-
-                            model.img=row.getString("image");
-                            model.title=row.getString("title");
-                            model.url=row.getString("url");
-
-                            slider_list.add(model);
-
-                        }
-
-                        Toast.makeText(context, ""+slider_list.size(), Toast.LENGTH_SHORT).show();
-                        slider_adapter = new SliderAdapter(context,slider_list);
-                        slider_pager.setAdapter(slider_adapter);
-
-                        close_shimer();
-                        start_automatic_changing();
-
-                    }catch (Exception e){
-                        e.printStackTrace();
-                        close_slider();
-                    }
-
-                }else{
-                    close_slider();
-                }
-
-            }
-        });
-
-
-
-    }
-
-    private void start_automatic_changing() {
-
-        slider_pager.setCurrentItem(0,true);
-        slider_autochange_timer=new CountDownTimer(3000,1000) {
-            @Override
-            public void onTick(long l) {
-
-            }
-
-            @Override
-            public void onFinish() {
-                slider_autochange_timer.cancel();
-                slider_autochange_timer.start();
-
-                try {
-                    if (item<slider_adapter.getCount()-1){
-                        item++;
-                        slider_pager.setCurrentItem(item);
-
-                    }else{
-                        item=0;
-                        slider_pager.setCurrentItem(item);
-
-                    }
-
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-
-            }
-        };
-        slider_autochange_timer.start();
-    }
-
-    private void close_shimer() {
-        slider_shimmer.setVisibility(View.GONE);
-        slider_layout.setVisibility(View.GONE);
-    }
-
-    private void close_slider() {
-        slider_shimmer.setVisibility(View.GONE);
-        slider_layout.setVisibility(View.GONE);
-    }
-
-    public void open_appDetails_byPosition(int position) {
-        Intent intent = new Intent(context, AppDetail.class);
-        intent.putExtra(ApiConfig.Request_code,"pos");
-        intent.putExtra("pos",position);
-        startActivity(intent);
-        try {
-            getActivity().overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     private void loadMore() {
-        getAllapps();
+        getAllApps();
     }
 
     public void openAppDetails(String app_id){
@@ -277,15 +176,113 @@ public class Main_Fragment extends Fragment {
         }
     }
 
-    public void getAllapps() {
+    /* access modifiers changed from: private */
+//    public void load_more() {
+//        ApiRequests.getallbuisnessapps(this.context, this.starting_point, new FragmentCallBack() {
+//            public void onResponce(Bundle bundle) {
+//                Main_Fragment.this.is_api_running = false;
+//                Main_Fragment.this.loading_bar_progress.setVisibility(View.GONE);
+//                if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)) {
+//                    Main_Fragment.this.load_more_list = null;
+//                    Main_Fragment.this.load_more_list = new ArrayList<>();
+//                    try {
+//                        JSONArray all_apps_json = new JSONArray(bundle.getString(ApiConfig.Request_response));
+//                        for (int i = 0; i < all_apps_json.length(); i++) {
+//                            JSONObject app = all_apps_json.getJSONObject(i);
+//                            Search_result_AppModel item = new Search_result_AppModel();
+//                            item.app_id = app.getString("id");
+//                            item.app_name = app.getString(AppMeasurementSdk.ConditionalUserProperty.NAME);
+//                            item.app_icon = app.getString("icon");
+//                            item.version = app.getString("version");
+//                            item.description = app.getString("desc");
+//                            item.size = app.getString("size");
+//                            item.downloads = app.getString("downloads");
+//                            item.download_link = app.getString("download_link");
+//                            item.tags = app.getString("tags");
+//                            item.rating = app.getString("rating");
+//                            item.package_name = app.getString("package");
+//                            Main_Fragment.this.load_more_list.add(item);
+//                            Main_Fragment.this.starting_point++;
+//                        }
+//                        Main_Fragment.this.adapter.update_data(Main_Fragment.this.datalist);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                        Main_Fragment.this.loading_bar_progress.setVisibility(View.GONE);
+//                    }
+//                } else {
+//                    Toast.makeText(Main_Fragment.this.context, "no more apps", Toast.LENGTH_SHORT).show();
+//                    Main_Fragment.this.loading_bar_progress.setVisibility(View.GONE);
+//                }
+//            }
+//        });
+//    }
+
+
+
+
+
+//    private void call_api_data() {
+//        ApiRequests.getallbuisnessapps(this.context, this.starting_point, new FragmentCallBack() {
+//            public void onResponce(Bundle bundle) {
+//                if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)) {
+//                    Main_Fragment.this.main_list = new ArrayList<>();
+//                    try {
+//                        JSONArray all_apps_json = new JSONArray(bundle.getString(ApiConfig.Request_response));
+//                        for (int i = 0; i < all_apps_json.length(); i++) {
+//                            JSONObject app = all_apps_json.getJSONObject(i);
+//                            Search_result_AppModel item = new Search_result_AppModel();
+//                            item.app_id = app.getString("id");
+//                            item.app_name = app.getString(AppMeasurementSdk.ConditionalUserProperty.NAME);
+//                            item.app_icon = app.getString("icon");
+//                            item.version = app.getString("version");
+//                            item.description = app.getString("desc");
+//                            item.size = app.getString("size");
+//                            item.downloads = app.getString("downloads");
+//                            item.download_link = app.getString("download_link");
+//                            item.tags = app.getString("tags");
+//                            item.rating = app.getString("rating");
+//                            item.package_name = app.getString("package");
+//                            Main_Fragment.this.main_list.add(item);
+//                            Main_Fragment.this.starting_point++;
+//                        }
+//                        if (!Main_Fragment.this.main_list.isEmpty()) {
+//                            Main_Fragment.this.adapter = new Business_adapter(Main_Fragment.this.context, Main_Fragment.this.main_list);
+////                            Main_Fragment.this.app_list.setAdapter(Main_Fragment.this.adapter);
+////                            Main_Fragment.this.main_layout.setVisibility(View.VISIBLE);
+////                            Main_Fragment.this.shimmer_layout.setVisibility(View.GONE);
+////                            Main_Fragment.this.no_apps_found_layout.setVisibility(View.GONE);
+//                            return;
+//                        }
+//                        Main_Fragment.this.no_apps_found();
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                        Main_Fragment.this.no_apps_found();
+//                    }
+//                } else {
+//                    Main_Fragment.this.no_apps_found();
+//                }
+//            }
+//        });
+//    }
+
+    public void getAllApps() {
+        if(is_api_running) return;
         is_api_running = true;
-        loading_bar_progress.setVisibility(View.VISIBLE);
-        StringRequest request = new StringRequest(Request.Method.GET, ApiConfig.getAllApps, new Response.Listener<String>() {
+
+        JSONObject params = new JSONObject();
+        try {
+            params.put("page",page_count+"");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        ApiRequests.postRequest(context, ApiConfig.getAllApps, params, new ApiCallback() {
             @Override
             public void onResponse(String response) {
-                is_api_running = false;
+                shimmer_layout.setVisibility(View.GONE);
                 loading_bar_progress.setVisibility(View.GONE);
-                //Toast.makeText(context, ""+response, Toast.LENGTH_SHORT).show();
+                is_api_running = false;
+
                 if (!response.equals("")) {
                     try {
 
@@ -297,17 +294,64 @@ public class Main_Fragment extends Fragment {
                             }
                             for (int i  = 0; i <array.length() ; i++) {
                                 AppModel item = DataParsing.parseAppModel(array.getJSONObject(i));
-                                datalist.add(item);
+                                if (!datalist.contains(item)){
+                                    datalist.add(item);
+                                }
                             }
-
                             page_count++;
-                            updateData();
+
 
                         }else{
                             //no records found
 
                         }
+                        updateData();
 
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+
+            }
+        });
+
+
+        if (true) return;
+
+        StringRequest request = new StringRequest(Request.Method.POST, ApiConfig.getAllAfriApps, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                shimmer_layout.setVisibility(View.GONE);
+                loading_bar_progress.setVisibility(View.GONE);
+                is_api_running = false;
+
+                if (!response.equals("")) {
+                    try {
+
+                        JSONObject resp = new JSONObject(response);
+                        if (resp.getString("code").equalsIgnoreCase("200")){
+                            JSONArray array = resp.getJSONArray("msg");
+                            if (datalist==null){
+                                datalist=new ArrayList<>();
+                            }
+                            for (int i  = 0; i <array.length() ; i++) {
+                                AppModel item = DataParsing.parseAppModel(array.getJSONObject(i));
+                                if (!datalist.contains(item)){
+                                    datalist.add(item);
+                                }
+                            }
+                            page_count++;
+
+
+                        }else{
+                            //no records found
+
+                        }
+                        updateData();
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -317,14 +361,21 @@ public class Main_Fragment extends Fragment {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                is_api_running = false;
-                loading_bar_progress.setVisibility(View.GONE);
-
                 Functions.ShowToast(context, error.toString());
-                Log.wtf("ollllllllllllllllllllllll okkkkkkk",error);
-
+                is_api_running = false;
+                shimmer_layout.setVisibility(View.GONE);
+                loading_bar_progress.setVisibility(View.GONE);
             }
         }){
+            @Nullable
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("page",page_count+"");
+                Log.wtf( "getParams: ",params.toString());
+                return params;
+            }
+
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headers = new HashMap<>();
@@ -339,76 +390,19 @@ public class Main_Fragment extends Fragment {
     }
 
     private void updateData() {
-        adapter.notifyDataSetChanged();
-
-    }
-
-
-
-
-
-    //adapter class
-
-    class SliderAdapter extends PagerAdapter {
-
-        Context context;
-        ArrayList<SliderModel> list;
-        Picasso picasso;
-
-        public SliderAdapter(Context context,ArrayList<SliderModel> data){
-            this.context=context;
-            this.list=data;
-
-        }
-
-        @Override
-        public int getCount() {
-            return list.size();
-        }
-
-        @NonNull
-        @Override
-        public Object instantiateItem(@NonNull ViewGroup root, int position) {
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View view = inflater.inflate(R.layout.item_main_slider,root,false);
-
-            SliderModel item = list.get(position);
-
-            final ImageView image=view.findViewById(R.id.main_slider_img);
-            if (picasso==null){
-                picasso=Picasso.get();
-            }
-            picasso.load(item.img).into(image);
-
-            image.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    try {
-                        Intent it = new Intent();
-                        it.setAction(Intent.ACTION_VIEW);
-                        it.setData(Uri.parse(item.url));
-                        startActivity(it);
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-
-                }
-            });
-
-            root.addView(view);
-            return view;
-        }
-
-        @Override
-        public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
-            return view.equals(object);
-        }
-
-        @Override
-        public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
-            container.removeView((View)  object);
+        if (!Main_Fragment.this.datalist.isEmpty()) {
+            adapter.notifyDataSetChanged();
+        }else{
+            no_apps_found();
         }
 
     }
 
+
+    /* access modifiers changed from: private */
+    public void no_apps_found() {
+        this.no_apps_found_layout.setVisibility(View.VISIBLE);
+        this.main_layout.setVisibility(View.GONE);
+        this.shimmer_layout.setVisibility(View.GONE);
+    }
 }

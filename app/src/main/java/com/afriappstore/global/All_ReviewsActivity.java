@@ -1,27 +1,30 @@
 package com.afriappstore.global;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.widget.NestedScrollView;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.widget.NestedScrollView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.afriappstore.global.Adepters.All_reviews_Adapter;
 import com.afriappstore.global.ApiClasses.ApiConfig;
 import com.afriappstore.global.ApiClasses.ApiRequests;
 import com.afriappstore.global.ApiClasses.DataParsing;
+import com.afriappstore.global.Interfaces.ApiCallback;
 import com.afriappstore.global.Interfaces.FragmentCallBack;
 import com.afriappstore.global.Model.ReviewModel;
+import com.google.android.gms.common.api.Api;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -37,6 +40,9 @@ public class All_ReviewsActivity extends AppCompatActivity {
     Boolean first_time=true;
     LinearLayout shimmer_loading;
     All_reviews_Adapter all_reviews_adapter;
+
+    int page = 0;
+    boolean isApiRunning = false;
 
     @SuppressLint("ResourceType")
     @Override
@@ -90,41 +96,73 @@ public class All_ReviewsActivity extends AppCompatActivity {
         all_review_list.setAdapter(all_reviews_adapter);
 
 
-
+        main_layout.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                // on scroll change we are checking when users scroll as bottom.
+                if (scrollY == v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight()) {
+                    // in this method we are incrementing page number,
+                    // making progress bar visible and calling get data method.
+                    //                    count++;
+                    // on below line we are making our progress bar visible.
+                    loading.setVisibility(View.VISIBLE);
+                    getData();
+                }
+            }
+        });
     }
 
+
+
+
     private void getData() {
+        if (isApiRunning){
+            return;
+        }
 
-        ApiRequests.getAllReviews(All_ReviewsActivity.this, String.valueOf(app_id), new FragmentCallBack() {
+        isApiRunning = true;
+
+        JSONObject params = new JSONObject();
+        try {
+            //params.put("app_id",app_id);
+            params.put("page",page+"");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        ApiRequests.getRequest(this, ApiConfig.showAllReviews+"?app_id=9", params, new ApiCallback() {
             @Override
-            public void onResponse(Bundle bundle) {
-                if (bundle.getString(ApiConfig.Request_code).equals(ApiConfig.RequestSuccess)){
-                    try {
-                        String response=bundle.getString(ApiConfig.Request_response);
-                        JSONObject resp = new JSONObject(response);
-                         if (resp.getString("code").equalsIgnoreCase("200")){
-                             JSONArray array = resp.getJSONArray("msg");
-                             for (int i = 0; i < array.length(); i++) {
+            public void onResponse(String response) {
+                isApiRunning = false;
+                try {
+                    JSONObject resp = new JSONObject(response);
+                    if (resp.getString("code").equalsIgnoreCase("200")){
+                        JSONArray array = resp.getJSONArray("msg");
+                        for (int i = 0; i < array.length(); i++) {
 
-                                 ReviewModel model = DataParsing.parseReviewModel(array.getJSONObject(i));
-                                 data_list.add(model);
-                                 updatedata();
+                            ReviewModel model = DataParsing.parseReviewModel(array.getJSONObject(i));
+                            if (model!=null && model.user !=null){
+                                data_list.add(model);
+                            }
+                            page++;
+                            updatedata();
 
-                             }
+                        }
 
-                         }
+                    }else{
+                        Toast.makeText(All_ReviewsActivity.this, "Something went wrong please try again", Toast.LENGTH_SHORT).show();
 
-
-
-                    }catch (Exception e){
-                        e.printStackTrace();
                     }
 
-                }else{
-                    Toast.makeText(All_ReviewsActivity.this, "error at all reviews:148 please contact developer", Toast.LENGTH_SHORT).show();
-
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+            }
 
+            @Override
+            public void onError(String error) {
+                isApiRunning = false;
+                Toast.makeText(All_ReviewsActivity.this, "Something went wrong please try again", Toast.LENGTH_SHORT).show();
             }
         });
 

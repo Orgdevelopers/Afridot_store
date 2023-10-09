@@ -8,14 +8,16 @@ public class ApiConfig {
 
     public static final String Base_url="https://afriappstore.com/";
     public static final String Api_url=Base_url+"api/";
+    public static final String S3Url = "https://s3.ca-central-1.amazonaws.com/afriappstore/";
     public static final String Terms_url="";
     public static final String Privacy_url="";
     public static final String APPUPLOADURI=Base_url+"uploads/apks/file_recive.php";
     public static final String APPIMAGEUPLOADURI=Base_url+"uploads/file_recive.php";
     public static final String APPICONUPLOADURI=Base_url+"uploads/logos/file_recive.php";
 
-    //
+
     public static final String getAllApps = Api_url+"showAllApps";
+    public static final String search = Api_url+"search";
     public static final String getAllAfriApps = Api_url+"showAllAfriApps";
     public static final  String getALlSliders = Api_url+"showAllSliders";
     public static final String showALlCategories = Api_url+"showAllCategories";
@@ -23,13 +25,17 @@ public class ApiConfig {
     public static final String Signup = Api_url+"Signup";
     public static final String Login=Api_url+"login";
     public static final String showAllReviews = Api_url+"showAllReviews";
-    public static final String getCategoryapps=Api_url+"showCategoryApps";
+    public static final String getCategoryapps = Api_url+"showCategoryApps";
+    public static final String sendVerificationEmail = Api_url+"sendVerificationEmail";
+    public static final String showUserApps = Api_url+"showUserApps";
+    public static final String download = Api_url+"download";
+
+
 
     public static final String forgetPassword = Api_url+"forgetPassword";
     public static final String updatePassword = Api_url+"updatePassword";
 
 
-    //
     public static final String Request="request";
     public static final String RequestSuccess="ok";
     public static final String RequestError="err";

@@ -1,6 +1,7 @@
 package com.afriappstore.global.SimpleClasses;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,8 +11,10 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.telephony.mbms.DownloadRequest;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -225,7 +228,7 @@ public class Functions {
 
 
         PRDownloader.initialize(context.getApplicationContext());
-        String filename=app_name_s+get_random_int(999,99999)+".apk";
+        String filename = app_name_s+get_random_int(999,99999)+".apk";
         Integer downloadId=0;
         String last_download_path="";
 
@@ -293,7 +296,7 @@ public class Functions {
                     @Override
                     public void onError(Error error) {
                         download_dialog.dismiss();
-                        Log.wtf("error",error.toString());
+                        Log.wtf("error",error.getConnectionException());
                     }
                 });
 
@@ -689,9 +692,47 @@ public class Functions {
 
     }
 
+    public static void showSoftKeyboard(Context context,View view) {
+        if (view.requestFocus()) {
+            InputMethodManager imm = context.getSystemService(InputMethodManager.class);
+            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+
+        }
+    }
+
+    // close the keybord
+    public static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        //Find the currently focused view, so we can grab the correct window token from it.
+        View view = activity.getCurrentFocus();
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = new View(activity);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+
+    // open the keyboard
+    public static void showKeyboardForced(Activity activity) {
+        View view = activity.findViewById(android.R.id.content);
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+        }
+    }
+
     public static void log(String response) {
         Log.wtf("log",response);
     }
 
 
+    public static String getAppFolder(Context context) {
+        try{
+            return context.getExternalFilesDir(null).getPath()+"/";
+        }catch (Exception e){
+            e.printStackTrace();
+            return context.getFilesDir().getPath()+"/";
+        }
+    }
 }

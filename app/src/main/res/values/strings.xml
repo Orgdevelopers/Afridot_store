@@ -2,7 +2,7 @@
     <string name="app_name">AFRI APP STORE</string>
 
     <string name="appstore_url_domain">afriappstore.com</string>
-    <string name="appstore_url_domain_pathprefix">/web/test.php</string>
+    <string name="appstore_url_domain_pathprefix">/apps/</string>
 
     <!--to toggle the open close button
         of the navigation drawer-->
